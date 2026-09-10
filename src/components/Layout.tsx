@@ -1,0 +1,57 @@
+import { NavLink, Outlet } from 'react-router-dom'
+
+const NAV_ITEMS = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/issues', label: 'Issues' },
+  { to: null, label: 'Cycles' },
+  { to: '/teams', label: 'Teams' },
+  { to: null, label: 'Analytics' },
+]
+
+export function Layout() {
+  return (
+    <div className="flex min-h-screen bg-bg text-fg">
+      <aside className="w-56 shrink-0 border-r border-border p-4">
+        <div className="mb-6 text-lg font-semibold">DevTrack</div>
+        <nav className="flex flex-col gap-1">
+          {NAV_ITEMS.map((item) =>
+            item.to ? (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                className={({ isActive }) =>
+                  `rounded px-3 py-2 text-sm ${
+                    isActive ? 'bg-bg-elevated text-fg' : 'text-fg-muted hover:bg-bg-elevated'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ) : (
+              <span key={item.label} className="cursor-default rounded px-3 py-2 text-sm text-fg-muted/50">
+                {item.label}
+              </span>
+            ),
+          )}
+        </nav>
+      </aside>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-border px-6 py-3">
+          <input
+            type="search"
+            placeholder="Search..."
+            className="w-64 rounded border border-border bg-bg-elevated px-3 py-1.5 text-sm text-fg outline-none placeholder:text-fg-muted"
+          />
+          <div className="flex items-center gap-4 text-sm text-fg-muted">
+            <span>Notifications</span>
+            <span>Profile</span>
+          </div>
+        </header>
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  )
+}
