@@ -1,3 +1,9 @@
+export interface UserBrief {
+  id: number
+  username: string
+  avatar: string | null
+}
+
 export interface User {
   id: number
   username: string
