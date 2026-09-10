@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../features/auth/AuthContext'
+import { useWorkspace } from '../features/workspace/WorkspaceContext'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -12,11 +13,17 @@ const NAV_ITEMS = [
 
 export function Layout() {
   const { user, logout } = useAuth()
+  const { currentWorkspace } = useWorkspace()
 
   return (
     <div className="flex min-h-screen bg-bg text-fg">
       <aside className="w-56 shrink-0 border-r border-border p-4">
-        <div className="mb-6 text-lg font-semibold">DevTrack</div>
+        <div className="mb-6">
+          <div className="text-lg font-semibold">DevTrack</div>
+          {currentWorkspace && (
+            <div className="truncate text-xs text-fg-muted">{currentWorkspace.name}</div>
+          )}
+        </div>
         <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) =>
             item.to ? (
