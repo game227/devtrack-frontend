@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { changePassword as changePasswordRequest, updateMe } from '../api/auth'
+import { getUserAnalytics } from '../api/analytics'
 import { FormField, formInputClass } from '../components/FormField'
+import { StatCard } from '../components/StatCard'
+import { DailyActivityChart } from '../components/DailyActivityChart'
 import { useAuth } from '../features/auth/AuthContext'
+import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import type { User } from '../types/auth'
 
@@ -18,6 +23,43 @@ export function ProfilePage() {
       <h1 className="text-xl font-semibold text-fg">Profile</h1>
       <ProfileForm user={user} onSaved={refreshUser} />
       <PasswordForm />
+      <DeveloperAnalyticsCard userId={user.id} />
+    </div>
+  )
+}
+
+function DeveloperAnalyticsCard({ userId }: { userId: number }) {
+  const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
+  const workspaceId = currentWorkspace?.id
+
+  const analyticsQuery = useQuery({
+    queryKey: ['user-analytics', userId, workspaceId],
+    queryFn: () => getUserAnalytics(userId, workspaceId!),
+    enabled: workspaceId !== undefined,
+  })
+
+  if (isWorkspaceLoading || analyticsQuery.isLoading) {
+    return <p className="text-sm text-fg-muted">Loading activity…</p>
+  }
+  if (!currentWorkspace || analyticsQuery.isError || !analyticsQuery.data) {
+    return null
+  }
+
+  const analytics = analyticsQuery.data
+
+  return (
+    <div className="rounded border border-border bg-bg-elevated p-5">
+      <h2 className="mb-3 text-sm font-semibold text-fg">
+        My activity <span className="text-fg-muted">· {currentWorkspace.name}</span>
+      </h2>
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label="Projects" value={analytics.projects_count} />
+        <StatCard label="Tasks completed" value={analytics.tasks_completed} />
+        <StatCard label="Issues resolved" value={analytics.issues_resolved} />
+        <StatCard label="Open assigned" value={analytics.open_assigned} />
+      </div>
+      <div className="mb-1 text-xs text-fg-muted">Daily activity</div>
+      <DailyActivityChart data={analytics.daily_activity} />
     </div>
   )
 }

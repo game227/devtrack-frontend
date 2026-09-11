@@ -4,19 +4,11 @@ import { getDashboard } from '../api/dashboard'
 import { listIssues } from '../api/issues'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { PriorityBadge, StatusBadge } from '../components/Badge'
+import { StatCard } from '../components/StatCard'
 import type { Activity } from '../types/activity'
 import type { ProjectStatus } from '../types/project'
 
 const PROJECT_STATUSES: ProjectStatus[] = ['planned', 'active', 'paused', 'completed', 'archived']
-
-function StatCard({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="rounded border border-border bg-bg-elevated px-4 py-3">
-      <div className="text-2xl font-semibold text-fg">{value}</div>
-      <div className="text-xs text-fg-muted">{label}</div>
-    </div>
-  )
-}
 
 function activityText(activity: Activity): string {
   switch (activity.verb) {

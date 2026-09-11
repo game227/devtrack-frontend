@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../features/auth/AuthContext'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { GlobalSearch } from './GlobalSearch'
+import { NotificationsMenu } from './NotificationsMenu'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -51,7 +52,7 @@ export function Layout() {
         <header className="flex items-center justify-between border-b border-border px-6 py-3">
           <GlobalSearch />
           <div className="flex items-center gap-4 text-sm text-fg-muted">
-            <span>Notifications</span>
+            <NotificationsMenu />
             <NavLink to="/profile" className="hover:text-fg">
               {user?.username ?? 'Profile'}
             </NavLink>
