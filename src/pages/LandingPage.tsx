@@ -28,12 +28,12 @@ export function LandingPage() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
         <span className="text-sm font-semibold tracking-tight">DevTrack</span>
         <nav className="flex items-center gap-4 text-sm">
-          <Link to="/login" className="text-fg-muted hover:text-fg">
+          <Link to="/login" className="text-fg-muted transition-colors duration-150 hover:text-fg">
             Sign in
           </Link>
           <Link
             to="/register"
-            className="rounded-lg bg-accent px-3 py-1.5 font-medium text-white hover:opacity-90"
+            className="rounded-lg bg-accent px-3 py-1.5 font-medium text-white transition-opacity duration-150 hover:opacity-90"
           >
             Get started
           </Link>
@@ -53,13 +53,13 @@ export function LandingPage() {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               to="/register"
-              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
             >
               Create a free workspace
             </Link>
             <Link
               to="/login"
-              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-fg hover:border-accent"
+              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-accent"
             >
               Sign in
             </Link>

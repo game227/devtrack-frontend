@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../features/auth/AuthContext'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { GlobalSearch } from './GlobalSearch'
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
 export function Layout() {
   const { user, logout } = useAuth()
   const { currentWorkspace } = useWorkspace()
+  const { pathname } = useLocation()
 
   return (
     <div className="flex min-h-screen bg-bg text-fg">
@@ -33,7 +34,7 @@ export function Layout() {
                 key={item.label}
                 to={item.to}
                 className={({ isActive }) =>
-                  `rounded px-3 py-2 text-sm ${
+                  `rounded px-3 py-2 text-sm transition-colors duration-150 ${
                     isActive ? 'bg-bg-elevated text-fg' : 'text-fg-muted hover:bg-bg-elevated'
                   }`
                 }
@@ -53,16 +54,18 @@ export function Layout() {
           <GlobalSearch />
           <div className="flex items-center gap-4 text-sm text-fg-muted">
             <NotificationsMenu />
-            <NavLink to="/profile" className="hover:text-fg">
+            <NavLink to="/profile" className="transition-colors duration-150 hover:text-fg">
               {user?.username ?? 'Profile'}
             </NavLink>
-            <button type="button" onClick={() => void logout()} className="hover:text-fg">
+            <button type="button" onClick={() => void logout()} className="transition-colors duration-150 hover:text-fg">
               Log out
             </button>
           </div>
         </header>
         <main className="flex-1 p-6">
-          <Outlet />
+          <div key={pathname} className="animate-fade-in">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

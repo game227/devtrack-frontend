@@ -116,7 +116,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
           </div>
         )}
         <label className="cursor-pointer text-sm">
-          <span className="block rounded border border-border px-3 py-1.5 text-fg-muted hover:bg-bg">
+          <span className="block rounded border border-border px-3 py-1.5 text-fg-muted transition-colors duration-150 hover:bg-bg">
             Change avatar
           </span>
           <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
@@ -162,7 +162,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded bg-accent px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded bg-accent px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
         >
           {status === 'saving' ? 'Saving…' : 'Save changes'}
         </button>
@@ -243,7 +243,7 @@ function PasswordForm() {
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded bg-accent px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded bg-accent px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
         >
           {status === 'saving' ? 'Saving…' : 'Update password'}
         </button>

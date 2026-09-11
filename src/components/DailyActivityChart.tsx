@@ -17,7 +17,7 @@ export function DailyActivityChart({ data }: { data: DailyActivity[] }) {
               className="w-full rounded-t bg-accent"
               style={{ height: `${day.count > 0 ? Math.max(heightPercent, 6) : 2}%` }}
             />
-            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 whitespace-nowrap rounded border border-border bg-bg px-1.5 py-0.5 text-[10px] text-fg opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 whitespace-nowrap rounded border border-border bg-bg px-1.5 py-0.5 text-[10px] text-fg opacity-0 transition-opacity group-transition-opacity duration-150 hover:opacity-100">
               {day.date}: {day.count}
             </div>
           </div>

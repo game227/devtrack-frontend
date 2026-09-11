@@ -52,7 +52,7 @@ export function ProjectMilestonesPage() {
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white"
+          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
         >
           {isFormOpen ? 'Cancel' : 'New milestone'}
         </button>
@@ -92,7 +92,7 @@ export function ProjectMilestonesPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create milestone'}
           </button>
@@ -123,7 +123,7 @@ export function ProjectMilestonesPage() {
                 <button
                   type="button"
                   onClick={() => deleteMutation.mutate(milestone.id)}
-                  className="text-xs text-fg-muted hover:text-red-400"
+                  className="text-xs text-fg-muted transition-colors duration-150 hover:text-red-400"
                 >
                   Delete
                 </button>

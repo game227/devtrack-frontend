@@ -122,7 +122,7 @@ export function IssueDetailPage() {
               setDescription(issue.description)
               setIsEditingDescription(true)
             }}
-            className="cursor-text whitespace-pre-wrap text-sm text-fg-muted hover:text-fg"
+            className="cursor-text whitespace-pre-wrap text-sm text-fg-muted transition-colors duration-150 hover:text-fg"
           >
             {issue.description || 'Click to add a description…'}
           </p>

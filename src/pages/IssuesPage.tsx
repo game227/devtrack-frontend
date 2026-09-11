@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { listIssues } from '../api/issues'
 import { PriorityBadge } from '../components/Badge'
 import { formInputClass } from '../components/FormField'
+import { Skeleton } from '../components/Skeleton'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus } from '../types/issue'
@@ -55,7 +56,13 @@ export function IssuesPage() {
         </label>
       </div>
 
-      {issuesQuery.isLoading && <p className="text-sm text-fg-muted">Loading issues…</p>}
+      {issuesQuery.isLoading && (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-14" />
+          ))}
+        </div>
+      )}
       {issuesQuery.isError && (
         <p className="text-sm text-red-400">Couldn't load issues. Is the backend running?</p>
       )}
@@ -66,7 +73,7 @@ export function IssuesPage() {
           <Link
             key={issue.id}
             to={`/issues/${issue.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 hover:border-accent"
+            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
           >
             <div>
               <div className="text-sm font-medium text-fg">{issue.title}</div>

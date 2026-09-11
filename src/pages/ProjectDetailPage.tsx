@@ -87,31 +87,31 @@ export function ProjectDetailPage() {
           <div className="ml-auto flex gap-2">
             <Link
               to={`/projects/${projectId}/issues`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
             >
               Issues
             </Link>
             <Link
               to={`/projects/${projectId}/board`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
             >
               Board
             </Link>
             <Link
               to={`/projects/${projectId}/cycles`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
             >
               Cycles
             </Link>
             <Link
               to={`/projects/${projectId}/milestones`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
             >
               Milestones
             </Link>
             <Link
               to={`/projects/${projectId}/notes`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
             >
               Notes
             </Link>
@@ -175,7 +175,7 @@ export function ProjectDetailPage() {
               <button
                 type="button"
                 onClick={() => removeMemberMutation.mutate(member.user.id)}
-                className="text-xs text-fg-muted hover:text-red-400"
+                className="text-xs text-fg-muted transition-colors duration-150 hover:text-red-400"
               >
                 Remove
               </button>
@@ -204,7 +204,7 @@ export function ProjectDetailPage() {
           <button
             type="submit"
             disabled={addMemberMutation.isPending}
-            className="mb-0.5 rounded bg-accent px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="mb-0.5 rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             Add
           </button>

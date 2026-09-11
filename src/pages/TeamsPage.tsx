@@ -54,7 +54,7 @@ function TeamMembers({ teamId }: { teamId: number }) {
             <button
               type="button"
               onClick={() => removeMutation.mutate(member.user.id)}
-              className="text-xs text-fg-muted hover:text-red-400"
+              className="text-xs text-fg-muted transition-colors duration-150 hover:text-red-400"
             >
               Remove
             </button>
@@ -73,7 +73,7 @@ function TeamMembers({ teamId }: { teamId: number }) {
         <button
           type="submit"
           disabled={addMutation.isPending}
-          className="mb-0.5 rounded bg-accent px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+          className="mb-0.5 rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
         >
           Add
         </button>
@@ -130,7 +130,7 @@ export function TeamsPage() {
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white"
+          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
         >
           {isFormOpen ? 'Cancel' : 'New team'}
         </button>
@@ -159,7 +159,7 @@ export function TeamsPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create team'}
           </button>

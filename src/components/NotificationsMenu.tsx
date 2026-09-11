@@ -75,7 +75,7 @@ export function NotificationsMenu() {
 
   return (
     <div ref={containerRef} className="relative">
-      <button type="button" onClick={() => setIsOpen((open) => !open)} className="relative hover:text-fg">
+      <button type="button" onClick={() => setIsOpen((open) => !open)} className="relative transition-colors duration-150 hover:text-fg">
         Notifications
         {unreadCount > 0 && (
           <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
@@ -84,7 +84,7 @@ export function NotificationsMenu() {
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 top-full z-10 mt-1 max-h-96 w-80 overflow-y-auto rounded border border-border bg-bg-elevated shadow-lg">
+        <div className="absolute right-0 top-full z-10 mt-1 max-h-96 w-80 origin-top-right animate-scale-in overflow-y-auto rounded border border-border bg-bg-elevated shadow-lg">
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
             <span className="text-xs font-semibold uppercase text-fg-muted">Notifications</span>
             {unreadCount > 0 && (
@@ -107,7 +107,7 @@ export function NotificationsMenu() {
               key={notification.id}
               type="button"
               onClick={() => handleClick(notification)}
-              className={`block w-full border-b border-border px-3 py-2 text-left text-sm last:border-b-0 hover:bg-bg ${
+              className={`block w-full border-b border-border px-3 py-2 text-left text-sm last:border-b-0 transition-colors duration-150 hover:bg-bg ${
                 notification.is_read ? 'text-fg-muted' : 'text-fg'
               }`}
             >

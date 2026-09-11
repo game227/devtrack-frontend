@@ -6,6 +6,7 @@ import { createProject, listProjects } from '../api/projects'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { FormField, formInputClass } from '../components/FormField'
+import { Skeleton } from '../components/Skeleton'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import type { ProjectStatus, Priority } from '../types/project'
 
@@ -62,7 +63,7 @@ export function ProjectsPage() {
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white"
+          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
         >
           {isFormOpen ? 'Cancel' : 'New project'}
         </button>
@@ -129,14 +130,20 @@ export function ProjectsPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create project'}
           </button>
         </form>
       )}
 
-      {projectsQuery.isLoading && <p className="text-sm text-fg-muted">Loading projects…</p>}
+      {projectsQuery.isLoading && (
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-14" />
+          ))}
+        </div>
+      )}
       {projectsQuery.isError && (
         <p className="text-sm text-red-400">Couldn't load projects. Is the backend running?</p>
       )}
@@ -149,7 +156,7 @@ export function ProjectsPage() {
           <Link
             key={project.id}
             to={`/projects/${project.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 hover:border-accent"
+            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
           >
             <div>
               <div className="text-sm font-medium text-fg">{project.name}</div>

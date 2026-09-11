@@ -63,7 +63,7 @@ export function GlobalSearch() {
         className="w-full rounded border border-border bg-bg-elevated px-3 py-1.5 text-sm text-fg outline-none placeholder:text-fg-muted"
       />
       {isOpen && debouncedQuery.length >= 2 && (
-        <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-96 overflow-y-auto rounded border border-border bg-bg-elevated shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-96 origin-top animate-scale-in overflow-y-auto rounded border border-border bg-bg-elevated shadow-lg">
           {searchQuery.isLoading && <p className="px-3 py-2 text-sm text-fg-muted">Searching…</p>}
           {searchQuery.isSuccess && !hasResults && (
             <p className="px-3 py-2 text-sm text-fg-muted">No results for "{debouncedQuery}".</p>
@@ -76,7 +76,7 @@ export function GlobalSearch() {
                   key={project.id}
                   type="button"
                   onClick={() => go(`/projects/${project.id}`)}
-                  className="block w-full truncate px-3 py-1.5 text-left text-sm text-fg hover:bg-bg"
+                  className="block w-full truncate px-3 py-1.5 text-left text-sm text-fg transition-colors duration-150 hover:bg-bg"
                 >
                   {project.name}
                 </button>
@@ -91,7 +91,7 @@ export function GlobalSearch() {
                   key={issue.id}
                   type="button"
                   onClick={() => go(`/issues/${issue.id}`)}
-                  className="block w-full truncate px-3 py-1.5 text-left text-sm text-fg hover:bg-bg"
+                  className="block w-full truncate px-3 py-1.5 text-left text-sm text-fg transition-colors duration-150 hover:bg-bg"
                 >
                   {issue.title}
                 </button>
@@ -106,7 +106,7 @@ export function GlobalSearch() {
                   key={cycle.id}
                   type="button"
                   onClick={() => go(`/projects/${cycle.project}/cycles`)}
-                  className="block w-full truncate px-3 py-1.5 text-left text-sm text-fg hover:bg-bg"
+                  className="block w-full truncate px-3 py-1.5 text-left text-sm text-fg transition-colors duration-150 hover:bg-bg"
                 >
                   {cycle.name}
                 </button>

@@ -5,6 +5,7 @@ import { listIssues } from '../api/issues'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
 import { PriorityBadge, StatusBadge } from '../components/Badge'
 import { StatCard } from '../components/StatCard'
+import { Skeleton } from '../components/Skeleton'
 import type { Activity } from '../types/activity'
 import type { ProjectStatus } from '../types/project'
 
@@ -54,7 +55,29 @@ export function DashboardPage() {
     return <p className="text-sm text-fg-muted">No workspace found.</p>
   }
   if (dashboardQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">Loading dashboard…</p>
+    return (
+      <div>
+        <h1 className="mb-4 text-xl font-semibold text-fg">Dashboard</h1>
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-16" />
+          ))}
+        </div>
+        <Skeleton className="mb-6 h-11" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-14" />
+            ))}
+          </div>
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-14" />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
   if (dashboardQuery.isError || !dashboardQuery.data) {
     return <p className="text-sm text-red-400">Couldn't load the dashboard. Is the backend running?</p>
@@ -103,7 +126,7 @@ export function DashboardPage() {
               <Link
                 key={issue.id}
                 to={`/issues/${issue.id}`}
-                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 hover:border-accent"
+                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{issue.title}</div>
@@ -128,7 +151,7 @@ export function DashboardPage() {
               <Link
                 key={item.id}
                 to={`/issues/${item.id}`}
-                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 hover:border-accent"
+                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{item.title}</div>
@@ -152,7 +175,7 @@ export function DashboardPage() {
             <Link
               key={project.id}
               to={`/projects/${project.id}`}
-              className="rounded border border-border bg-bg-elevated px-4 py-3 hover:border-accent"
+              className="rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-medium text-fg">{project.name}</div>
@@ -184,7 +207,7 @@ export function DashboardPage() {
             return (
               <div
                 key={activity.id}
-                className="flex items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-bg-elevated"
+                className="flex items-center justify-between rounded px-2 py-1.5 text-sm transition-colors duration-150 hover:bg-bg-elevated"
               >
                 {href ? (
                   <Link to={href} className="min-w-0 truncate">

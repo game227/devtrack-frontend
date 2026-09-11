@@ -21,6 +21,7 @@ export function ProjectBoardPage() {
   const queryClient = useQueryClient()
   const queryKey = ['issues', projectId, 'board']
   const [dragOverColumn, setDragOverColumn] = useState<IssueStatus | null>(null)
+  const [draggingIssueId, setDraggingIssueId] = useState<number | null>(null)
 
   const issuesQuery = useQuery({
     queryKey,
@@ -48,6 +49,12 @@ export function ProjectBoardPage() {
   function handleDragStart(event: DragEvent<HTMLDivElement>, issueId: number) {
     event.dataTransfer.setData('text/plain', String(issueId))
     event.dataTransfer.effectAllowed = 'move'
+    setDraggingIssueId(issueId)
+  }
+
+  function handleDragEnd() {
+    setDraggingIssueId(null)
+    setDragOverColumn(null)
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>, status: IssueStatus) {
@@ -74,7 +81,7 @@ export function ProjectBoardPage() {
         <h1 className="text-xl font-semibold text-fg">Board</h1>
         <Link
           to={`/projects/${projectId}/issues`}
-          className="rounded border border-border px-3 py-1.5 text-sm text-fg hover:border-accent"
+          className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-accent"
         >
           List view
         </Link>
@@ -92,7 +99,7 @@ export function ProjectBoardPage() {
               }}
               onDragLeave={() => setDragOverColumn((current) => (current === status ? null : current))}
               onDrop={(e) => handleDrop(e, status)}
-              className={`flex min-h-[200px] flex-col gap-2 rounded border p-2 ${
+              className={`flex min-h-[200px] flex-col gap-2 rounded border p-2 transition-colors duration-150 ${
                 dragOverColumn === status ? 'border-accent bg-bg-elevated' : 'border-border'
               }`}
             >
@@ -104,9 +111,12 @@ export function ProjectBoardPage() {
                   key={issue.id}
                   draggable
                   onDragStart={(e) => handleDragStart(e, issue.id)}
-                  className="cursor-grab rounded border border-border bg-bg-elevated p-2 active:cursor-grabbing"
+                  onDragEnd={handleDragEnd}
+                  className={`cursor-grab rounded border border-border bg-bg-elevated p-2 transition-all duration-150 hover:-translate-y-0.5 hover:border-accent hover:shadow-md active:cursor-grabbing ${
+                    draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
+                  }`}
                 >
-                  <Link to={`/issues/${issue.id}`} className="text-sm text-fg hover:text-accent">
+                  <Link to={`/issues/${issue.id}`} className="text-sm text-fg transition-colors duration-150 hover:text-accent">
                     {issue.title}
                   </Link>
                   <div className="mt-1.5 flex items-center justify-between">
