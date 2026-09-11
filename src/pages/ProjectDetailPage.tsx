@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addProjectMember, getProject, listProjectMembers, removeProjectMember } from '../api/projects'
+import { createProjectComment, listProjectComments } from '../api/comments'
 import { StatusBadge, PriorityBadge } from '../components/Badge'
+import { CommentThread } from '../components/CommentThread'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 
@@ -59,10 +61,24 @@ export function ProjectDetailPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           <h1 className="text-xl font-semibold text-fg">{project.name}</h1>
           <PriorityBadge priority={project.priority} />
           <StatusBadge status={project.status} />
+          <div className="ml-auto flex gap-2">
+            <Link
+              to={`/projects/${projectId}/issues`}
+              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+            >
+              Issues
+            </Link>
+            <Link
+              to={`/projects/${projectId}/board`}
+              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+            >
+              Board
+            </Link>
+          </div>
         </div>
         {project.description && <p className="text-sm text-fg-muted">{project.description}</p>}
         <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-4">
@@ -135,6 +151,12 @@ export function ProjectDetailPage() {
           </button>
         </form>
       </div>
+
+      <CommentThread
+        queryKey={['project-comments', projectId]}
+        listComments={() => listProjectComments(projectId)}
+        createComment={(body) => createProjectComment(projectId, body)}
+      />
     </div>
   )
 }
