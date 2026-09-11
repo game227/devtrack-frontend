@@ -26,6 +26,8 @@ export interface Issue {
   assignee: UserBrief | null
   reporter: UserBrief
   labels: IssueLabel[]
+  cycle: number | null
+  milestone: number | null
   due_date: string | null
   created_at: string
   updated_at: string
@@ -51,4 +53,6 @@ export interface IssueFilters {
   type?: IssueType
   assignee?: number | 'me'
   label?: number
+  cycle?: number
+  milestone?: number
 }

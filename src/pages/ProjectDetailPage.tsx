@@ -2,10 +2,18 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { addProjectMember, getProject, listProjectMembers, removeProjectMember } from '../api/projects'
+import {
+  addProjectMember,
+  getProject,
+  listProjectMembers,
+  removeProjectMember,
+  updateProject,
+} from '../api/projects'
+import { listTeams } from '../api/teams'
 import { createProjectComment, listProjectComments } from '../api/comments'
 import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { CommentThread } from '../components/CommentThread'
+import { ProjectHealthCard } from '../components/ProjectHealthCard'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 
@@ -44,6 +52,17 @@ export function ProjectDetailPage() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['project-members', projectId] }),
   })
 
+  const teamsQuery = useQuery({
+    queryKey: ['teams', projectQuery.data?.workspace],
+    queryFn: () => listTeams(projectQuery.data!.workspace),
+    enabled: projectQuery.data?.workspace !== undefined,
+  })
+
+  const updateTeamMutation = useMutation({
+    mutationFn: (teamId: number | null) => updateProject(projectId, { team: teamId }),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['project', projectId] }),
+  })
+
   function handleAddMember(event: FormEvent) {
     event.preventDefault()
     addMemberMutation.mutate()
@@ -78,6 +97,24 @@ export function ProjectDetailPage() {
             >
               Board
             </Link>
+            <Link
+              to={`/projects/${projectId}/cycles`}
+              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+            >
+              Cycles
+            </Link>
+            <Link
+              to={`/projects/${projectId}/milestones`}
+              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+            >
+              Milestones
+            </Link>
+            <Link
+              to={`/projects/${projectId}/notes`}
+              className="rounded border border-border px-3 py-1 text-sm text-fg hover:border-accent"
+            >
+              Notes
+            </Link>
           </div>
         </div>
         {project.description && <p className="text-sm text-fg-muted">{project.description}</p>}
@@ -98,8 +135,30 @@ export function ProjectDetailPage() {
             <dt className="text-fg-muted">Repository</dt>
             <dd className="text-fg">{project.repository_url ?? '—'}</dd>
           </div>
+          <div>
+            <dt className="text-fg-muted">Team</dt>
+            <dd className="text-fg">
+              <select
+                className="rounded border border-border bg-bg px-2 py-1 text-sm text-fg outline-none focus:border-accent"
+                value={project.team ?? ''}
+                onChange={(e) =>
+                  updateTeamMutation.mutate(e.target.value ? Number(e.target.value) : null)
+                }
+                disabled={updateTeamMutation.isPending}
+              >
+                <option value="">No team</option>
+                {teamsQuery.data?.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </dd>
+          </div>
         </dl>
       </div>
+
+      <ProjectHealthCard projectId={projectId} />
 
       <div>
         <h2 className="mb-2 text-sm font-semibold text-fg">Members</h2>

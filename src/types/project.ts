@@ -14,6 +14,7 @@ export interface Project {
   start_date: string | null
   target_date: string | null
   owner: UserBrief
+  team: number | null
   repository_url: string | null
   tech_stack: unknown
   created_at: string
@@ -28,6 +29,7 @@ export interface CreateProjectPayload {
   priority?: Priority
   start_date?: string
   target_date?: string
+  team?: number | null
 }
 
 export type UpdateProjectPayload = Partial<Omit<CreateProjectPayload, 'workspace'>>

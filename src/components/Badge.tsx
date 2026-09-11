@@ -1,5 +1,6 @@
 import type { Priority, ProjectStatus } from '../types/project'
 import type { IssueStatus } from '../types/issue'
+import type { ProjectHealthStatus } from '../types/health'
 
 const STATUS_STYLES: Record<ProjectStatus, string> = {
   planned: 'bg-slate-500/15 text-slate-300',
@@ -25,6 +26,12 @@ const PRIORITY_STYLES: Record<Priority, string> = {
   urgent: 'bg-red-500/15 text-red-300',
 }
 
+const HEALTH_STATUS_STYLES: Record<ProjectHealthStatus, string> = {
+  healthy: 'bg-emerald-500/15 text-emerald-300',
+  needs_attention: 'bg-amber-500/15 text-amber-300',
+  at_risk: 'bg-red-500/15 text-red-300',
+}
+
 function Badge({ label, className }: { label: string; className: string }) {
   return (
     <span className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${className}`}>
@@ -43,4 +50,8 @@ export function IssueStatusBadge({ status }: { status: IssueStatus }) {
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
   return <Badge label={priority} className={PRIORITY_STYLES[priority]} />
+}
+
+export function HealthStatusBadge({ status }: { status: ProjectHealthStatus }) {
+  return <Badge label={status} className={HEALTH_STATUS_STYLES[status]} />
 }

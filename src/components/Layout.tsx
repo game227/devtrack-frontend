@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../features/auth/AuthContext'
 import { useWorkspace } from '../features/workspace/WorkspaceContext'
+import { GlobalSearch } from './GlobalSearch'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -48,11 +49,7 @@ export function Layout() {
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-border px-6 py-3">
-          <input
-            type="search"
-            placeholder="Search..."
-            className="w-64 rounded border border-border bg-bg-elevated px-3 py-1.5 text-sm text-fg outline-none placeholder:text-fg-muted"
-          />
+          <GlobalSearch />
           <div className="flex items-center gap-4 text-sm text-fg-muted">
             <span>Notifications</span>
             <NavLink to="/profile" className="hover:text-fg">
