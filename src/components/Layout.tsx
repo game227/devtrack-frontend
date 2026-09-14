@@ -54,6 +54,9 @@ export function Layout() {
           <GlobalSearch />
           <div className="flex items-center gap-4 text-sm text-fg-muted">
             <NotificationsMenu />
+            <NavLink to="/settings" className="transition-colors duration-150 hover:text-fg">
+              Settings
+            </NavLink>
             <NavLink to="/profile" className="transition-colors duration-150 hover:text-fg">
               {user?.username ?? 'Profile'}
             </NavLink>

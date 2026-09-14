@@ -9,6 +9,7 @@ import { getProject, listProjectMembers } from '../api/projects'
 import { IssueStatusBadge, PriorityBadge } from '../components/Badge'
 import { CommentThread } from '../components/CommentThread'
 import { formInputClass } from '../components/FormField'
+import { IssueGithubActivity } from '../components/IssueGithubActivity'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus } from '../types/issue'
 import type { Priority } from '../types/project'
@@ -216,6 +217,8 @@ export function IssueDetailPage() {
           )}
         </div>
       </div>
+
+      <IssueGithubActivity issueId={issueId} />
 
       <CommentThread
         queryKey={['issue-comments', issueId]}

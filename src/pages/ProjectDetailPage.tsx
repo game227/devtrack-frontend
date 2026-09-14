@@ -13,6 +13,7 @@ import { listTeams } from '../api/teams'
 import { createProjectComment, listProjectComments } from '../api/comments'
 import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { CommentThread } from '../components/CommentThread'
+import { ProjectGithubLink } from '../components/ProjectGithubLink'
 import { ProjectHealthCard } from '../components/ProjectHealthCard'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
@@ -210,6 +211,8 @@ export function ProjectDetailPage() {
           </button>
         </form>
       </div>
+
+      <ProjectGithubLink projectId={projectId} />
 
       <CommentThread
         queryKey={['project-comments', projectId]}

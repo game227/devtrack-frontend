@@ -1,6 +1,7 @@
 import type { Priority, ProjectStatus } from '../types/project'
 import type { IssueStatus } from '../types/issue'
 import type { ProjectHealthStatus } from '../types/health'
+import type { PullRequestState } from '../types/integrations'
 
 const STATUS_STYLES: Record<ProjectStatus, string> = {
   planned: 'bg-slate-500/15 text-slate-300',
@@ -32,6 +33,12 @@ const HEALTH_STATUS_STYLES: Record<ProjectHealthStatus, string> = {
   at_risk: 'bg-red-500/15 text-red-300',
 }
 
+const PULL_REQUEST_STATE_STYLES: Record<'open' | 'closed' | 'merged', string> = {
+  open: 'bg-emerald-500/15 text-emerald-300',
+  merged: 'bg-purple-500/15 text-purple-300',
+  closed: 'bg-red-500/15 text-red-300',
+}
+
 function Badge({ label, className }: { label: string; className: string }) {
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${className}`}>
@@ -54,4 +61,9 @@ export function PriorityBadge({ priority }: { priority: Priority }) {
 
 export function HealthStatusBadge({ status }: { status: ProjectHealthStatus }) {
   return <Badge label={status} className={HEALTH_STATUS_STYLES[status]} />
+}
+
+export function PullRequestStatusBadge({ state, merged }: { state: PullRequestState; merged: boolean }) {
+  const effective = merged ? 'merged' : state
+  return <Badge label={effective} className={PULL_REQUEST_STATE_STYLES[effective]} />
 }
