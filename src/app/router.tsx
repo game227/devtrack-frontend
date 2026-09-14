@@ -14,6 +14,7 @@ import { ProjectCyclesPage } from '../pages/ProjectCyclesPage'
 import { ProjectMilestonesPage } from '../pages/ProjectMilestonesPage'
 import { ProjectNotesPage } from '../pages/ProjectNotesPage'
 import { ProjectAnalyticsPage } from '../pages/ProjectAnalyticsPage'
+import { ProjectTimelinePage } from '../pages/ProjectTimelinePage'
 import { IssuesPage } from '../pages/IssuesPage'
 import { IssueDetailPage } from '../pages/IssueDetailPage'
 import { TeamsPage } from '../pages/TeamsPage'
@@ -41,6 +42,7 @@ export function AppRoutes() {
           <Route path="/projects/:id/cycles" element={<ProjectCyclesPage />} />
           <Route path="/projects/:id/milestones" element={<ProjectMilestonesPage />} />
           <Route path="/projects/:id/notes" element={<ProjectNotesPage />} />
+          <Route path="/projects/:id/timeline" element={<ProjectTimelinePage />} />
           <Route path="/projects/:id/analytics" element={<ProjectAnalyticsPage />} />
           <Route path="/issues" element={<IssuesPage />} />
           <Route path="/issues/:id" element={<IssueDetailPage />} />

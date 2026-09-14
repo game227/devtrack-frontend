@@ -116,6 +116,12 @@ export function ProjectDetailPage() {
             >
               Notes
             </Link>
+            <Link
+              to={`/projects/${projectId}/timeline`}
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+            >
+              Timeline
+            </Link>
           </div>
         </div>
         {project.description && <p className="text-sm text-fg-muted">{project.description}</p>}
