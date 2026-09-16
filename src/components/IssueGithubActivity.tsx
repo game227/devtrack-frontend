@@ -38,7 +38,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
               href={commit.url}
               target="_blank"
               rel="noreferrer"
-              className="font-mono text-xs text-accent hover:underline"
+              className="font-mono text-xs text-code hover:underline"
             >
               {commit.sha.slice(0, 7)}
             </a>

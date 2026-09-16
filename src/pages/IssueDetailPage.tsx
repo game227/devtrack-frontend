@@ -104,7 +104,7 @@ export function IssueDetailPage() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="rounded bg-accent px-3 py-1 text-sm font-medium text-white"
+                className="rounded border border-border px-3 py-1 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg"
               >
                 Save
               </button>

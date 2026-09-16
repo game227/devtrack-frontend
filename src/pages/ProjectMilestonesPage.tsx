@@ -52,7 +52,7 @@ export function ProjectMilestonesPage() {
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
         >
           {isFormOpen ? 'Cancel' : 'New milestone'}
         </button>
@@ -92,7 +92,7 @@ export function ProjectMilestonesPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create milestone'}
           </button>

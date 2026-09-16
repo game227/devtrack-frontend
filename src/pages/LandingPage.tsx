@@ -33,7 +33,7 @@ export function LandingPage() {
           </Link>
           <Link
             to="/register"
-            className="rounded-lg bg-accent px-3 py-1.5 font-medium text-white transition-opacity duration-150 hover:opacity-90"
+            className="rounded-lg border border-border px-3 py-1.5 font-medium text-fg transition-colors duration-150 hover:border-fg"
           >
             Get started
           </Link>
@@ -53,13 +53,13 @@ export function LandingPage() {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               to="/register"
-              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-opacity duration-150 hover:opacity-90"
+              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg"
             >
               Create a free workspace
             </Link>
             <Link
               to="/login"
-              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg"
             >
               Sign in
             </Link>

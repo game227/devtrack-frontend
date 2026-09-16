@@ -67,14 +67,14 @@ export function ProjectIssuesPage() {
         <div className="flex items-center gap-2">
           <Link
             to={`/projects/${projectId}/board`}
-            className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-accent"
+            className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
           >
             Board
           </Link>
           <button
             type="button"
             onClick={() => setIsFormOpen((open) => !open)}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
           >
             {isFormOpen ? 'Cancel' : 'New issue'}
           </button>
@@ -157,7 +157,7 @@ export function ProjectIssuesPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create issue'}
           </button>
@@ -175,7 +175,7 @@ export function ProjectIssuesPage() {
           <Link
             key={issue.id}
             to={`/issues/${issue.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
+            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
           >
             <div>
               <div className="text-sm font-medium text-fg">{issue.title}</div>

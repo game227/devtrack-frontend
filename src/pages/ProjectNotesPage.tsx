@@ -54,14 +54,14 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {updateMutation.isPending ? 'Saving…' : 'Save'}
           </button>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-accent"
+            className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
           >
             Cancel
           </button>
@@ -130,7 +130,7 @@ export function ProjectNotesPage() {
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
         >
           {isFormOpen ? 'Cancel' : 'New note'}
         </button>
@@ -154,7 +154,7 @@ export function ProjectNotesPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create note'}
           </button>

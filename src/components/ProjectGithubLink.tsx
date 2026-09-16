@@ -89,7 +89,7 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
       ) : (
         <div className="flex max-w-md items-end gap-2">
           <select
-            className="flex-1 rounded border border-border bg-bg px-2 py-1.5 text-sm text-fg outline-none focus:border-accent"
+            className="flex-1 rounded border border-border bg-bg px-2 py-1.5 text-sm text-fg outline-none focus:border-fg"
             value={selectedRepo}
             onChange={(e) => setSelectedRepo(e.target.value)}
           >
@@ -104,7 +104,7 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
             type="button"
             onClick={() => linkMutation.mutate()}
             disabled={linkMutation.isPending || !selectedRepo}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             Link
           </button>

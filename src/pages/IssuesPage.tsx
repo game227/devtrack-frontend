@@ -73,7 +73,7 @@ export function IssuesPage() {
           <Link
             key={issue.id}
             to={`/issues/${issue.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
+            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
           >
             <div>
               <div className="text-sm font-medium text-fg">{issue.title}</div>

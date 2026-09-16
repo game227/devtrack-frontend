@@ -3,67 +3,79 @@ import type { IssueStatus } from '../types/issue'
 import type { ProjectHealthStatus } from '../types/health'
 import type { PullRequestState } from '../types/integrations'
 
-const STATUS_STYLES: Record<ProjectStatus, string> = {
-  planned: 'bg-slate-500/15 text-slate-300',
-  active: 'bg-emerald-500/15 text-emerald-300',
-  paused: 'bg-amber-500/15 text-amber-300',
-  completed: 'bg-blue-500/15 text-blue-300',
-  archived: 'bg-fg-muted/15 text-fg-muted',
+const NEUTRAL = '#6e727a'
+const SUCCESS = '#3ad389'
+const WARNING = '#ffca16'
+const INFO = '#70b8ff'
+const DANGER = '#ff9592'
+const MERGED_VIOLET = '#baa7ff'
+
+const STATUS_COLORS: Record<ProjectStatus, string | null> = {
+  planned: NEUTRAL,
+  active: SUCCESS,
+  paused: WARNING,
+  completed: INFO,
+  archived: null,
 }
 
-const ISSUE_STATUS_STYLES: Record<IssueStatus, string> = {
-  backlog: 'bg-fg-muted/15 text-fg-muted',
-  todo: 'bg-slate-500/15 text-slate-300',
-  in_progress: 'bg-amber-500/15 text-amber-300',
-  in_review: 'bg-blue-500/15 text-blue-300',
-  done: 'bg-emerald-500/15 text-emerald-300',
+const ISSUE_STATUS_COLORS: Record<IssueStatus, string | null> = {
+  backlog: null,
+  todo: null,
+  in_progress: WARNING,
+  in_review: INFO,
+  done: SUCCESS,
 }
 
-const PRIORITY_STYLES: Record<Priority, string> = {
-  none: 'bg-fg-muted/15 text-fg-muted',
-  low: 'bg-slate-500/15 text-slate-300',
-  medium: 'bg-amber-500/15 text-amber-300',
-  high: 'bg-orange-500/15 text-orange-300',
-  urgent: 'bg-red-500/15 text-red-300',
+const PRIORITY_COLORS: Record<Priority, string | null> = {
+  none: null,
+  low: null,
+  medium: WARNING,
+  high: DANGER,
+  urgent: DANGER,
 }
 
-const HEALTH_STATUS_STYLES: Record<ProjectHealthStatus, string> = {
-  healthy: 'bg-emerald-500/15 text-emerald-300',
-  needs_attention: 'bg-amber-500/15 text-amber-300',
-  at_risk: 'bg-red-500/15 text-red-300',
+const HEALTH_STATUS_COLORS: Record<ProjectHealthStatus, string> = {
+  healthy: SUCCESS,
+  needs_attention: WARNING,
+  at_risk: DANGER,
 }
 
-const PULL_REQUEST_STATE_STYLES: Record<'open' | 'closed' | 'merged', string> = {
-  open: 'bg-emerald-500/15 text-emerald-300',
-  merged: 'bg-purple-500/15 text-purple-300',
-  closed: 'bg-red-500/15 text-red-300',
+const PULL_REQUEST_STATE_COLORS: Record<'open' | 'closed' | 'merged', string> = {
+  open: SUCCESS,
+  merged: MERGED_VIOLET,
+  closed: DANGER,
 }
 
-function Badge({ label, className }: { label: string; className: string }) {
+function Badge({ label, color }: { label: string; color: string | null }) {
+  const textColor = color ?? NEUTRAL
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${className}`}>
+    <span
+      className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium capitalize"
+      style={{ color: textColor }}
+    >
+      {color && <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />}
       {label.replace('_', ' ')}
     </span>
   )
 }
 
 export function StatusBadge({ status }: { status: ProjectStatus }) {
-  return <Badge label={status} className={STATUS_STYLES[status]} />
+  return <Badge label={status} color={STATUS_COLORS[status]} />
 }
 
 export function IssueStatusBadge({ status }: { status: IssueStatus }) {
-  return <Badge label={status} className={ISSUE_STATUS_STYLES[status]} />
+  return <Badge label={status} color={ISSUE_STATUS_COLORS[status]} />
 }
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
-  return <Badge label={priority} className={PRIORITY_STYLES[priority]} />
+  return <Badge label={priority} color={PRIORITY_COLORS[priority]} />
 }
 
 export function HealthStatusBadge({ status }: { status: ProjectHealthStatus }) {
-  return <Badge label={status} className={HEALTH_STATUS_STYLES[status]} />
+  return <Badge label={status} color={HEALTH_STATUS_COLORS[status]} />
 }
 
 export function PullRequestStatusBadge({ state, merged }: { state: PullRequestState; merged: boolean }) {
   const effective = merged ? 'merged' : state
-  return <Badge label={effective} className={PULL_REQUEST_STATE_STYLES[effective]} />
+  return <Badge label={effective} color={PULL_REQUEST_STATE_COLORS[effective]} />
 }

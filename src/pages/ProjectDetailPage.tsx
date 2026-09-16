@@ -88,37 +88,37 @@ export function ProjectDetailPage() {
           <div className="ml-auto flex gap-2">
             <Link
               to={`/projects/${projectId}/issues`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-fg"
             >
               Issues
             </Link>
             <Link
               to={`/projects/${projectId}/board`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-fg"
             >
               Board
             </Link>
             <Link
               to={`/projects/${projectId}/cycles`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-fg"
             >
               Cycles
             </Link>
             <Link
               to={`/projects/${projectId}/milestones`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-fg"
             >
               Milestones
             </Link>
             <Link
               to={`/projects/${projectId}/notes`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-fg"
             >
               Notes
             </Link>
             <Link
               to={`/projects/${projectId}/timeline`}
-              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border px-3 py-1 text-sm text-fg transition-colors duration-150 hover:border-fg"
             >
               Timeline
             </Link>
@@ -146,7 +146,7 @@ export function ProjectDetailPage() {
             <dt className="text-fg-muted">Team</dt>
             <dd className="text-fg">
               <select
-                className="rounded border border-border bg-bg px-2 py-1 text-sm text-fg outline-none focus:border-accent"
+                className="rounded border border-border bg-bg px-2 py-1 text-sm text-fg outline-none focus:border-fg"
                 value={project.team ?? ''}
                 onChange={(e) =>
                   updateTeamMutation.mutate(e.target.value ? Number(e.target.value) : null)
@@ -211,7 +211,7 @@ export function ProjectDetailPage() {
           <button
             type="submit"
             disabled={addMemberMutation.isPending}
-            className="mb-0.5 rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="mb-0.5 rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             Add
           </button>

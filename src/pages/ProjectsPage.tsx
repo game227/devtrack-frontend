@@ -63,7 +63,7 @@ export function ProjectsPage() {
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98]"
+          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
         >
           {isFormOpen ? 'Cancel' : 'New project'}
         </button>
@@ -130,7 +130,7 @@ export function ProjectsPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded bg-accent px-3 py-1.5 text-sm font-medium text-white transition-all duration-150 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? 'Creating…' : 'Create project'}
           </button>
@@ -156,7 +156,7 @@ export function ProjectsPage() {
           <Link
             key={project.id}
             to={`/projects/${project.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
+            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
           >
             <div>
               <div className="text-sm font-medium text-fg">{project.name}</div>

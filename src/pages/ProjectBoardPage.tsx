@@ -81,7 +81,7 @@ export function ProjectBoardPage() {
         <h1 className="text-xl font-semibold text-fg">Board</h1>
         <Link
           to={`/projects/${projectId}/issues`}
-          className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-accent"
+          className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
         >
           List view
         </Link>
@@ -100,7 +100,7 @@ export function ProjectBoardPage() {
               onDragLeave={() => setDragOverColumn((current) => (current === status ? null : current))}
               onDrop={(e) => handleDrop(e, status)}
               className={`flex min-h-[200px] flex-col gap-2 rounded border p-2 transition-colors duration-150 ${
-                dragOverColumn === status ? 'border-accent bg-bg-elevated' : 'border-border'
+                dragOverColumn === status ? 'border-fg bg-bg-elevated' : 'border-border'
               }`}
             >
               <div className="px-1 text-xs font-semibold uppercase text-fg-muted">
@@ -112,7 +112,7 @@ export function ProjectBoardPage() {
                   draggable
                   onDragStart={(e) => handleDragStart(e, issue.id)}
                   onDragEnd={handleDragEnd}
-                  className={`cursor-grab rounded border border-border bg-bg-elevated p-2 transition-all duration-150 hover:-translate-y-0.5 hover:border-accent hover:shadow-md active:cursor-grabbing ${
+                  className={`cursor-grab rounded border border-border bg-bg-elevated p-2 transition-all duration-150 hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing ${
                     draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
                   }`}
                 >

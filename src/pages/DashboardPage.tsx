@@ -126,7 +126,7 @@ export function DashboardPage() {
               <Link
                 key={issue.id}
                 to={`/issues/${issue.id}`}
-                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
+                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{issue.title}</div>
@@ -151,7 +151,7 @@ export function DashboardPage() {
               <Link
                 key={item.id}
                 to={`/issues/${item.id}`}
-                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
+                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{item.title}</div>
@@ -175,7 +175,7 @@ export function DashboardPage() {
             <Link
               key={project.id}
               to={`/projects/${project.id}`}
-              className="rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-accent"
+              className="rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-medium text-fg">{project.name}</div>
