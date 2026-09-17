@@ -6,12 +6,14 @@ import {
   getGithubAuthorizeUrl,
   getGithubConnectionStatus,
 } from '../api/integrations'
+import { disconnectTelegram, getTelegramConnectionStatus, getTelegramDeepLink } from '../api/telegram'
 
 export function SettingsPage() {
   return (
     <div className="max-w-xl space-y-6">
       <h1 className="text-xl font-semibold text-fg">Settings</h1>
       <GithubConnectionCard />
+      <TelegramConnectionCard />
     </div>
   )
 }
@@ -92,6 +94,72 @@ function GithubConnectionCard() {
         <div className="flex items-center justify-between">
           <p className="text-sm text-fg">
             Connected as <span className="font-medium">{connectionQuery.data.github_username}</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => disconnectMutation.mutate()}
+            disabled={disconnectMutation.isPending}
+            className="shrink-0 rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-red-400 hover:text-red-400 disabled:opacity-50"
+          >
+            Disconnect
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function TelegramConnectionCard() {
+  const queryClient = useQueryClient()
+
+  const connectionQuery = useQuery({
+    queryKey: ['telegram-connection'],
+    queryFn: getTelegramConnectionStatus,
+    // No redirect-back exists for Telegram (unlike GitHub's OAuth callback) —
+    // the link happens via the bot webhook, so re-check whenever the user
+    // returns to this tab after tapping Start in Telegram.
+    refetchOnWindowFocus: true,
+  })
+
+  const connectMutation = useMutation({
+    mutationFn: getTelegramDeepLink,
+    onSuccess: ({ deep_link }) => {
+      window.open(deep_link, '_blank', 'noopener,noreferrer')
+    },
+  })
+
+  const disconnectMutation = useMutation({
+    mutationFn: disconnectTelegram,
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['telegram-connection'] }),
+  })
+
+  return (
+    <div className="rounded border border-border bg-bg-elevated p-5">
+      <h2 className="mb-3 text-sm font-semibold text-fg">Telegram</h2>
+
+      {connectionQuery.isLoading && <p className="text-sm text-fg-muted">Loading…</p>}
+
+      {connectionQuery.data && !connectionQuery.data.connected && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-fg-muted">
+            Connect Telegram to receive password-reset links there instead of email.
+          </p>
+          <button
+            type="button"
+            onClick={() => connectMutation.mutate()}
+            disabled={connectMutation.isPending}
+            className="shrink-0 rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          >
+            Connect Telegram
+          </button>
+        </div>
+      )}
+
+      {connectionQuery.data?.connected && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-fg">
+            Connected as{' '}
+            <span className="font-medium">@{connectionQuery.data.telegram_username || 'unknown'}</span>
           </p>
           <button
             type="button"
