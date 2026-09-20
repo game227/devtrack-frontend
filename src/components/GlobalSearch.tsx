@@ -2,9 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { search } from '../api/search'
-import { useWorkspace } from '../features/workspace/WorkspaceContext'
+import { useWorkspace } from '../features/workspace/workspaceContext'
+import { useT } from '../i18n'
+import { Icon } from './Icon'
 
 export function GlobalSearch() {
+  const t = useT()
   const { currentWorkspace } = useWorkspace()
   const navigate = useNavigate()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -50,27 +53,29 @@ export function GlobalSearch() {
       results.users.length > 0)
 
   return (
-    <div ref={containerRef} className="relative w-64">
+    <div ref={containerRef} className="relative w-full max-w-xs">
+      <Icon name="search" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-muted" />
       <input
         type="search"
-        placeholder="Search..."
+        aria-label={t('search.aria')}
+        placeholder={t('search.placeholder')}
         value={query}
         onChange={(e) => {
           setQuery(e.target.value)
           setIsOpen(true)
         }}
         onFocus={() => setIsOpen(true)}
-        className="w-full rounded border border-border bg-bg-elevated px-3 py-1.5 text-sm text-fg outline-none placeholder:text-fg-muted"
+        className="w-full rounded-md border border-border bg-bg py-1.5 pl-8 pr-3 text-sm text-fg outline-none placeholder:text-fg-muted focus:border-fg"
       />
       {isOpen && debouncedQuery.length >= 2 && (
-        <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-96 origin-top animate-scale-in overflow-y-auto rounded border border-border bg-bg-elevated shadow-lg">
-          {searchQuery.isLoading && <p className="px-3 py-2 text-sm text-fg-muted">Searching…</p>}
+        <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-96 origin-top animate-scale-in overflow-y-auto rounded-md border border-border bg-bg-elevated">
+          {searchQuery.isLoading && <p className="px-3 py-2 text-sm text-fg-muted">{t('search.searching')}</p>}
           {searchQuery.isSuccess && !hasResults && (
-            <p className="px-3 py-2 text-sm text-fg-muted">No results for "{debouncedQuery}".</p>
+            <p className="px-3 py-2 text-sm text-fg-muted">{t('search.noResults', { query: debouncedQuery })}</p>
           )}
           {results && results.projects.length > 0 && (
             <div className="border-b border-border py-1">
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">Projects</div>
+              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">{t('search.projects')}</div>
               {results.projects.map((project) => (
                 <button
                   key={project.id}
@@ -85,7 +90,7 @@ export function GlobalSearch() {
           )}
           {results && results.issues.length > 0 && (
             <div className="border-b border-border py-1">
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">Issues</div>
+              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">{t('search.issues')}</div>
               {results.issues.map((issue) => (
                 <button
                   key={issue.id}
@@ -100,7 +105,7 @@ export function GlobalSearch() {
           )}
           {results && results.cycles.length > 0 && (
             <div className="border-b border-border py-1">
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">Cycles</div>
+              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">{t('search.cycles')}</div>
               {results.cycles.map((cycle) => (
                 <button
                   key={cycle.id}
@@ -115,7 +120,7 @@ export function GlobalSearch() {
           )}
           {results && results.labels.length > 0 && (
             <div className="border-b border-border py-1">
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">Labels</div>
+              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">{t('search.labels')}</div>
               <div className="flex flex-wrap gap-1 px-3 py-1.5">
                 {results.labels.map((label) => (
                   <span
@@ -131,7 +136,7 @@ export function GlobalSearch() {
           )}
           {results && results.users.length > 0 && (
             <div className="py-1">
-              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">People</div>
+              <div className="px-3 py-1 text-xs font-semibold uppercase text-fg-muted">{t('search.people')}</div>
               {results.users.map((user) => (
                 <div key={user.id} className="px-3 py-1.5 text-sm text-fg">
                   {user.username}

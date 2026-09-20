@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addTeamMember, createTeam, listTeamMembers, listTeams, removeTeamMember } from '../api/teams'
-import { useWorkspace } from '../features/workspace/WorkspaceContext'
+import { useWorkspace } from '../features/workspace/workspaceContext'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 

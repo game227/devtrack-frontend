@@ -1,5 +1,5 @@
 import { Link, Navigate } from 'react-router-dom'
-import { useAuth } from '../features/auth/AuthContext'
+import { useAuth } from '../features/auth/authContext'
 
 const FEATURES = [
   {

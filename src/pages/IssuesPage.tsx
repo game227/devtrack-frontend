@@ -5,7 +5,7 @@ import { listIssues } from '../api/issues'
 import { PriorityBadge } from '../components/Badge'
 import { formInputClass } from '../components/FormField'
 import { Skeleton } from '../components/Skeleton'
-import { useWorkspace } from '../features/workspace/WorkspaceContext'
+import { useWorkspace } from '../features/workspace/workspaceContext'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus } from '../types/issue'
 
