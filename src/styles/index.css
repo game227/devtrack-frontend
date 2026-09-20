@@ -9,6 +9,13 @@
   --color-accent: #70b8ff;
   --color-code: #9281f7;
 
+  --color-subtle: #6e727a;
+  --color-success: #3ad389;
+  --color-warning: #ffca16;
+  --color-info: #70b8ff;
+  --color-danger: #ff9592;
+  --color-merged: #baa7ff;
+
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
