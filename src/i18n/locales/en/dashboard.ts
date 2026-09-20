@@ -1,0 +1,35 @@
+const en: Record<string, string> = {
+  'activity.created_project': 'created project {target}',
+  'activity.created_issue': 'created issue {target}',
+  'activity.moved_issue': 'moved {target} from {from} to {to}',
+  'activity.commented': 'commented: "{target}"',
+  'activity.pr_merged': 'merged PR #{pr} — {target} moved to {to}',
+
+  'dashboard.title': 'Dashboard',
+  'dashboard.loadFailed': "Couldn't load the dashboard. Is the backend running?",
+  'dashboard.statProjects': 'Projects',
+  'dashboard.statActiveProjects': 'Active projects',
+  'dashboard.statOpenIssues': 'Open issues',
+  'dashboard.statDoneIssues': 'Done issues',
+  'dashboard.myOpenIssues': 'My open issues',
+  'dashboard.myIssuesFailed': "Couldn't load your issues.",
+  'dashboard.noMyIssues': 'No open issues assigned to you.',
+  'dashboard.issueMeta': '{type} · {status}',
+  'dashboard.issueMetaDue': '{type} · {status} · due {date}',
+  'dashboard.upcomingDeadlines': 'Upcoming deadlines',
+  'dashboard.noDeadlines': 'Nothing due in the next 30 days.',
+  'dashboard.overdue': 'overdue · {date}',
+  'dashboard.due': 'due {date}',
+  'dashboard.projectProgress': 'Project progress',
+  'dashboard.noProjects': 'No projects yet.',
+  'dashboard.recentActivity': 'Recent activity',
+  'dashboard.noActivity': 'No activity yet.',
+
+  'projects.title': 'Projects',
+  'projects.new': 'New project',
+  'projects.create': 'Create project',
+  'projects.empty': 'No projects yet.',
+  'projects.loadFailed': "Couldn't load projects. Is the backend running?",
+}
+
+export default en

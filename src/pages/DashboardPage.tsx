@@ -2,37 +2,18 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getDashboard } from '../api/dashboard'
 import { listIssues } from '../api/issues'
-import { useWorkspace } from '../features/workspace/WorkspaceContext'
+import { activityLink, describeActivity } from '../features/activity/activityText'
+import { useWorkspace } from '../features/workspace/workspaceContext'
+import { useI18n } from '../i18n'
 import { PriorityBadge, StatusBadge } from '../components/Badge'
 import { StatCard } from '../components/StatCard'
 import { Skeleton } from '../components/Skeleton'
-import type { Activity } from '../types/activity'
 import type { ProjectStatus } from '../types/project'
 
 const PROJECT_STATUSES: ProjectStatus[] = ['planned', 'active', 'paused', 'completed', 'archived']
 
-function activityText(activity: Activity): string {
-  switch (activity.verb) {
-    case 'created_project':
-      return `created project ${activity.target_display}`
-    case 'created_issue':
-      return `created issue ${activity.target_display}`
-    case 'moved_issue':
-      return `moved ${activity.target_display} from ${activity.metadata.from} to ${activity.metadata.to}`
-    case 'commented':
-      return `commented: "${activity.target_display}"`
-    default:
-      return activity.verb
-  }
-}
-
-function activityLink(activity: Activity): string | null {
-  if (activity.target_type === 'issue') return `/issues/${activity.target_id}`
-  if (activity.target_type === 'project') return `/projects/${activity.target_id}`
-  return null
-}
-
 export function DashboardPage() {
+  const { t, formatDate, formatDateTime } = useI18n()
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const workspaceId = currentWorkspace?.id
 
@@ -49,15 +30,15 @@ export function DashboardPage() {
   })
 
   if (isWorkspaceLoading) {
-    return <p className="text-sm text-fg-muted">Loading workspace…</p>
+    return <p className="text-sm text-fg-muted">{t('common.loadingWorkspace')}</p>
   }
   if (!currentWorkspace) {
-    return <p className="text-sm text-fg-muted">No workspace found.</p>
+    return <p className="text-sm text-fg-muted">{t('common.noWorkspace')}</p>
   }
   if (dashboardQuery.isLoading) {
     return (
       <div>
-        <h1 className="mb-4 text-xl font-semibold text-fg">Dashboard</h1>
+        <h1 className="mb-4 text-xl font-semibold text-fg">{t('dashboard.title')}</h1>
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-16" />
@@ -80,7 +61,7 @@ export function DashboardPage() {
     )
   }
   if (dashboardQuery.isError || !dashboardQuery.data) {
-    return <p className="text-sm text-red-400">Couldn't load the dashboard. Is the backend running?</p>
+    return <p className="text-sm text-danger">{t('dashboard.loadFailed')}</p>
   }
 
   const data = dashboardQuery.data
@@ -95,13 +76,13 @@ export function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-fg">Dashboard</h1>
+      <h1 className="mb-4 text-xl font-semibold text-fg">{t('dashboard.title')}</h1>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Projects" value={data.projects.total} />
-        <StatCard label="Active projects" value={data.projects.active} />
-        <StatCard label="Open issues" value={data.issues.open} />
-        <StatCard label="Done issues" value={data.issues.done} />
+        <StatCard label={t('dashboard.statProjects')} value={data.projects.total} />
+        <StatCard label={t('dashboard.statActiveProjects')} value={data.projects.active} />
+        <StatCard label={t('dashboard.statOpenIssues')} value={data.issues.open} />
+        <StatCard label={t('dashboard.statDoneIssues')} value={data.issues.done} />
       </div>
 
       <div className="mb-6 flex flex-wrap gap-4 rounded border border-border bg-bg-elevated px-4 py-3">
@@ -115,11 +96,11 @@ export function DashboardPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-fg">My open issues</h2>
-          {myIssuesQuery.isLoading && <p className="text-sm text-fg-muted">Loading…</p>}
-          {myIssuesQuery.isError && <p className="text-sm text-red-400">Couldn't load your issues.</p>}
+          <h2 className="mb-2 text-sm font-semibold text-fg">{t('dashboard.myOpenIssues')}</h2>
+          {myIssuesQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
+          {myIssuesQuery.isError && <p className="text-sm text-danger">{t('dashboard.myIssuesFailed')}</p>}
           {myIssuesQuery.isSuccess && myOpenIssues.length === 0 && (
-            <p className="text-sm text-fg-muted">No open issues assigned to you.</p>
+            <p className="text-sm text-fg-muted">{t('dashboard.noMyIssues')}</p>
           )}
           <div className="flex flex-col gap-2">
             {myOpenIssues.map((issue) => (
@@ -131,8 +112,16 @@ export function DashboardPage() {
                 <div>
                   <div className="text-sm font-medium text-fg">{issue.title}</div>
                   <div className="text-xs text-fg-muted">
-                    {issue.type} · {issue.status.replace('_', ' ')}
-                    {issue.due_date && ` · due ${issue.due_date}`}
+                    {issue.due_date
+                      ? t('dashboard.issueMetaDue', {
+                          type: t(`issueType.${issue.type}`),
+                          status: t(`status.${issue.status}`),
+                          date: formatDate(issue.due_date),
+                        })
+                      : t('dashboard.issueMeta', {
+                          type: t(`issueType.${issue.type}`),
+                          status: t(`status.${issue.status}`),
+                        })}
                   </div>
                 </div>
                 <PriorityBadge priority={issue.priority} />
@@ -142,9 +131,9 @@ export function DashboardPage() {
         </div>
 
         <div>
-          <h2 className="mb-2 text-sm font-semibold text-fg">Upcoming deadlines</h2>
+          <h2 className="mb-2 text-sm font-semibold text-fg">{t('dashboard.upcomingDeadlines')}</h2>
           {data.upcoming_deadlines.length === 0 && (
-            <p className="text-sm text-fg-muted">Nothing due in the next 30 days.</p>
+            <p className="text-sm text-fg-muted">{t('dashboard.noDeadlines')}</p>
           )}
           <div className="flex flex-col gap-2">
             {data.upcoming_deadlines.map((item) => (
@@ -157,9 +146,8 @@ export function DashboardPage() {
                   <div className="text-sm font-medium text-fg">{item.title}</div>
                   <div className="text-xs text-fg-muted">{item.project.name}</div>
                 </div>
-                <span className={`text-xs ${item.is_overdue ? 'text-red-400' : 'text-fg-muted'}`}>
-                  {item.is_overdue ? 'overdue · ' : 'due '}
-                  {item.due_date}
+                <span className={`text-xs ${item.is_overdue ? 'text-danger' : 'text-fg-muted'}`}>
+                  {t(item.is_overdue ? 'dashboard.overdue' : 'dashboard.due', { date: formatDate(item.due_date) })}
                 </span>
               </Link>
             ))}
@@ -168,8 +156,8 @@ export function DashboardPage() {
       </div>
 
       <div className="mb-6">
-        <h2 className="mb-2 text-sm font-semibold text-fg">Project progress</h2>
-        {data.project_progress.length === 0 && <p className="text-sm text-fg-muted">No projects yet.</p>}
+        <h2 className="mb-2 text-sm font-semibold text-fg">{t('dashboard.projectProgress')}</h2>
+        {data.project_progress.length === 0 && <p className="text-sm text-fg-muted">{t('dashboard.noProjects')}</p>}
         <div className="flex flex-col gap-2">
           {data.project_progress.map((project) => (
             <Link
@@ -185,7 +173,7 @@ export function DashboardPage() {
                 </div>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
-                <div className="h-full rounded-full bg-accent" style={{ width: `${project.progress_percent}%` }} />
+                <div className="h-full rounded-full bg-fg" style={{ width: `${project.progress_percent}%` }} />
               </div>
             </Link>
           ))}
@@ -193,15 +181,15 @@ export function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-semibold text-fg">Recent activity</h2>
-        {data.recent_activity.length === 0 && <p className="text-sm text-fg-muted">No activity yet.</p>}
+        <h2 className="mb-2 text-sm font-semibold text-fg">{t('dashboard.recentActivity')}</h2>
+        {data.recent_activity.length === 0 && <p className="text-sm text-fg-muted">{t('dashboard.noActivity')}</p>}
         <div className="flex flex-col gap-1">
           {data.recent_activity.map((activity) => {
             const href = activityLink(activity)
             const content = (
               <>
                 <span className="font-medium text-fg">{activity.actor.username}</span>{' '}
-                <span className="text-fg-muted">{activityText(activity)}</span>
+                <span className="text-fg-muted">{describeActivity(activity, t)}</span>
               </>
             )
             return (
@@ -216,7 +204,7 @@ export function DashboardPage() {
                 ) : (
                   <span className="min-w-0 truncate">{content}</span>
                 )}
-                <span className="shrink-0 pl-3 text-xs text-fg-muted">{activity.created_at}</span>
+                <span className="shrink-0 pl-3 text-xs text-fg-muted">{formatDateTime(activity.created_at)}</span>
               </div>
             )
           })}

@@ -1,0 +1,35 @@
+const uz: Record<string, string> = {
+  'activity.created_project': '{target} loyihasini yaratdi',
+  'activity.created_issue': '{target} vazifasini yaratdi',
+  'activity.moved_issue': '{target} vazifasini "{from}" holatidan "{to}" holatiga o\'tkazdi',
+  'activity.commented': 'izoh qoldirdi: "{target}"',
+  'activity.pr_merged': 'PR #{pr} birlashtirildi — {target} "{to}" holatiga o\'tdi',
+
+  'dashboard.title': 'Boshqaruv paneli',
+  'dashboard.loadFailed': "Boshqaruv panelini yuklab bo'lmadi. Backend ishlayaptimi?",
+  'dashboard.statProjects': 'Loyihalar',
+  'dashboard.statActiveProjects': 'Faol loyihalar',
+  'dashboard.statOpenIssues': 'Ochiq vazifalar',
+  'dashboard.statDoneIssues': 'Bajarilgan vazifalar',
+  'dashboard.myOpenIssues': 'Mening ochiq vazifalarim',
+  'dashboard.myIssuesFailed': "Vazifalaringizni yuklab bo'lmadi.",
+  'dashboard.noMyIssues': "Sizga tayinlangan ochiq vazifa yo'q.",
+  'dashboard.issueMeta': '{type} · {status}',
+  'dashboard.issueMetaDue': '{type} · {status} · muddat: {date}',
+  'dashboard.upcomingDeadlines': 'Yaqin muddatlar',
+  'dashboard.noDeadlines': "Keyingi 30 kunda muddati keladigan vazifa yo'q.",
+  'dashboard.overdue': "muddati o'tgan · {date}",
+  'dashboard.due': 'muddat: {date}',
+  'dashboard.projectProgress': 'Loyihalar bajarilishi',
+  'dashboard.noProjects': "Hozircha loyiha yo'q.",
+  'dashboard.recentActivity': "So'nggi faollik",
+  'dashboard.noActivity': "Hozircha faollik yo'q.",
+
+  'projects.title': 'Loyihalar',
+  'projects.new': 'Yangi loyiha',
+  'projects.create': 'Loyiha yaratish',
+  'projects.empty': "Hozircha loyiha yo'q.",
+  'projects.loadFailed': "Loyihalarni yuklab bo'lmadi. Backend ishlayaptimi?",
+}
+
+export default uz

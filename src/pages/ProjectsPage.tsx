@@ -3,14 +3,16 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createProject, listProjects } from '../api/projects'
-import { useWorkspace } from '../features/workspace/WorkspaceContext'
+import { useWorkspace } from '../features/workspace/workspaceContext'
 import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { FormField, formInputClass } from '../components/FormField'
 import { Skeleton } from '../components/Skeleton'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useI18n } from '../i18n'
 import type { ProjectStatus, Priority } from '../types/project'
 
 export function ProjectsPage() {
+  const { t, lang } = useI18n()
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const queryClient = useQueryClient()
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -39,7 +41,7 @@ export function ProjectsPage() {
       setPriority('none')
       setErrors({})
     },
-    onError: (error) => setErrors(extractFieldErrors(error)),
+    onError: (error) => setErrors(extractFieldErrors(error, lang)),
   })
 
   function handleSubmit(event: FormEvent) {
@@ -49,23 +51,23 @@ export function ProjectsPage() {
   }
 
   if (isWorkspaceLoading) {
-    return <p className="text-sm text-fg-muted">Loading workspace…</p>
+    return <p className="text-sm text-fg-muted">{t('common.loadingWorkspace')}</p>
   }
 
   if (!currentWorkspace) {
-    return <p className="text-sm text-fg-muted">No workspace found.</p>
+    return <p className="text-sm text-fg-muted">{t('common.noWorkspace')}</p>
   }
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">Projects</h1>
+        <h1 className="text-xl font-semibold text-fg">{t('projects.title')}</h1>
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
           className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
         >
-          {isFormOpen ? 'Cancel' : 'New project'}
+          {isFormOpen ? t('common.cancel') : t('projects.new')}
         </button>
       </div>
 
@@ -75,10 +77,10 @@ export function ProjectsPage() {
           className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4"
         >
           {errors.non_field_errors && (
-            <p className="mb-3 text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+            <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
           )}
           <div className="mb-3">
-            <FormField label="Name" errors={errors.name}>
+            <FormField label={t('common.name')} errors={errors.name}>
               <input
                 className={formInputClass}
                 value={name}
@@ -88,7 +90,7 @@ export function ProjectsPage() {
             </FormField>
           </div>
           <div className="mb-3">
-            <FormField label="Description" errors={errors.description}>
+            <FormField label={t('common.description')} errors={errors.description}>
               <textarea
                 className={formInputClass}
                 value={description}
@@ -98,7 +100,7 @@ export function ProjectsPage() {
             </FormField>
           </div>
           <div className="mb-3 grid grid-cols-2 gap-2">
-            <FormField label="Status" errors={errors.status}>
+            <FormField label={t('common.status')} errors={errors.status}>
               <select
                 className={formInputClass}
                 value={status}
@@ -107,13 +109,13 @@ export function ProjectsPage() {
                 {(['planned', 'active', 'paused', 'completed', 'archived'] as ProjectStatus[]).map(
                   (value) => (
                     <option key={value} value={value}>
-                      {value}
+                      {t(`projectStatus.${value}`)}
                     </option>
                   ),
                 )}
               </select>
             </FormField>
-            <FormField label="Priority" errors={errors.priority}>
+            <FormField label={t('common.priority')} errors={errors.priority}>
               <select
                 className={formInputClass}
                 value={priority}
@@ -121,7 +123,7 @@ export function ProjectsPage() {
               >
                 {(['none', 'low', 'medium', 'high', 'urgent'] as Priority[]).map((value) => (
                   <option key={value} value={value}>
-                    {value}
+                    {t(`priority.${value}`)}
                   </option>
                 ))}
               </select>
@@ -132,7 +134,7 @@ export function ProjectsPage() {
             disabled={createMutation.isPending}
             className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
-            {createMutation.isPending ? 'Creating…' : 'Create project'}
+            {createMutation.isPending ? t('common.creating') : t('projects.create')}
           </button>
         </form>
       )}
@@ -145,10 +147,10 @@ export function ProjectsPage() {
         </div>
       )}
       {projectsQuery.isError && (
-        <p className="text-sm text-red-400">Couldn't load projects. Is the backend running?</p>
+        <p className="text-sm text-danger">{t('projects.loadFailed')}</p>
       )}
       {projectsQuery.data && projectsQuery.data.length === 0 && (
-        <p className="text-sm text-fg-muted">No projects yet.</p>
+        <p className="text-sm text-fg-muted">{t('projects.empty')}</p>
       )}
 
       <div className="flex flex-col gap-2">
