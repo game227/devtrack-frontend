@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { AuthShell, primaryButtonClass } from '../components/AuthShell'
 import { FormField, formInputClass } from '../components/FormField'
-import { useAuth } from '../features/auth/AuthContext'
+import { useAuth } from '../features/auth/authContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useI18n } from '../i18n'
 
 export function LoginPage() {
+  const { t, lang } = useI18n()
   const { login } = useAuth()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
@@ -21,26 +24,23 @@ export function LoginPage() {
       await login({ username, password })
       navigate('/dashboard', { replace: true })
     } catch (error) {
-      setErrors(extractFieldErrors(error))
+      setErrors(extractFieldErrors(error, lang))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg text-fg">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded border border-border bg-bg-elevated p-6"
-      >
-        <h1 className="mb-6 text-lg font-semibold">Sign in to DevTrack</h1>
-
+    <AuthShell title={t('auth.signInTitle')}>
+      <form onSubmit={handleSubmit}>
         {errors.non_field_errors && (
-          <p className="mb-4 text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+          <p role="alert" className="mb-4 text-sm text-danger">
+            {errors.non_field_errors.join(' ')}
+          </p>
         )}
 
         <div className="mb-3">
-          <FormField label="Username" errors={errors.username}>
+          <FormField label={t('auth.username')} errors={errors.username}>
             <input
               className={formInputClass}
               value={username}
@@ -51,8 +51,8 @@ export function LoginPage() {
           </FormField>
         </div>
 
-        <div className="mb-4">
-          <FormField label="Password" errors={errors.password}>
+        <div className="mb-2">
+          <FormField label={t('auth.password')} errors={errors.password}>
             <input
               type="password"
               className={formInputClass}
@@ -64,21 +64,23 @@ export function LoginPage() {
           </FormField>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-        >
-          {isSubmitting ? 'Signing in…' : 'Sign in'}
+        <div className="mb-4 text-right text-xs">
+          <Link to="/forgot-password" className="text-accent hover:underline">
+            {t('auth.forgotPassword')}
+          </Link>
+        </div>
+
+        <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+          {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
         </button>
 
         <p className="mt-4 text-center text-sm text-fg-muted">
-          No account?{' '}
+          {t('auth.noAccount')}{' '}
           <Link to="/register" className="text-accent hover:underline">
-            Register
+            {t('auth.register')}
           </Link>
         </p>
       </form>
-    </div>
+    </AuthShell>
   )
 }

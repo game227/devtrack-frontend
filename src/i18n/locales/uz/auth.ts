@@ -1,0 +1,36 @@
+const uz: Record<string, string> = {
+  'auth.signInTitle': "DevTrack'ga kirish",
+  'auth.username': 'Foydalanuvchi nomi',
+  'auth.password': 'Parol',
+  'auth.signIn': 'Kirish',
+  'auth.signingIn': 'Kirilmoqda…',
+  'auth.forgotPassword': 'Parolni unutdingizmi?',
+  'auth.noAccount': "Akkauntingiz yo'qmi?",
+  'auth.register': "Ro'yxatdan o'tish",
+  'auth.registerTitle': 'DevTrack akkauntini yarating',
+  'auth.email': 'Email',
+  'auth.firstName': 'Ism',
+  'auth.lastName': 'Familiya',
+  'auth.confirmPassword': 'Parolni tasdiqlang',
+  'auth.createAccount': 'Akkaunt yaratish',
+  'auth.creatingAccount': 'Akkaunt yaratilmoqda…',
+  'auth.haveAccount': 'Akkauntingiz bormi?',
+  'auth.forgotTitle': 'Parolni tiklash',
+  'auth.forgotHelp':
+    "Ro'yxatdan o'tgan emailingizni kiriting. Agar u akkauntga tegishli bo'lsa, tiklash havolasi ulangan Telegram'ingizga (yoki emailga) yuboriladi.",
+  'auth.sendLink': 'Havolani yuborish',
+  'auth.sending': 'Yuborilmoqda…',
+  'auth.linkSent':
+    "Agar bunday email bilan akkaunt mavjud bo'lsa, tiklash havolasi yuborildi. Telegram yoki emailingizni tekshiring.",
+  'auth.backToSignIn': 'Kirish sahifasiga qaytish',
+  'auth.resetTitle': 'Yangi parol tanlang',
+  'auth.newPassword': 'Yangi parol',
+  'auth.confirmNewPassword': 'Yangi parolni tasdiqlang',
+  'auth.resetPassword': 'Parolni tiklash',
+  'auth.resetting': 'Tiklanmoqda…',
+  'auth.resetDone': 'Parolingiz tiklandi. Endi tizimga kirishingiz mumkin.',
+  'auth.goToSignIn': "Kirishga o'tish",
+  'auth.backHome': 'Bosh sahifaga qaytish',
+}
+
+export default uz

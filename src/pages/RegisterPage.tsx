@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { AuthShell, primaryButtonClass } from '../components/AuthShell'
 import { FormField, formInputClass } from '../components/FormField'
-import { useAuth } from '../features/auth/AuthContext'
+import { useAuth } from '../features/auth/authContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useI18n } from '../i18n'
 
 interface FormState {
   username: string
@@ -24,6 +26,7 @@ const initialState: FormState = {
 }
 
 export function RegisterPage() {
+  const { t, lang } = useI18n()
   const { register } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState<FormState>(initialState)
@@ -39,7 +42,7 @@ export function RegisterPage() {
     setErrors({})
 
     if (form.password !== form.passwordConfirm) {
-      setErrors({ password_confirm: ["Passwords don't match."] })
+      setErrors({ password_confirm: [t('error.passwordMismatch')] })
       return
     }
 
@@ -55,26 +58,23 @@ export function RegisterPage() {
       })
       navigate('/dashboard', { replace: true })
     } catch (error) {
-      setErrors(extractFieldErrors(error))
+      setErrors(extractFieldErrors(error, lang))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg text-fg">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded border border-border bg-bg-elevated p-6"
-      >
-        <h1 className="mb-6 text-lg font-semibold">Create your DevTrack account</h1>
-
+    <AuthShell title={t('auth.registerTitle')}>
+      <form onSubmit={handleSubmit}>
         {errors.non_field_errors && (
-          <p className="mb-4 text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+          <p role="alert" className="mb-4 text-sm text-danger">
+            {errors.non_field_errors.join(' ')}
+          </p>
         )}
 
         <div className="mb-3">
-          <FormField label="Username" errors={errors.username}>
+          <FormField label={t('auth.username')} errors={errors.username}>
             <input
               className={formInputClass}
               value={form.username}
@@ -86,7 +86,7 @@ export function RegisterPage() {
         </div>
 
         <div className="mb-3">
-          <FormField label="Email" errors={errors.email}>
+          <FormField label={t('auth.email')} errors={errors.email}>
             <input
               type="email"
               className={formInputClass}
@@ -99,7 +99,7 @@ export function RegisterPage() {
         </div>
 
         <div className="mb-3 grid grid-cols-2 gap-2">
-          <FormField label="First name" errors={errors.first_name}>
+          <FormField label={t('auth.firstName')} errors={errors.first_name}>
             <input
               className={formInputClass}
               value={form.firstName}
@@ -107,7 +107,7 @@ export function RegisterPage() {
               autoComplete="given-name"
             />
           </FormField>
-          <FormField label="Last name" errors={errors.last_name}>
+          <FormField label={t('auth.lastName')} errors={errors.last_name}>
             <input
               className={formInputClass}
               value={form.lastName}
@@ -118,7 +118,7 @@ export function RegisterPage() {
         </div>
 
         <div className="mb-3">
-          <FormField label="Password" errors={errors.password}>
+          <FormField label={t('auth.password')} errors={errors.password}>
             <input
               type="password"
               className={formInputClass}
@@ -131,7 +131,7 @@ export function RegisterPage() {
         </div>
 
         <div className="mb-4">
-          <FormField label="Confirm password" errors={errors.password_confirm}>
+          <FormField label={t('auth.confirmPassword')} errors={errors.password_confirm}>
             <input
               type="password"
               className={formInputClass}
@@ -143,21 +143,17 @@ export function RegisterPage() {
           </FormField>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-        >
-          {isSubmitting ? 'Creating account…' : 'Create account'}
+        <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+          {isSubmitting ? t('auth.creatingAccount') : t('auth.createAccount')}
         </button>
 
         <p className="mt-4 text-center text-sm text-fg-muted">
-          Already have an account?{' '}
+          {t('auth.haveAccount')}{' '}
           <Link to="/login" className="text-accent hover:underline">
-            Sign in
+            {t('auth.signIn')}
           </Link>
         </p>
       </form>
-    </div>
+    </AuthShell>
   )
 }

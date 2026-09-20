@@ -1,0 +1,36 @@
+const en: Record<string, string> = {
+  'auth.signInTitle': 'Sign in to DevTrack',
+  'auth.username': 'Username',
+  'auth.password': 'Password',
+  'auth.signIn': 'Sign in',
+  'auth.signingIn': 'Signing in…',
+  'auth.forgotPassword': 'Forgot password?',
+  'auth.noAccount': 'No account?',
+  'auth.register': 'Register',
+  'auth.registerTitle': 'Create your DevTrack account',
+  'auth.email': 'Email',
+  'auth.firstName': 'First name',
+  'auth.lastName': 'Last name',
+  'auth.confirmPassword': 'Confirm password',
+  'auth.createAccount': 'Create account',
+  'auth.creatingAccount': 'Creating account…',
+  'auth.haveAccount': 'Already have an account?',
+  'auth.forgotTitle': 'Reset your password',
+  'auth.forgotHelp':
+    "Enter the email you registered with. If it belongs to an account, we'll send a reset link to your connected Telegram, or by email.",
+  'auth.sendLink': 'Send reset link',
+  'auth.sending': 'Sending…',
+  'auth.linkSent':
+    'If an account with that email exists, a reset link has been sent. Check your Telegram or your email.',
+  'auth.backToSignIn': 'Back to sign in',
+  'auth.resetTitle': 'Choose a new password',
+  'auth.newPassword': 'New password',
+  'auth.confirmNewPassword': 'Confirm new password',
+  'auth.resetPassword': 'Reset password',
+  'auth.resetting': 'Resetting…',
+  'auth.resetDone': 'Your password has been reset. You can now sign in.',
+  'auth.goToSignIn': 'Go to sign in',
+  'auth.backHome': 'Back to home',
+}
+
+export default en

@@ -12,7 +12,7 @@ export function FormField({ label, errors, children }: FormFieldProps) {
       {label}
       {children}
       {errors && errors.length > 0 && (
-        <p className="mt-1 text-xs text-red-400">{errors.join(' ')}</p>
+        <p className="mt-1 text-xs text-danger">{errors.join(' ')}</p>
       )}
     </label>
   )
