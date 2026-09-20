@@ -1,12 +1,9 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateTeamPayload, Team, TeamMember, UpdateTeamPayload } from '../types/team'
 
 export async function listTeams(workspaceId: number): Promise<Team[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Team>>('/teams/', {
-    params: { workspace: workspaceId },
-  })
-  return data.results
+  return getAllPages<Team>('/teams/', { workspace: workspaceId })
 }
 
 export async function createTeam(payload: CreateTeamPayload): Promise<Team> {
@@ -24,8 +21,7 @@ export async function deleteTeam(id: number): Promise<void> {
 }
 
 export async function listTeamMembers(teamId: number): Promise<TeamMember[]> {
-  const { data } = await apiClient.get<PaginatedResponse<TeamMember>>(`/teams/${teamId}/members/`)
-  return data.results
+  return getAllPages<TeamMember>(`/teams/${teamId}/members/`)
 }
 
 export async function addTeamMember(teamId: number, username: string): Promise<TeamMember> {

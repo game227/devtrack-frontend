@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateLabelPayload, Label } from '../types/label'
 
 export interface LabelFilters {
@@ -8,8 +8,7 @@ export interface LabelFilters {
 }
 
 export async function listLabels(filters: LabelFilters): Promise<Label[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Label>>('/labels/', { params: filters })
-  return data.results
+  return getAllPages<Label>('/labels/', { ...filters })
 }
 
 export async function createLabel(payload: CreateLabelPayload): Promise<Label> {

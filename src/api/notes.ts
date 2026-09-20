@@ -1,10 +1,9 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateNotePayload, Note, UpdateNotePayload } from '../types/note'
 
 export async function listProjectNotes(projectId: number): Promise<Note[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Note>>(`/projects/${projectId}/notes/`)
-  return data.results
+  return getAllPages<Note>(`/projects/${projectId}/notes/`)
 }
 
 export async function createProjectNote(projectId: number, payload: CreateNotePayload): Promise<Note> {

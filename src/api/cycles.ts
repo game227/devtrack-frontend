@@ -1,12 +1,9 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateCyclePayload, Cycle, UpdateCyclePayload } from '../types/cycle'
 
 export async function listCycles(projectId: number): Promise<Cycle[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Cycle>>('/cycles/', {
-    params: { project: projectId },
-  })
-  return data.results
+  return getAllPages<Cycle>('/cycles/', { project: projectId })
 }
 
 export async function createCycle(payload: CreateCyclePayload): Promise<Cycle> {

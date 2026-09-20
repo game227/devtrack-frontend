@@ -1,12 +1,9 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateMilestonePayload, Milestone, UpdateMilestonePayload } from '../types/milestone'
 
 export async function listMilestones(projectId: number): Promise<Milestone[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Milestone>>('/milestones/', {
-    params: { project: projectId },
-  })
-  return data.results
+  return getAllPages<Milestone>('/milestones/', { project: projectId })
 }
 
 export async function createMilestone(payload: CreateMilestonePayload): Promise<Milestone> {

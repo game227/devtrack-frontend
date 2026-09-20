@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateIssuePayload, Issue, IssueFilters, UpdateIssuePayload } from '../types/issue'
 
 interface ListIssuesScope {
@@ -11,10 +11,7 @@ export async function listIssues(
   scope: ListIssuesScope,
   filters: IssueFilters = {},
 ): Promise<Issue[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Issue>>('/issues/', {
-    params: { ...scope, ...filters },
-  })
-  return data.results
+  return getAllPages<Issue>('/issues/', { ...scope, ...filters })
 }
 
 export async function createIssue(payload: CreateIssuePayload): Promise<Issue> {

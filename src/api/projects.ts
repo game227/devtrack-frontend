@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type {
   AddProjectMemberPayload,
   CreateProjectPayload,
@@ -17,10 +17,7 @@ export async function listProjects(
   workspaceId: number,
   filters: ProjectFilters = {},
 ): Promise<Project[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Project>>('/projects/', {
-    params: { workspace: workspaceId, ...filters },
-  })
-  return data.results
+  return getAllPages<Project>('/projects/', { workspace: workspaceId, ...filters })
 }
 
 export async function createProject(payload: CreateProjectPayload): Promise<Project> {
@@ -43,10 +40,7 @@ export async function deleteProject(id: number): Promise<void> {
 }
 
 export async function listProjectMembers(projectId: number): Promise<ProjectMember[]> {
-  const { data } = await apiClient.get<PaginatedResponse<ProjectMember>>(
-    `/projects/${projectId}/members/`,
-  )
-  return data.results
+  return getAllPages<ProjectMember>(`/projects/${projectId}/members/`)
 }
 
 export async function addProjectMember(

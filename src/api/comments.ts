@@ -1,10 +1,9 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { Comment } from '../types/comment'
 
 export async function listIssueComments(issueId: number): Promise<Comment[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Comment>>(`/issues/${issueId}/comments/`)
-  return data.results
+  return getAllPages<Comment>(`/issues/${issueId}/comments/`)
 }
 
 export async function createIssueComment(issueId: number, body: string): Promise<Comment> {
@@ -13,8 +12,7 @@ export async function createIssueComment(issueId: number, body: string): Promise
 }
 
 export async function listProjectComments(projectId: number): Promise<Comment[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Comment>>(`/projects/${projectId}/comments/`)
-  return data.results
+  return getAllPages<Comment>(`/projects/${projectId}/comments/`)
 }
 
 export async function createProjectComment(projectId: number, body: string): Promise<Comment> {

@@ -1,10 +1,9 @@
 import { apiClient } from './client'
-import type { PaginatedResponse } from '../types/api'
+import { getAllPages } from './pagination'
 import type { CreateWorkspacePayload, Workspace } from '../types/workspace'
 
 export async function listWorkspaces(): Promise<Workspace[]> {
-  const { data } = await apiClient.get<PaginatedResponse<Workspace>>('/workspaces/')
-  return data.results
+  return getAllPages<Workspace>('/workspaces/')
 }
 
 export async function createWorkspace(payload: CreateWorkspacePayload): Promise<Workspace> {
