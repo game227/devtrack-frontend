@@ -1,8 +1,10 @@
 import { apiClient } from './client'
 import type {
   GitHubConnectionStatus,
+  GitHubImportResult,
   GitHubRepo,
   GitHubRepoLink,
+  GitHubSyncResult,
   IssueGitHubLinks,
 } from '../types/integrations'
 
@@ -44,5 +46,20 @@ export async function unlinkProjectGithubRepo(projectId: number): Promise<void> 
 
 export async function getIssueGithubLinks(issueId: number): Promise<IssueGitHubLinks> {
   const { data } = await apiClient.get(`/integrations/issues/${issueId}/github-links/`)
+  return data
+}
+
+export async function importGithubRepo(payload: {
+  workspace: number
+  github_repo_id: number
+  full_name: string
+  import_issues: boolean
+}): Promise<GitHubImportResult> {
+  const { data } = await apiClient.post('/integrations/github/import/', payload)
+  return data
+}
+
+export async function syncProjectGithub(projectId: number): Promise<GitHubSyncResult> {
+  const { data } = await apiClient.post(`/integrations/projects/${projectId}/github-sync/`)
   return data
 }

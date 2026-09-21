@@ -11,6 +11,8 @@ export interface GitHubRepo {
   full_name: string
   private: boolean
   html_url: string
+  // Admin rights are needed to install a webhook; importing and syncing only need read access.
+  admin: boolean
 }
 
 interface GitHubRepoLinkedInfo {
@@ -18,8 +20,26 @@ interface GitHubRepoLinkedInfo {
   project: number
   github_repo_id: number
   full_name: string
+  // False when GitHub cannot reach this server (e.g. localhost): the repo is linked, but only a manual sync updates it.
+  webhook_installed: boolean
   connected_by: UserBrief
   created_at: string
+}
+
+export interface WebhookWarning {
+  code: 'not_public_url' | 'github_rejected'
+  detail: string
+}
+
+export interface GitHubImportResult {
+  project: { id: number; name: string }
+  issues_imported: number
+  link: { webhook_installed: boolean; webhook_warning: WebhookWarning | null }
+}
+
+export interface GitHubSyncResult {
+  pull_requests: number
+  commits: number
 }
 
 export type GitHubRepoLink = { linked: false } | ({ linked: true } & GitHubRepoLinkedInfo)

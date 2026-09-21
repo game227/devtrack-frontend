@@ -28,6 +28,9 @@ export interface Issue {
   cycle: number | null
   milestone: number | null
   due_date: string | null
+  // Set on issues imported from GitHub.
+  github_number: number | null
+  github_url: string
   created_at: string
   updated_at: string
 }

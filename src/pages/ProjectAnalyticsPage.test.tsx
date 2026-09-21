@@ -26,6 +26,8 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
     cycle: null,
     milestone: null,
     due_date: null,
+    github_number: null,
+    github_url: '',
     created_at: '2026-09-01T10:00:00Z',
     updated_at: '2026-09-01T10:00:00Z',
     ...overrides,

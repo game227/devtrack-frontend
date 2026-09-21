@@ -17,6 +17,9 @@ export function IssueRow({ issue }: { issue: Issue }) {
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
           <span className="shrink-0 font-mono text-xs text-code">#{issue.id}</span>
+          {issue.github_number !== null && (
+            <span className="shrink-0 font-mono text-xs text-fg-muted">GH#{issue.github_number}</span>
+          )}
           <span className="truncate text-sm font-medium text-fg">{issue.title}</span>
         </div>
         <div className="text-xs text-fg-muted">{meta}</div>

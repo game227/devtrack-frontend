@@ -5,9 +5,11 @@ import {
   getProjectGithubLink,
   linkProjectGithubRepo,
   listAvailableGithubRepos,
+  syncProjectGithub,
   unlinkProjectGithubRepo,
 } from '../api/integrations'
 import { describeError } from '../features/auth/errors'
+import { ConfirmButton } from './ConfirmButton'
 import { useI18n } from '../i18n'
 
 export function ProjectGithubLink({ projectId }: { projectId: number }) {
@@ -51,6 +53,16 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
     onSuccess: invalidate,
   })
 
+  const syncMutation = useMutation({
+    mutationFn: () => syncProjectGithub(projectId),
+    onSuccess: () => {
+      // New commits / merged pull requests change issues, health and the timeline.
+      for (const key of ['issues', 'issue-github-links', 'project-timeline', 'project-health', 'issue']) {
+        void queryClient.invalidateQueries({ queryKey: [key] })
+      }
+    },
+  })
+
   if (linkQuery.isLoading) {
     return <p className="text-sm text-fg-muted">{t('github.loading')}</p>
   }
@@ -67,23 +79,47 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
       )}
 
       {link?.linked ? (
-        <div className="flex max-w-md items-center justify-between rounded border border-border bg-bg-elevated px-3 py-2 text-sm">
-          <a
-            href={`https://github.com/${link.full_name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-accent hover:underline"
-          >
-            {link.full_name}
-          </a>
-          <button
-            type="button"
-            onClick={() => unlinkMutation.mutate()}
-            disabled={unlinkMutation.isPending}
-            className="text-xs text-fg-muted transition-colors duration-150 hover:text-danger"
-          >
-            {t('common.unlink')}
-          </button>
+        <div className="max-w-md rounded border border-border bg-bg-elevated px-3 py-2 text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <a
+              href={`https://github.com/${link.full_name}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent hover:underline"
+            >
+              {link.full_name}
+            </a>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => syncMutation.mutate()}
+                disabled={syncMutation.isPending}
+                className="rounded-md border border-border px-2.5 py-1 text-xs text-fg transition-colors duration-150 hover:border-fg disabled:opacity-50"
+              >
+                {syncMutation.isPending ? t('github.syncing') : t('github.sync')}
+              </button>
+              <ConfirmButton
+                onConfirm={() => unlinkMutation.mutate()}
+                disabled={unlinkMutation.isPending}
+                className="text-xs text-fg-muted transition-colors duration-150 hover:text-danger"
+              >
+                {t('common.unlink')}
+              </ConfirmButton>
+            </div>
+          </div>
+          <p className={`mt-2 text-xs ${link.webhook_installed ? 'text-success' : 'text-fg-muted'}`}>
+            {link.webhook_installed ? t('github.webhookOn') : t('github.noWebhook')}
+          </p>
+          {syncMutation.isSuccess && (
+            <p role="status" className="mt-1 text-xs text-fg-muted">
+              {t('github.synced', { pulls: syncMutation.data.pull_requests, commits: syncMutation.data.commits })}
+            </p>
+          )}
+          {syncMutation.isError && (
+            <p role="alert" className="mt-1 text-xs text-danger">
+              {describeError(syncMutation.error, lang) || t('github.syncFailed')}
+            </p>
+          )}
         </div>
       ) : reposQuery.isError ? (
         <p className="text-sm text-fg-muted">
@@ -104,6 +140,7 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
             {reposQuery.data?.map((repo) => (
               <option key={repo.id} value={repo.full_name}>
                 {repo.full_name}
+                {repo.admin ? '' : ` (${t('github.readOnly')})`}
               </option>
             ))}
           </select>

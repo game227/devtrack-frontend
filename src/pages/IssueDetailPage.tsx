@@ -102,6 +102,16 @@ export function IssueDetailPage() {
           <div className="mb-2 mt-2 flex flex-wrap items-center gap-2">
             <span className="font-mono text-sm text-code">#{issue.id}</span>
             <h1 className="text-xl font-semibold text-fg">{issue.title}</h1>
+            {issue.github_url && (
+              <a
+                href={issue.github_url}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-xs text-accent hover:underline"
+              >
+                {t('issue.githubNumber', { number: issue.github_number ?? '' })}
+              </a>
+            )}
             <span className="text-xs uppercase text-fg-muted">{t(`issueType.${issue.type}`)}</span>
           </div>
           <div className="mb-4 flex items-center gap-2">

@@ -6,6 +6,8 @@ import { createProject, listProjects } from '../api/projects'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { FormField, formInputClass } from '../components/FormField'
+import { ImportFromGithub } from '../components/ImportFromGithub'
+import { Icon } from '../components/Icon'
 import { Skeleton } from '../components/Skeleton'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
@@ -16,6 +18,7 @@ export function ProjectsPage() {
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const queryClient = useQueryClient()
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isImportOpen, setIsImportOpen] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState<ProjectStatus>('planned')
@@ -62,14 +65,27 @@ export function ProjectsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-fg">{t('projects.title')}</h1>
-        <button
-          type="button"
-          onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
-        >
-          {isFormOpen ? t('common.cancel') : t('projects.new')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsImportOpen((open) => !open)}
+            aria-expanded={isImportOpen}
+            className="flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+          >
+            <Icon name="github" />
+            {t('github.import.button')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsFormOpen((open) => !open)}
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+          >
+            {isFormOpen ? t('common.cancel') : t('projects.new')}
+          </button>
+        </div>
       </div>
+
+      {isImportOpen && <ImportFromGithub workspaceId={currentWorkspace.id} />}
 
       {isFormOpen && (
         <form
