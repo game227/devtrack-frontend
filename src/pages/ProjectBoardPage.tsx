@@ -5,17 +5,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { listIssues, updateIssue } from '../api/issues'
 import { Avatar } from '../components/Avatar'
 import { PriorityBadge } from '../components/Badge'
+import { STATUS_COLOR } from '../lib/statusColors'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
-
-const COLUMN_DOT: Record<IssueStatus, string> = {
-  backlog: 'var(--color-subtle)',
-  todo: 'var(--color-fg-muted)',
-  in_progress: 'var(--color-warning)',
-  in_review: 'var(--color-info)',
-  done: 'var(--color-success)',
-}
 
 export function ProjectBoardPage() {
   const t = useT()
@@ -107,7 +100,7 @@ export function ProjectBoardPage() {
               }`}
             >
               <div className="flex items-center gap-2 px-1 text-xs font-semibold uppercase text-fg-muted">
-                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: COLUMN_DOT[status] }} />
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: STATUS_COLOR[status] }} />
                 {t(`status.${status}`)}
                 <span className="ml-auto font-mono font-normal text-fg-muted/70">{columnIssues.length}</span>
               </div>

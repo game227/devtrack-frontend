@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LANG, LANGS, STORAGE_KEY, dictionaries, formatDate, readStoredLang, storeLang, translate } from './core'
+import { DEFAULT_LANG, LANGS, STORAGE_KEY, dictionaries, formatDate, formatDateTime, formatTime, readStoredLang, storeLang, translate } from './core'
 
 describe('translate', () => {
   it('returns the translation for the requested language', () => {
@@ -83,14 +83,19 @@ describe('language storage', () => {
   })
 })
 
-describe('formatDate', () => {
+describe('date formatting', () => {
   it('keeps calendar dates on the same day regardless of timezone', () => {
     expect(formatDate('en', '2026-09-18')).toBe(new Date(2026, 8, 18).toLocaleDateString('en-US', { dateStyle: 'medium' }))
-    expect(formatDate('uz', '2026-01-01')).toBe(new Date(2026, 0, 1).toLocaleDateString('uz-UZ', { dateStyle: 'medium' }))
+    expect(formatDate('uz', '2026-01-01')).toBe('1 yanvar 2026')
   })
 
-  it('formats full timestamps as instants', () => {
+  it('formats full timestamps as instants in local time', () => {
     const iso = '2026-09-18T14:33:27Z'
     expect(formatDate('en', iso)).toBe(new Date(iso).toLocaleDateString('en-US', { dateStyle: 'medium' }))
+    const local = new Date(iso)
+    const hh = String(local.getHours()).padStart(2, '0')
+    const mm = String(local.getMinutes()).padStart(2, '0')
+    expect(formatTime('uz', iso)).toBe(`${hh}:${mm}`)
+    expect(formatDateTime('uz', iso)).toBe(`${local.getDate()} sentabr 2026, ${hh}:${mm}`)
   })
 })

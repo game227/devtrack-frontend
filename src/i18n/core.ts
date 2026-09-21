@@ -50,8 +50,34 @@ export function storeLang(lang: Lang): void {
 
 const INTL_LOCALES: Record<Lang, string> = { uz: 'uz-UZ', en: 'en-US' }
 
+// Browsers ship poor Uzbek date data (Chromium prints "2026 M09 21"), so Uzbek dates are built here.
+const UZ_MONTHS = [
+  'yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun',
+  'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr',
+]
+
+function pad(n: number): string {
+  return String(n).padStart(2, '0')
+}
+
+function uzDate(date: Date): string {
+  return `${date.getDate()} ${UZ_MONTHS[date.getMonth()]} ${date.getFullYear()}`
+}
+
+function uzTime(date: Date): string {
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
 export function formatDateTime(lang: Lang, iso: string): string {
-  return new Date(iso).toLocaleString(INTL_LOCALES[lang], { dateStyle: 'medium', timeStyle: 'short' })
+  const date = new Date(iso)
+  if (lang === 'uz') return `${uzDate(date)}, ${uzTime(date)}`
+  return date.toLocaleString(INTL_LOCALES[lang], { dateStyle: 'medium', timeStyle: 'short' })
+}
+
+export function formatTime(lang: Lang, iso: string): string {
+  const date = new Date(iso)
+  if (lang === 'uz') return uzTime(date)
+  return date.toLocaleTimeString(INTL_LOCALES[lang], { timeStyle: 'short' })
 }
 
 // Date-only strings ("2026-09-18") are calendar dates, not instants: parsing them as UTC
@@ -61,5 +87,6 @@ const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
 export function formatDate(lang: Lang, iso: string): string {
   const dateOnly = DATE_ONLY.exec(iso)
   const date = dateOnly ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : new Date(iso)
+  if (lang === 'uz') return uzDate(date)
   return date.toLocaleDateString(INTL_LOCALES[lang], { dateStyle: 'medium' })
 }

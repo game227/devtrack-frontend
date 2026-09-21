@@ -7,6 +7,7 @@ export interface I18nValue {
   t: (key: string, params?: TranslateParams) => string
   formatDateTime: (iso: string) => string
   formatDate: (iso: string) => string
+  formatTime: (iso: string) => string
 }
 
 export const I18nContext = createContext<I18nValue | null>(null)

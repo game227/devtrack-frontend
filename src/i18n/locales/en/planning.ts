@@ -1,0 +1,53 @@
+const en: Record<string, string> = {
+  'confirm.ask': 'Are you sure?',
+  'planning.doneCount': '{done}/{total} done',
+
+  'cycles.title': 'Cycles',
+  'cycles.new': 'New cycle',
+  'cycles.create': 'Create cycle',
+  'cycles.loading': 'Loading cycles…',
+  'cycles.loadFailed': "Couldn't load cycles. Is the backend running?",
+  'cycles.empty': 'No cycles yet.',
+  'cycles.endDate': 'End date',
+  'cycles.active': 'active',
+
+  'milestones.title': 'Milestones',
+  'milestones.new': 'New milestone',
+  'milestones.create': 'Create milestone',
+  'milestones.loading': 'Loading milestones…',
+  'milestones.loadFailed': "Couldn't load milestones. Is the backend running?",
+  'milestones.empty': 'No milestones yet.',
+  'milestones.target': 'Target: {date}',
+
+  'notes.title': 'Notes',
+  'notes.new': 'New note',
+  'notes.create': 'Create note',
+  'notes.body': 'Body',
+  'notes.loading': 'Loading notes…',
+  'notes.loadFailed': "Couldn't load notes. Is the backend running?",
+  'notes.empty': 'No notes yet.',
+
+  'timeline.title': 'Timeline',
+  'timeline.loading': 'Loading timeline…',
+  'timeline.loadFailed': "Couldn't load the timeline.",
+  'timeline.empty': 'No activity yet.',
+  'timeline.loadMore': 'Load more',
+
+  'analytics.title': 'Analytics',
+  'analytics.loading': 'Loading analytics…',
+  'analytics.loadFailed': "Couldn't load analytics.",
+  'analytics.totalIssues': 'Total issues',
+  'analytics.completed': 'Completed',
+  'analytics.open': 'Open',
+  'analytics.overdue': 'Overdue',
+  'analytics.byStatus': 'Issues by status',
+  'analytics.byPriority': 'Open issues by priority',
+  'analytics.byType': 'Issues by type',
+  'analytics.workload': 'Open issues by assignee',
+  'analytics.velocity': 'Cycle completion',
+  'analytics.noIssues': 'No issues yet — analytics appear once the project has some.',
+  'analytics.noCycles': 'No cycles yet.',
+  'analytics.barLabel': '{label}: {value} ({percent}%)',
+}
+
+export default en

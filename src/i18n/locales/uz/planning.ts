@@ -1,0 +1,53 @@
+const uz: Record<string, string> = {
+  'confirm.ask': 'Ishonchingiz komilmi?',
+  'planning.doneCount': '{done}/{total} bajarildi',
+
+  'cycles.title': 'Sikllar',
+  'cycles.new': 'Yangi sikl',
+  'cycles.create': 'Sikl yaratish',
+  'cycles.loading': 'Sikllar yuklanmoqda…',
+  'cycles.loadFailed': "Sikllarni yuklab bo'lmadi. Backend ishlayaptimi?",
+  'cycles.empty': "Hozircha sikl yo'q.",
+  'cycles.endDate': 'Tugash sanasi',
+  'cycles.active': 'faol',
+
+  'milestones.title': 'Bosqichlar',
+  'milestones.new': 'Yangi bosqich',
+  'milestones.create': 'Bosqich yaratish',
+  'milestones.loading': 'Bosqichlar yuklanmoqda…',
+  'milestones.loadFailed': "Bosqichlarni yuklab bo'lmadi. Backend ishlayaptimi?",
+  'milestones.empty': "Hozircha bosqich yo'q.",
+  'milestones.target': 'Muddat: {date}',
+
+  'notes.title': 'Qaydlar',
+  'notes.new': 'Yangi qayd',
+  'notes.create': 'Qayd yaratish',
+  'notes.body': 'Matn',
+  'notes.loading': 'Qaydlar yuklanmoqda…',
+  'notes.loadFailed': "Qaydlarni yuklab bo'lmadi. Backend ishlayaptimi?",
+  'notes.empty': "Hozircha qayd yo'q.",
+
+  'timeline.title': 'Xronologiya',
+  'timeline.loading': 'Xronologiya yuklanmoqda…',
+  'timeline.loadFailed': "Xronologiyani yuklab bo'lmadi.",
+  'timeline.empty': "Hozircha faollik yo'q.",
+  'timeline.loadMore': 'Yana yuklash',
+
+  'analytics.title': 'Tahlil',
+  'analytics.loading': 'Tahlil yuklanmoqda…',
+  'analytics.loadFailed': "Tahlilni yuklab bo'lmadi.",
+  'analytics.totalIssues': 'Jami vazifalar',
+  'analytics.completed': 'Bajarilgan',
+  'analytics.open': 'Ochiq',
+  'analytics.overdue': "Muddati o'tgan",
+  'analytics.byStatus': "Holat bo'yicha vazifalar",
+  'analytics.byPriority': "Ochiq vazifalar ustuvorlik bo'yicha",
+  'analytics.byType': "Tur bo'yicha vazifalar",
+  'analytics.workload': "Ijrochilar bo'yicha ochiq vazifalar",
+  'analytics.velocity': 'Sikllar bajarilishi',
+  'analytics.noIssues': "Hozircha vazifa yo'q — loyihada vazifalar paydo bo'lgach tahlil ko'rinadi.",
+  'analytics.noCycles': "Hozircha sikl yo'q.",
+  'analytics.barLabel': '{label}: {value} ({percent}%)',
+}
+
+export default uz

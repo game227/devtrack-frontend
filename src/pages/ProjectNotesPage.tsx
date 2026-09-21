@@ -4,10 +4,13 @@ import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createProjectNote, deleteNote, listProjectNotes, updateNote } from '../api/notes'
 import { FormField, formInputClass } from '../components/FormField'
+import { ConfirmButton } from '../components/ConfirmButton'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useI18n } from '../i18n'
 import type { Note } from '../types/note'
 
 function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
+  const { t, lang, formatDateTime } = useI18n()
   const queryClient = useQueryClient()
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(note.title)
@@ -21,7 +24,7 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
       setIsEditing(false)
       setErrors({})
     },
-    onError: (error) => setErrors(extractFieldErrors(error)),
+    onError: (error) => setErrors(extractFieldErrors(error, lang)),
   })
 
   const deleteMutation = useMutation({
@@ -38,15 +41,15 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
     return (
       <form onSubmit={handleSubmit} className="rounded border border-border bg-bg-elevated p-4">
         {errors.non_field_errors && (
-          <p className="mb-3 text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+          <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
         )}
         <div className="mb-3">
-          <FormField label="Title" errors={errors.title}>
+          <FormField label={t('common.title')} errors={errors.title}>
             <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
           </FormField>
         </div>
         <div className="mb-3">
-          <FormField label="Body" errors={errors.body}>
+          <FormField label={t('notes.body')} errors={errors.body}>
             <textarea className={formInputClass} value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
           </FormField>
         </div>
@@ -54,16 +57,16 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
-            {updateMutation.isPending ? 'Saving…' : 'Save'}
+            {updateMutation.isPending ? t('common.saving') : t('common.save')}
           </button>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
+            className="rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </form>
@@ -76,14 +79,17 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
         <span className="text-sm font-medium text-fg">{note.title}</span>
         <div className="flex items-center gap-3 text-xs text-fg-muted">
           <span>
-            {note.author.username} · {new Date(note.updated_at).toLocaleString()}
+            {note.author.username} · {formatDateTime(note.updated_at)}
           </span>
           <button type="button" onClick={() => setIsEditing(true)} className="transition-colors duration-150 hover:text-fg">
-            Edit
+            {t('common.edit')}
           </button>
-          <button type="button" onClick={() => deleteMutation.mutate()} className="transition-colors duration-150 hover:text-red-400">
-            Delete
-          </button>
+          <ConfirmButton
+            onConfirm={() => deleteMutation.mutate()}
+            className="transition-colors duration-150 hover:text-danger"
+          >
+            {t('common.delete')}
+          </ConfirmButton>
         </div>
       </div>
       <p className="whitespace-pre-wrap text-sm text-fg">{note.body}</p>
@@ -92,8 +98,10 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
 }
 
 export function ProjectNotesPage() {
+  const { t } = useI18n()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
+  const { lang } = useI18n()
   const queryClient = useQueryClient()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [title, setTitle] = useState('')
@@ -115,7 +123,7 @@ export function ProjectNotesPage() {
       setBody('')
       setErrors({})
     },
-    onError: (error) => setErrors(extractFieldErrors(error)),
+    onError: (error) => setErrors(extractFieldErrors(error, lang)),
   })
 
   function handleSubmit(event: FormEvent) {
@@ -126,46 +134,46 @@ export function ProjectNotesPage() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">Notes</h1>
+        <h1 className="text-xl font-semibold text-fg">{t('notes.title')}</h1>
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
         >
-          {isFormOpen ? 'Cancel' : 'New note'}
+          {isFormOpen ? t('common.cancel') : t('notes.new')}
         </button>
       </div>
 
       {isFormOpen && (
         <form onSubmit={handleSubmit} className="mb-6 max-w-lg rounded border border-border bg-bg-elevated p-4">
           {errors.non_field_errors && (
-            <p className="mb-3 text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+            <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
           )}
           <div className="mb-3">
-            <FormField label="Title" errors={errors.title}>
+            <FormField label={t('common.title')} errors={errors.title}>
               <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
             </FormField>
           </div>
           <div className="mb-3">
-            <FormField label="Body" errors={errors.body}>
+            <FormField label={t('notes.body')} errors={errors.body}>
               <textarea className={formInputClass} value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
             </FormField>
           </div>
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
-            {createMutation.isPending ? 'Creating…' : 'Create note'}
+            {createMutation.isPending ? t('common.creating') : t('notes.create')}
           </button>
         </form>
       )}
 
-      {notesQuery.isLoading && <p className="text-sm text-fg-muted">Loading notes…</p>}
+      {notesQuery.isLoading && <p className="text-sm text-fg-muted">{t('notes.loading')}</p>}
       {notesQuery.isError && (
-        <p className="text-sm text-red-400">Couldn't load notes. Is the backend running?</p>
+        <p className="text-sm text-danger">{t('notes.loadFailed')}</p>
       )}
-      {notesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">No notes yet.</p>}
+      {notesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('notes.empty')}</p>}
 
       <div className="flex flex-col gap-3">
         {notesQuery.data?.map((note) => (
