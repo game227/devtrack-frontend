@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { getIssueGithubLinks } from '../api/integrations'
+import { useT } from '../i18n'
 import { PullRequestStatusBadge } from './Badge'
 
 export function IssueGithubActivity({ issueId }: { issueId: number }) {
+  const t = useT()
   const linksQuery = useQuery({
     queryKey: ['issue-github-links', issueId],
     queryFn: () => getIssueGithubLinks(issueId),
@@ -16,7 +18,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
 
   return (
     <div>
-      <div className="mb-2 text-xs text-fg-muted">Linked GitHub activity</div>
+      <div className="mb-2 text-xs text-fg-muted">{t('github.linkedActivity')}</div>
       <ul className="flex flex-col gap-1.5">
         {links.pull_requests.map((pr) => (
           <li

@@ -51,9 +51,15 @@ export function storeLang(lang: Lang): void {
 const INTL_LOCALES: Record<Lang, string> = { uz: 'uz-UZ', en: 'en-US' }
 
 export function formatDateTime(lang: Lang, iso: string): string {
-  return new Date(iso).toLocaleString(INTL_LOCALES[lang])
+  return new Date(iso).toLocaleString(INTL_LOCALES[lang], { dateStyle: 'medium', timeStyle: 'short' })
 }
 
+// Date-only strings ("2026-09-18") are calendar dates, not instants: parsing them as UTC
+// midnight would show the previous day west of UTC, so build them in local time instead.
+const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
+
 export function formatDate(lang: Lang, iso: string): string {
-  return new Date(iso).toLocaleDateString(INTL_LOCALES[lang])
+  const dateOnly = DATE_ONLY.exec(iso)
+  const date = dateOnly ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : new Date(iso)
+  return date.toLocaleDateString(INTL_LOCALES[lang], { dateStyle: 'medium' })
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LANG, LANGS, STORAGE_KEY, dictionaries, readStoredLang, storeLang, translate } from './core'
+import { DEFAULT_LANG, LANGS, STORAGE_KEY, dictionaries, formatDate, readStoredLang, storeLang, translate } from './core'
 
 describe('translate', () => {
   it('returns the translation for the requested language', () => {
@@ -80,5 +80,17 @@ describe('language storage', () => {
   it('ignores unsupported stored values', () => {
     localStorage.setItem(STORAGE_KEY, 'ru')
     expect(readStoredLang()).toBe('uz')
+  })
+})
+
+describe('formatDate', () => {
+  it('keeps calendar dates on the same day regardless of timezone', () => {
+    expect(formatDate('en', '2026-09-18')).toBe(new Date(2026, 8, 18).toLocaleDateString('en-US', { dateStyle: 'medium' }))
+    expect(formatDate('uz', '2026-01-01')).toBe(new Date(2026, 0, 1).toLocaleDateString('uz-UZ', { dateStyle: 'medium' }))
+  })
+
+  it('formats full timestamps as instants', () => {
+    const iso = '2026-09-18T14:33:27Z'
+    expect(formatDate('en', iso)).toBe(new Date(iso).toLocaleDateString('en-US', { dateStyle: 'medium' }))
   })
 })

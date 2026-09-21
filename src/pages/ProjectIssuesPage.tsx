@@ -3,9 +3,10 @@ import type { FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createIssue, listIssues } from '../api/issues'
-import { PriorityBadge } from '../components/Badge'
 import { FormField, formInputClass } from '../components/FormField'
+import { IssueRow } from '../components/IssueRow'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useI18n } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus, IssueType } from '../types/issue'
 import type { Priority } from '../types/project'
@@ -14,6 +15,7 @@ const TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
 const PRIORITIES: Priority[] = ['none', 'low', 'medium', 'high', 'urgent']
 
 export function ProjectIssuesPage() {
+  const { t, lang } = useI18n()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
   const queryClient = useQueryClient()
@@ -52,7 +54,7 @@ export function ProjectIssuesPage() {
       setPriority('none')
       setErrors({})
     },
-    onError: (error) => setErrors(extractFieldErrors(error)),
+    onError: (error) => setErrors(extractFieldErrors(error, lang)),
   })
 
   function handleSubmit(event: FormEvent) {
@@ -63,92 +65,88 @@ export function ProjectIssuesPage() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">Issues</h1>
+        <h1 className="text-xl font-semibold text-fg">{t('issues.title')}</h1>
         <div className="flex items-center gap-2">
           <Link
             to={`/projects/${projectId}/board`}
-            className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
+            className="rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
           >
-            Board
+            {t('nav.board')}
           </Link>
           <button
             type="button"
             onClick={() => setIsFormOpen((open) => !open)}
-            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
           >
-            {isFormOpen ? 'Cancel' : 'New issue'}
+            {isFormOpen ? t('common.cancel') : t('issues.new')}
           </button>
         </div>
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
         <select
-          className={formInputClass}
+          aria-label={t('issues.filterStatus')}
+          className={`${formInputClass} mt-0! w-auto!`}
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as IssueStatus | '')}
         >
-          <option value="">All statuses</option>
+          <option value="">{t('issues.allStatuses')}</option>
           {ISSUE_STATUSES.map((s) => (
             <option key={s} value={s}>
-              {s.replace('_', ' ')}
+              {t(`status.${s}`)}
             </option>
           ))}
         </select>
         <select
-          className={formInputClass}
+          aria-label={t('issues.filterType')}
+          className={`${formInputClass} mt-0! w-auto!`}
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as IssueType | '')}
         >
-          <option value="">All types</option>
-          {TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
+          <option value="">{t('issues.allTypes')}</option>
+          {TYPES.map((value) => (
+            <option key={value} value={value}>
+              {t(`issueType.${value}`)}
             </option>
           ))}
         </select>
         <label className="flex items-center gap-1.5 text-fg-muted">
           <input type="checkbox" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} />
-          Assigned to me
+          {t('issues.assignedToMe')}
         </label>
       </div>
 
       {isFormOpen && (
-        <form
-          onSubmit={handleSubmit}
-          className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4"
-        >
+        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4">
           {errors.non_field_errors && (
-            <p className="mb-3 text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+            <p role="alert" className="mb-3 text-sm text-danger">
+              {errors.non_field_errors.join(' ')}
+            </p>
           )}
           <div className="mb-3">
-            <FormField label="Title" errors={errors.title}>
-              <input
-                className={formInputClass}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
+            <FormField label={t('common.title')} errors={errors.title}>
+              <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
             </FormField>
           </div>
           <div className="mb-3 grid grid-cols-2 gap-2">
-            <FormField label="Type" errors={errors.type}>
+            <FormField label={t('common.type')} errors={errors.type}>
               <select className={formInputClass} value={type} onChange={(e) => setType(e.target.value as IssueType)}>
-                {TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {TYPES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`issueType.${value}`)}
                   </option>
                 ))}
               </select>
             </FormField>
-            <FormField label="Priority" errors={errors.priority}>
+            <FormField label={t('common.priority')} errors={errors.priority}>
               <select
                 className={formInputClass}
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
               >
-                {PRIORITIES.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
+                {PRIORITIES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`priority.${value}`)}
                   </option>
                 ))}
               </select>
@@ -157,36 +155,19 @@ export function ProjectIssuesPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
-            {createMutation.isPending ? 'Creating…' : 'Create issue'}
+            {createMutation.isPending ? t('common.creating') : t('issues.create')}
           </button>
         </form>
       )}
 
-      {issuesQuery.isLoading && <p className="text-sm text-fg-muted">Loading issues…</p>}
-      {issuesQuery.isError && (
-        <p className="text-sm text-red-400">Couldn't load issues. Is the backend running?</p>
-      )}
-      {issuesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">No issues yet.</p>}
+      {issuesQuery.isLoading && <p className="text-sm text-fg-muted">{t('issues.loading')}</p>}
+      {issuesQuery.isError && <p className="text-sm text-danger">{t('issues.loadFailed')}</p>}
+      {issuesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('issues.empty')}</p>}
 
       <div className="flex flex-col gap-2">
-        {issuesQuery.data?.map((issue) => (
-          <Link
-            key={issue.id}
-            to={`/issues/${issue.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
-          >
-            <div>
-              <div className="text-sm font-medium text-fg">{issue.title}</div>
-              <div className="text-xs text-fg-muted">
-                {issue.type} · {issue.status.replace('_', ' ')}
-                {issue.assignee && ` · ${issue.assignee.username}`}
-              </div>
-            </div>
-            <PriorityBadge priority={issue.priority} />
-          </Link>
-        ))}
+        {issuesQuery.data?.map((issue) => <IssueRow key={issue.id} issue={issue} />)}
       </div>
     </div>
   )

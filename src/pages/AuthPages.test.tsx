@@ -66,7 +66,7 @@ describe('ForgotPasswordPage', () => {
     await user.click(screen.getByRole('button', { name: 'Havolani yuborish' }))
 
     expect(await screen.findByRole('status')).toHaveTextContent('tiklash havolasi yuborildi')
-    expect(requestPasswordReset).toHaveBeenCalledWith({ email: 'jane@example.com' })
+    expect(requestPasswordReset).toHaveBeenCalledWith({ email: 'jane@example.com', lang: 'uz' })
   })
 })
 

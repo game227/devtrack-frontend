@@ -19,7 +19,7 @@ export function ForgotPasswordPage() {
     setErrors({})
     setIsSubmitting(true)
     try {
-      await requestPasswordReset({ email })
+      await requestPasswordReset({ email, lang })
       setIsSent(true)
     } catch (error) {
       setErrors(extractFieldErrors(error, lang))

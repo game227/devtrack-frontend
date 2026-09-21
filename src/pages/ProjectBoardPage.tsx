@@ -3,19 +3,22 @@ import type { DragEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { listIssues, updateIssue } from '../api/issues'
+import { Avatar } from '../components/Avatar'
 import { PriorityBadge } from '../components/Badge'
-import { BOARD_STATUSES } from '../types/issue'
+import { useT } from '../i18n'
+import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
 
-const COLUMN_LABELS: Record<IssueStatus, string> = {
-  backlog: 'Backlog',
-  todo: 'Todo',
-  in_progress: 'In Progress',
-  in_review: 'In Review',
-  done: 'Done',
+const COLUMN_DOT: Record<IssueStatus, string> = {
+  backlog: 'var(--color-subtle)',
+  todo: 'var(--color-fg-muted)',
+  in_progress: 'var(--color-warning)',
+  in_review: 'var(--color-info)',
+  done: 'var(--color-success)',
 }
 
 export function ProjectBoardPage() {
+  const t = useT()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
   const queryClient = useQueryClient()
@@ -67,10 +70,10 @@ export function ProjectBoardPage() {
   }
 
   if (issuesQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">Loading board…</p>
+    return <p className="text-sm text-fg-muted">{t('board.loading')}</p>
   }
   if (issuesQuery.isError) {
-    return <p className="text-sm text-red-400">Couldn't load the board. Is the backend running?</p>
+    return <p className="text-sm text-danger">{t('board.loadFailed')}</p>
   }
 
   const issues = issuesQuery.data ?? []
@@ -78,17 +81,17 @@ export function ProjectBoardPage() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">Board</h1>
+        <h1 className="text-xl font-semibold text-fg">{t('board.title')}</h1>
         <Link
           to={`/projects/${projectId}/issues`}
-          className="rounded border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
+          className="rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
         >
-          List view
+          {t('board.listView')}
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {BOARD_STATUSES.map((status) => {
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {ISSUE_STATUSES.map((status) => {
           const columnIssues = issues.filter((issue) => issue.status === status)
           return (
             <div
@@ -103,28 +106,58 @@ export function ProjectBoardPage() {
                 dragOverColumn === status ? 'border-fg bg-bg-elevated' : 'border-border'
               }`}
             >
-              <div className="px-1 text-xs font-semibold uppercase text-fg-muted">
-                {COLUMN_LABELS[status]} <span className="text-fg-muted/70">({columnIssues.length})</span>
+              <div className="flex items-center gap-2 px-1 text-xs font-semibold uppercase text-fg-muted">
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: COLUMN_DOT[status] }} />
+                {t(`status.${status}`)}
+                <span className="ml-auto font-mono font-normal text-fg-muted/70">{columnIssues.length}</span>
               </div>
+              {columnIssues.length === 0 && (
+                <p className="px-1 py-2 text-xs text-fg-muted/70">{t('board.emptyColumn')}</p>
+              )}
               {columnIssues.map((issue) => (
                 <div
                   key={issue.id}
                   draggable
                   onDragStart={(e) => handleDragStart(e, issue.id)}
                   onDragEnd={handleDragEnd}
-                  className={`cursor-grab rounded border border-border bg-bg-elevated p-2 transition-all duration-150 hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing ${
+                  className={`cursor-grab rounded border border-border bg-bg-elevated p-2.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing ${
                     draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
                   }`}
                 >
-                  <Link to={`/issues/${issue.id}`} className="text-sm text-fg transition-colors duration-150 hover:text-accent">
-                    {issue.title}
-                  </Link>
-                  <div className="mt-1.5 flex items-center justify-between">
-                    <span className="text-xs text-fg-muted">
-                      {issue.assignee?.username ?? 'Unassigned'}
-                    </span>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs text-code">#{issue.id}</span>
                     <PriorityBadge priority={issue.priority} />
                   </div>
+                  <Link
+                    to={`/issues/${issue.id}`}
+                    className="block text-sm text-fg transition-colors duration-150 hover:text-accent"
+                  >
+                    {issue.title}
+                  </Link>
+                  <div className="mt-2 flex items-center gap-1.5 text-xs text-fg-muted">
+                    {issue.assignee ? (
+                      <>
+                        <Avatar name={issue.assignee.username} src={issue.assignee.avatar} size={18} />
+                        <span className="truncate">{issue.assignee.username}</span>
+                      </>
+                    ) : (
+                      <span>{t('common.unassigned')}</span>
+                    )}
+                    <span className="ml-auto shrink-0">{t(`issueType.${issue.type}`)}</span>
+                  </div>
+                  {/* Touch screens cannot drag cards, so small screens get an explicit status control. */}
+                  <select
+                    aria-label={t('board.moveTo')}
+                    value={issue.status}
+                    onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus })}
+                    className="mt-2 w-full rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg md:hidden"
+                  >
+                    {ISSUE_STATUSES.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`status.${value}`)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               ))}
             </div>

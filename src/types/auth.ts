@@ -55,6 +55,8 @@ export interface ChangePasswordPayload {
 
 export interface RequestPasswordResetPayload {
   email: string
+  // Language of the message that carries the reset link.
+  lang?: 'uz' | 'en'
 }
 
 export interface ConfirmPasswordResetPayload {
