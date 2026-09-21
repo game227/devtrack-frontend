@@ -9,9 +9,11 @@ import { DailyActivityChart } from '../components/DailyActivityChart'
 import { useAuth } from '../features/auth/authContext'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useI18n } from '../i18n'
 import type { User } from '../types/auth'
 
 export function ProfilePage() {
+  const { t } = useI18n()
   const { user, refreshUser } = useAuth()
 
   if (!user) {
@@ -20,7 +22,7 @@ export function ProfilePage() {
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="text-xl font-semibold text-fg">Profile</h1>
+      <h1 className="text-xl font-semibold text-fg">{t('profile.title')}</h1>
       <ProfileForm user={user} onSaved={refreshUser} />
       <PasswordForm />
       <DeveloperAnalyticsCard userId={user.id} />
@@ -29,6 +31,7 @@ export function ProfilePage() {
 }
 
 function DeveloperAnalyticsCard({ userId }: { userId: number }) {
+  const t = useI18n().t
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const workspaceId = currentWorkspace?.id
 
@@ -39,7 +42,7 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   })
 
   if (isWorkspaceLoading || analyticsQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">Loading activity…</p>
+    return <p className="text-sm text-fg-muted">{t('profile.loadingActivity')}</p>
   }
   if (!currentWorkspace || analyticsQuery.isError || !analyticsQuery.data) {
     return null
@@ -50,21 +53,22 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   return (
     <div className="rounded border border-border bg-bg-elevated p-5">
       <h2 className="mb-3 text-sm font-semibold text-fg">
-        My activity <span className="text-fg-muted">· {currentWorkspace.name}</span>
+        {t('profile.myActivity')} <span className="text-fg-muted">· {currentWorkspace.name}</span>
       </h2>
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Projects" value={analytics.projects_count} />
-        <StatCard label="Tasks completed" value={analytics.tasks_completed} />
-        <StatCard label="Issues resolved" value={analytics.issues_resolved} />
-        <StatCard label="Open assigned" value={analytics.open_assigned} />
+        <StatCard label={t('profile.projects')} value={analytics.projects_count} />
+        <StatCard label={t('profile.tasksCompleted')} value={analytics.tasks_completed} />
+        <StatCard label={t('profile.issuesResolved')} value={analytics.issues_resolved} />
+        <StatCard label={t('profile.openAssigned')} value={analytics.open_assigned} />
       </div>
-      <div className="mb-1 text-xs text-fg-muted">Daily activity</div>
+      <div className="mb-1 text-xs text-fg-muted">{t('profile.dailyActivity')}</div>
       <DailyActivityChart data={analytics.daily_activity} />
     </div>
   )
 }
 
 function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<void> }) {
+  const { t, lang } = useI18n()
   const [firstName, setFirstName] = useState(user.first_name)
   const [lastName, setLastName] = useState(user.last_name)
   const [bio, setBio] = useState(user.bio)
@@ -97,7 +101,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
       await onSaved()
       setStatus('saved')
     } catch (error) {
-      setErrors(extractFieldErrors(error))
+      setErrors(extractFieldErrors(error, lang))
       setStatus('idle')
     }
   }
@@ -109,29 +113,29 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
     >
       <div className="flex items-center gap-4">
         {avatarPreview ? (
-          <img src={avatarPreview} alt="" className="h-16 w-16 rounded-full object-cover" />
+          <img src={avatarPreview} alt="" className="h-16 w-16 rounded-full border border-border object-cover" />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-bg text-xl text-fg-muted">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-bg text-xl text-fg-muted">
             {user.username.slice(0, 1).toUpperCase()}
           </div>
         )}
         <label className="cursor-pointer text-sm">
-          <span className="block rounded border border-border px-3 py-1.5 text-fg-muted transition-colors duration-150 hover:bg-bg">
-            Change avatar
+          <span className="block rounded-md border border-border px-3 py-1.5 text-fg-muted transition-colors duration-150 hover:border-fg hover:text-fg">
+            {t('profile.changeAvatar')}
           </span>
           <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
         </label>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <FormField label="First name" errors={errors.first_name}>
+        <FormField label={t('profile.firstName')} errors={errors.first_name}>
           <input
             className={formInputClass}
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
           />
         </FormField>
-        <FormField label="Last name" errors={errors.last_name}>
+        <FormField label={t('profile.lastName')} errors={errors.last_name}>
           <input
             className={formInputClass}
             value={lastName}
@@ -140,16 +144,16 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
         </FormField>
       </div>
 
-      <FormField label="Title" errors={errors.title}>
+      <FormField label={t('profile.jobTitle')} errors={errors.title}>
         <input
           className={formInputClass}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g. Backend Developer"
+          placeholder={t('profile.jobTitlePlaceholder')}
         />
       </FormField>
 
-      <FormField label="Bio" errors={errors.bio}>
+      <FormField label={t('profile.bio')} errors={errors.bio}>
         <textarea
           className={formInputClass}
           rows={3}
@@ -162,17 +166,18 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className="rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
         >
-          {status === 'saving' ? 'Saving…' : 'Save changes'}
+          {status === 'saving' ? t('common.saving') : t('profile.saveChanges')}
         </button>
-        {status === 'saved' && <span className="text-sm text-fg-muted">Saved.</span>}
+        {status === 'saved' && <span role="status" className="text-sm text-fg-muted">{t('common.saved')}</span>}
       </div>
     </form>
   )
 }
 
 function PasswordForm() {
+  const { t, lang } = useI18n()
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
@@ -183,7 +188,7 @@ function PasswordForm() {
     event.preventDefault()
     setErrors({})
     if (newPassword !== newPasswordConfirm) {
-      setErrors({ new_password_confirm: ["Passwords don't match."] })
+      setErrors({ new_password_confirm: [t('error.passwordMismatch')] })
       return
     }
     setStatus('saving')
@@ -198,7 +203,7 @@ function PasswordForm() {
       setNewPasswordConfirm('')
       setStatus('saved')
     } catch (error) {
-      setErrors(extractFieldErrors(error))
+      setErrors(extractFieldErrors(error, lang))
       setStatus('idle')
     }
   }
@@ -208,11 +213,11 @@ function PasswordForm() {
       onSubmit={handleSubmit}
       className="space-y-3 rounded border border-border bg-bg-elevated p-5"
     >
-      <h2 className="text-sm font-semibold text-fg">Change password</h2>
+      <h2 className="text-sm font-semibold text-fg">{t('profile.changePassword')}</h2>
       {errors.non_field_errors && (
-        <p className="text-sm text-red-400">{errors.non_field_errors.join(' ')}</p>
+        <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
       )}
-      <FormField label="Current password" errors={errors.old_password}>
+      <FormField label={t('profile.currentPassword')} errors={errors.old_password}>
         <input
           type="password"
           className={formInputClass}
@@ -221,7 +226,7 @@ function PasswordForm() {
           autoComplete="current-password"
         />
       </FormField>
-      <FormField label="New password" errors={errors.new_password}>
+      <FormField label={t('profile.newPassword')} errors={errors.new_password}>
         <input
           type="password"
           className={formInputClass}
@@ -230,7 +235,7 @@ function PasswordForm() {
           autoComplete="new-password"
         />
       </FormField>
-      <FormField label="Confirm new password" errors={errors.new_password_confirm}>
+      <FormField label={t('profile.confirmNewPassword')} errors={errors.new_password_confirm}>
         <input
           type="password"
           className={formInputClass}
@@ -243,11 +248,11 @@ function PasswordForm() {
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className="rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
         >
-          {status === 'saving' ? 'Saving…' : 'Update password'}
+          {status === 'saving' ? t('common.saving') : t('profile.updatePassword')}
         </button>
-        {status === 'saved' && <span className="text-sm text-fg-muted">Updated.</span>}
+        {status === 'saved' && <span role="status" className="text-sm text-fg-muted">{t('profile.passwordUpdated')}</span>}
       </div>
     </form>
   )
