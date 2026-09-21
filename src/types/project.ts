@@ -34,14 +34,20 @@ export interface CreateProjectPayload {
 
 export type UpdateProjectPayload = Partial<Omit<CreateProjectPayload, 'workspace'>>
 
+// What a person does on a project (separate from `role`, their permission level).
+export type ProjectSpecialty = 'frontend' | 'backend' | 'debugger' | 'designer'
+export const SPECIALTIES: ProjectSpecialty[] = ['frontend', 'backend', 'debugger', 'designer']
+
 export interface ProjectMember {
   id: number
   user: UserBrief
   role: string
+  specialty: ProjectSpecialty | ''
   added_at: string
 }
 
 export interface AddProjectMemberPayload {
   username: string
   role?: string
+  specialty?: ProjectSpecialty | ''
 }

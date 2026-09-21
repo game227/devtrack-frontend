@@ -213,6 +213,7 @@ export function IssueDetailPage() {
               {membersQuery.data?.map((member) => (
                 <option key={member.user.id} value={member.user.id}>
                   {member.user.username}
+                  {member.specialty ? ` · ${t(`specialty.${member.specialty}`)}` : ''}
                 </option>
               ))}
             </select>

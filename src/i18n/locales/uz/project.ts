@@ -26,6 +26,12 @@ const uz: Record<string, string> = {
   'comments.empty': "Hozircha izoh yo'q.",
   'comments.placeholder': 'Izoh yozing…',
   'comments.post': 'Yuborish',
+  'specialty.label': 'Mutaxassislik',
+  'specialty.none': 'Belgilanmagan',
+  'specialty.frontend': 'Frontend dasturchi',
+  'specialty.backend': 'Backend dasturchi',
+  'specialty.debugger': 'Debugger',
+  'specialty.designer': 'Dizayner',
 }
 
 export default uz

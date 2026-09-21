@@ -5,6 +5,7 @@ import type {
   CreateProjectPayload,
   Project,
   ProjectMember,
+  ProjectSpecialty,
   UpdateProjectPayload,
 } from '../types/project'
 
@@ -53,4 +54,13 @@ export async function addProjectMember(
 
 export async function removeProjectMember(projectId: number, userId: number): Promise<void> {
   await apiClient.delete(`/projects/${projectId}/members/${userId}/`)
+}
+
+export async function updateProjectMemberSpecialty(
+  projectId: number,
+  userId: number,
+  specialty: ProjectSpecialty | '',
+): Promise<ProjectMember> {
+  const { data } = await apiClient.patch<ProjectMember>(`/projects/${projectId}/members/${userId}/`, { specialty })
+  return data
 }

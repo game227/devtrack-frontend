@@ -26,6 +26,12 @@ const en: Record<string, string> = {
   'comments.empty': 'No comments yet.',
   'comments.placeholder': 'Write a comment…',
   'comments.post': 'Post',
+  'specialty.label': 'Specialty',
+  'specialty.none': 'No specialty',
+  'specialty.frontend': 'Frontend developer',
+  'specialty.backend': 'Backend developer',
+  'specialty.debugger': 'Debugger',
+  'specialty.designer': 'Designer',
 }
 
 export default en
