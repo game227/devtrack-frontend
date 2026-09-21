@@ -162,7 +162,7 @@ export function Layout() {
             onClick={() => setMenuOpen(true)}
             className="rounded-md border border-border p-1.5 text-fg-muted transition-colors duration-150 hover:text-fg md:hidden"
           >
-            <Icon name="dashboard" size={18} />
+            <Icon name="menu" size={18} />
           </button>
           <GlobalSearch />
           <div className="ml-auto flex items-center gap-3 text-sm text-fg-muted">
