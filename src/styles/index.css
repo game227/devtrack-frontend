@@ -25,6 +25,10 @@
 
   --animate-fade-in: fade-in 200ms ease-out;
   --animate-scale-in: scale-in 150ms ease-out;
+  /* Marketing entrance (hero stagger, scroll-reveal) — more travel and a slower, springier
+     ease than the 150-200ms UI transitions above. `both` keeps the element hidden before
+     the (possibly delayed) animation starts, so a staggered sequence never flashes unstyled. */
+  --animate-fade-up: fade-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes fade-in {
@@ -46,6 +50,17 @@
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
