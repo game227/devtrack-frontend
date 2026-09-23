@@ -167,7 +167,7 @@ export function IssueDetailPage() {
         />
       </div>
 
-      <aside className="h-fit rounded border border-border bg-bg-elevated p-4">
+      <aside className="h-fit rounded-2xl border border-border bg-bg-elevated p-4">
         <h2 className="mb-4 text-sm font-semibold text-fg">{t('issue.properties')}</h2>
         {updateMutation.isError && (
           <p role="alert" className="mb-3 text-xs text-danger">
@@ -236,7 +236,7 @@ export function IssueDetailPage() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => toggleLabel(label.id)}
-                    className="rounded px-2 py-0.5 text-xs font-medium"
+                    className="rounded-md px-2 py-0.5 text-xs font-medium"
                     style={{
                       backgroundColor: active ? `${label.color}33` : 'transparent',
                       color: active ? label.color : 'var(--color-fg-muted)',

@@ -51,7 +51,7 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   const analytics = analyticsQuery.data
 
   return (
-    <div className="rounded border border-border bg-bg-elevated p-5">
+    <div className="rounded-2xl border border-border bg-bg-elevated p-5">
       <h2 className="mb-3 text-sm font-semibold text-fg">
         {t('profile.myActivity')} <span className="text-fg-muted">· {currentWorkspace.name}</span>
       </h2>
@@ -109,7 +109,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded border border-border bg-bg-elevated p-5"
+      className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5"
     >
       <div className="flex items-center gap-4">
         {avatarPreview ? (
@@ -211,7 +211,7 @@ function PasswordForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded border border-border bg-bg-elevated p-5"
+      className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5"
     >
       <h2 className="text-sm font-semibold text-fg">{t('profile.changePassword')}</h2>
       {errors.non_field_errors && (

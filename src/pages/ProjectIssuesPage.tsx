@@ -117,7 +117,7 @@ export function ProjectIssuesPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
           {errors.non_field_errors && (
             <p role="alert" className="mb-3 text-sm text-danger">
               {errors.non_field_errors.join(' ')}

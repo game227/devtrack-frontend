@@ -85,7 +85,7 @@ export function DashboardPage() {
         <StatCard label={t('dashboard.statDoneIssues')} value={data.issues.done} />
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-4 rounded border border-border bg-bg-elevated px-4 py-3">
+      <div className="mb-6 flex flex-wrap gap-4 rounded-2xl border border-border bg-bg-elevated px-4 py-3">
         {PROJECT_STATUSES.map((status) => (
           <div key={status} className="flex items-center gap-2">
             <StatusBadge status={status} />
@@ -107,7 +107,7 @@ export function DashboardPage() {
               <Link
                 key={issue.id}
                 to={`/issues/${issue.id}`}
-                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
+                className="flex items-center justify-between rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{issue.title}</div>
@@ -140,7 +140,7 @@ export function DashboardPage() {
               <Link
                 key={item.id}
                 to={`/issues/${item.id}`}
-                className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
+                className="flex items-center justify-between rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
               >
                 <div>
                   <div className="text-sm font-medium text-fg">{item.title}</div>
@@ -163,7 +163,7 @@ export function DashboardPage() {
             <Link
               key={project.id}
               to={`/projects/${project.id}`}
-              className="rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
+              className="rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-medium text-fg">{project.name}</div>
@@ -195,7 +195,7 @@ export function DashboardPage() {
             return (
               <div
                 key={activity.id}
-                className="flex items-center justify-between rounded px-2 py-1.5 text-sm transition-colors duration-150 hover:bg-bg-elevated"
+                className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors duration-150 hover:bg-bg-elevated"
               >
                 {href ? (
                   <Link to={href} className="min-w-0 truncate">

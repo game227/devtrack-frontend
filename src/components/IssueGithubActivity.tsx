@@ -23,7 +23,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
         {links.pull_requests.map((pr) => (
           <li
             key={`pr-${pr.id}`}
-            className="flex items-center gap-2 rounded border border-border bg-bg-elevated px-3 py-2 text-sm"
+            className="flex items-center gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
           >
             <PullRequestStatusBadge state={pr.state} merged={pr.merged} />
             <a href={pr.url} target="_blank" rel="noreferrer" className="truncate text-fg hover:text-accent">
@@ -34,7 +34,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
         {links.commits.map((commit) => (
           <li
             key={`commit-${commit.id}`}
-            className="flex items-center gap-2 rounded border border-border bg-bg-elevated px-3 py-2 text-sm"
+            className="flex items-center gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
           >
             <a
               href={commit.url}

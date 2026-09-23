@@ -52,7 +52,7 @@ function TeamMembers({ teamId }: { teamId: number }) {
         {membersQuery.data?.map((member) => (
           <li
             key={member.id}
-            className="flex items-center justify-between rounded border border-border bg-bg px-3 py-2 text-sm"
+            className="flex items-center justify-between rounded-2xl border border-border bg-bg px-3 py-2 text-sm"
           >
             <span className="flex items-center gap-2 text-fg">
               <Avatar name={member.user.username} src={member.user.avatar} size={20} />
@@ -146,7 +146,7 @@ export function TeamsPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
           {errors.non_field_errors && (
             <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
           )}
@@ -185,7 +185,7 @@ export function TeamsPage() {
         {teamsQuery.data?.map((team) => {
           const isExpanded = expandedTeamId === team.id
           return (
-            <div key={team.id} className="rounded border border-border bg-bg-elevated px-4 py-3">
+            <div key={team.id} className="rounded-2xl border border-border bg-bg-elevated px-4 py-3">
               <button
                 type="button"
                 onClick={() => setExpandedTeamId(isExpanded ? null : team.id)}

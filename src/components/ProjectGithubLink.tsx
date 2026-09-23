@@ -79,7 +79,7 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
       )}
 
       {link?.linked ? (
-        <div className="max-w-md rounded border border-border bg-bg-elevated px-3 py-2 text-sm">
+        <div className="max-w-md rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm">
           <div className="flex items-center justify-between gap-3">
             <a
               href={`https://github.com/${link.full_name}`}

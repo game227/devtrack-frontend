@@ -20,7 +20,7 @@ const dangerButton =
 
 function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings'; children: ReactNode }) {
   return (
-    <div className="rounded border border-border bg-bg-elevated p-5">
+    <div className="rounded-2xl border border-border bg-bg-elevated p-5">
       <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg">
         {icon && <Icon name={icon} />}
         {title}

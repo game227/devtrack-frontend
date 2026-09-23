@@ -39,7 +39,7 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
 
   if (isEditing) {
     return (
-      <form onSubmit={handleSubmit} className="rounded border border-border bg-bg-elevated p-4">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-bg-elevated p-4">
         {errors.non_field_errors && (
           <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
         )}
@@ -74,7 +74,7 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
   }
 
   return (
-    <div className="rounded border border-border bg-bg-elevated p-4">
+    <div className="rounded-2xl border border-border bg-bg-elevated p-4">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-sm font-medium text-fg">{note.title}</span>
         <div className="flex items-center gap-3 text-xs text-fg-muted">
@@ -145,7 +145,7 @@ export function ProjectNotesPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-lg rounded border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-6 max-w-lg rounded-2xl border border-border bg-bg-elevated p-4">
           {errors.non_field_errors && (
             <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
           )}

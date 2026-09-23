@@ -19,4 +19,4 @@ export function FormField({ label, errors, children }: FormFieldProps) {
 }
 
 export const formInputClass =
-  'mt-1 w-full rounded-lg border border-border bg-bg px-3 py-1.5 text-sm text-fg outline-none focus:border-fg'
+  'mt-1 w-full rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-fg outline-none focus:border-fg'

@@ -41,7 +41,7 @@ export function CommentThread({ queryKey, listComments, createComment }: Comment
 
       <ul className="mb-3 flex flex-col gap-2">
         {commentsQuery.data?.map((comment) => (
-          <li key={comment.id} className="rounded border border-border bg-bg-elevated p-3 text-sm">
+          <li key={comment.id} className="rounded-2xl border border-border bg-bg-elevated p-3 text-sm">
             <div className="mb-1 flex items-center justify-between gap-2">
               <span className="flex items-center gap-2 font-medium text-fg">
                 <Avatar name={comment.author.username} src={comment.author.avatar} size={20} />

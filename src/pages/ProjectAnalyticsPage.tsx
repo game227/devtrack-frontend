@@ -24,7 +24,7 @@ function localToday(): string {
 
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded border border-border bg-bg-elevated p-4">
+    <section className="rounded-2xl border border-border bg-bg-elevated p-4">
       <h2 className="mb-3 text-sm font-semibold text-fg">{title}</h2>
       {children}
     </section>

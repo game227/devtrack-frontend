@@ -28,7 +28,7 @@ export function ProjectHealthCard({ projectId }: { projectId: number }) {
     : health.risks
 
   return (
-    <div className="rounded border border-border bg-bg-elevated p-4">
+    <div className="rounded-2xl border border-border bg-bg-elevated p-4">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-fg">{t('health.title')}</h2>
         <div className="flex items-center gap-2">

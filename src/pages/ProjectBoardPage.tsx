@@ -95,7 +95,7 @@ export function ProjectBoardPage() {
               }}
               onDragLeave={() => setDragOverColumn((current) => (current === status ? null : current))}
               onDrop={(e) => handleDrop(e, status)}
-              className={`flex min-h-[200px] flex-col gap-2 rounded border p-2 transition-colors duration-150 ${
+              className={`flex min-h-[200px] flex-col gap-2 rounded-2xl border p-2 transition-colors duration-150 ${
                 dragOverColumn === status ? 'border-fg bg-bg-elevated' : 'border-border'
               }`}
             >
@@ -113,7 +113,7 @@ export function ProjectBoardPage() {
                   draggable
                   onDragStart={(e) => handleDragStart(e, issue.id)}
                   onDragEnd={handleDragEnd}
-                  className={`cursor-grab rounded border border-border bg-bg-elevated p-2.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing ${
+                  className={`cursor-grab rounded-2xl border border-border bg-bg-elevated p-2.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing ${
                     draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
                   }`}
                 >

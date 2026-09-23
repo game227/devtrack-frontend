@@ -90,7 +90,7 @@ export function ProjectsPage() {
       {isFormOpen && (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4"
+          className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4"
         >
           {errors.non_field_errors && (
             <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
@@ -148,7 +148,7 @@ export function ProjectsPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
           >
             {createMutation.isPending ? t('common.creating') : t('projects.create')}
           </button>
@@ -174,7 +174,7 @@ export function ProjectsPage() {
           <Link
             key={project.id}
             to={`/projects/${project.id}`}
-            className="flex items-center justify-between rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
+            className="flex items-center justify-between rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
           >
             <div>
               <div className="text-sm font-medium text-fg">{project.name}</div>

@@ -125,7 +125,7 @@ export function GlobalSearch() {
                 {results.labels.map((label) => (
                   <span
                     key={label.id}
-                    className="rounded px-2 py-0.5 text-xs"
+                    className="rounded-md px-2 py-0.5 text-xs"
                     style={{ backgroundColor: `${label.color}33`, color: label.color }}
                   >
                     {label.name}

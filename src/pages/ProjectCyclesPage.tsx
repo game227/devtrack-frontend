@@ -63,7 +63,7 @@ export function ProjectCyclesPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
           {errors.non_field_errors && (
             <p role="alert" className="mb-3 text-sm text-danger">
               {errors.non_field_errors.join(' ')}
@@ -110,7 +110,7 @@ export function ProjectCyclesPage() {
 
       <div className="flex flex-col gap-2">
         {cyclesQuery.data?.map((cycle) => (
-          <div key={cycle.id} className="rounded border border-border bg-bg-elevated px-4 py-3">
+          <div key={cycle.id} className="rounded-2xl border border-border bg-bg-elevated px-4 py-3">
             <div className="mb-2 flex items-center justify-between gap-3">
               <div>
                 <span className="text-sm font-medium text-fg">{cycle.name}</span>

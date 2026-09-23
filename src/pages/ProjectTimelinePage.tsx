@@ -58,7 +58,7 @@ export function ProjectTimelinePage() {
               return (
                 <li
                   key={activity.id}
-                  className="flex items-center justify-between gap-3 rounded border border-border bg-bg-elevated px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
                 >
                   <span className="flex min-w-0 items-center gap-2">
                     <Avatar name={activity.actor.username} src={activity.actor.avatar} size={20} />

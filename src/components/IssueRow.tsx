@@ -12,7 +12,7 @@ export function IssueRow({ issue }: { issue: Issue }) {
   return (
     <Link
       to={`/issues/${issue.id}`}
-      className="flex items-center justify-between gap-3 rounded border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
+      className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
     >
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">

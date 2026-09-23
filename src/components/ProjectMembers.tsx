@@ -80,7 +80,7 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
         {membersQuery.data?.map((member) => (
           <li
             key={member.id}
-            className="flex items-center justify-between gap-3 rounded border border-border bg-bg-elevated px-3 py-2 text-sm"
+            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
           >
             <span className="flex min-w-0 items-center gap-2 text-fg">
               <Avatar name={member.user.username} src={member.user.avatar} size={20} />
