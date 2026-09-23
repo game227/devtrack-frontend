@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { listIssues, updateIssue } from '../api/issues'
 import { Avatar } from '../components/Avatar'
 import { PriorityBadge } from '../components/Badge'
+import { useAuth } from '../features/auth/authContext'
 import { STATUS_COLOR } from '../lib/statusColors'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
@@ -12,6 +13,7 @@ import type { Issue, IssueStatus } from '../types/issue'
 
 export function ProjectBoardPage() {
   const t = useT()
+  const { user } = useAuth()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
   const queryClient = useQueryClient()
@@ -107,52 +109,60 @@ export function ProjectBoardPage() {
               {columnIssues.length === 0 && (
                 <p className="px-1 py-2 text-xs text-fg-muted/70">{t('board.emptyColumn')}</p>
               )}
-              {columnIssues.map((issue) => (
-                <div
-                  key={issue.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, issue.id)}
-                  onDragEnd={handleDragEnd}
-                  className={`cursor-grab rounded-2xl border border-border bg-bg-elevated p-2.5 transition-all duration-150 hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing ${
-                    draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
-                  }`}
-                >
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <span className="font-mono text-xs text-code">#{issue.id}</span>
-                    <PriorityBadge priority={issue.priority} />
-                  </div>
-                  <Link
-                    to={`/issues/${issue.id}`}
-                    className="block text-sm text-fg transition-colors duration-150 hover:text-accent"
+              {columnIssues.map((issue) => {
+                // Only the issue's creator can edit it (backend: IsIssueReporter) — dragging or
+                // using the mobile status picker on someone else's issue would just bounce off a
+                // 403, so it's disabled here instead of letting the user hit that silently.
+                const canEdit = issue.reporter.id === user?.id
+                return (
+                  <div
+                    key={issue.id}
+                    draggable={canEdit}
+                    onDragStart={canEdit ? (e) => handleDragStart(e, issue.id) : undefined}
+                    onDragEnd={canEdit ? handleDragEnd : undefined}
+                    title={canEdit ? undefined : t('board.notYours')}
+                    className={`rounded-2xl border border-border bg-bg-elevated p-2.5 transition-all duration-150 ${
+                      canEdit ? 'cursor-grab hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing' : ''
+                    } ${draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'}`}
                   >
-                    {issue.title}
-                  </Link>
-                  <div className="mt-2 flex items-center gap-1.5 text-xs text-fg-muted">
-                    {issue.assignee ? (
-                      <>
-                        <Avatar name={issue.assignee.username} src={issue.assignee.avatar} size={18} />
-                        <span className="truncate">{issue.assignee.username}</span>
-                      </>
-                    ) : (
-                      <span>{t('common.unassigned')}</span>
-                    )}
-                    <span className="ml-auto shrink-0">{t(`issueType.${issue.type}`)}</span>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs text-code">#{issue.id}</span>
+                      <PriorityBadge priority={issue.priority} />
+                    </div>
+                    <Link
+                      to={`/issues/${issue.id}`}
+                      className="block text-sm text-fg transition-colors duration-150 hover:text-accent"
+                    >
+                      {issue.title}
+                    </Link>
+                    <div className="mt-2 flex items-center gap-1.5 text-xs text-fg-muted">
+                      {issue.assignee ? (
+                        <>
+                          <Avatar name={issue.assignee.username} src={issue.assignee.avatar} size={18} />
+                          <span className="truncate">{issue.assignee.username}</span>
+                        </>
+                      ) : (
+                        <span>{t('common.unassigned')}</span>
+                      )}
+                      <span className="ml-auto shrink-0">{t(`issueType.${issue.type}`)}</span>
+                    </div>
+                    {/* Touch screens cannot drag cards, so small screens get an explicit status control. */}
+                    <select
+                      aria-label={t('board.moveTo')}
+                      value={issue.status}
+                      disabled={!canEdit}
+                      onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus })}
+                      className="mt-2 w-full rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg disabled:opacity-40 md:hidden"
+                    >
+                      {ISSUE_STATUSES.map((value) => (
+                        <option key={value} value={value}>
+                          {t(`status.${value}`)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  {/* Touch screens cannot drag cards, so small screens get an explicit status control. */}
-                  <select
-                    aria-label={t('board.moveTo')}
-                    value={issue.status}
-                    onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus })}
-                    className="mt-2 w-full rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg md:hidden"
-                  >
-                    {ISSUE_STATUSES.map((value) => (
-                      <option key={value} value={value}>
-                        {t(`status.${value}`)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )
         })}

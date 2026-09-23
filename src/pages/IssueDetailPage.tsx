@@ -11,6 +11,7 @@ import { IssueStatusBadge, PriorityBadge } from '../components/Badge'
 import { CommentThread } from '../components/CommentThread'
 import { formInputClass } from '../components/FormField'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
+import { useAuth } from '../features/auth/authContext'
 import { useI18n } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus } from '../types/issue'
@@ -29,6 +30,7 @@ function Property({ label, children }: { label: string; children: ReactNode }) {
 
 export function IssueDetailPage() {
   const { t, formatDateTime } = useI18n()
+  const { user } = useAuth()
   const { id } = useParams<{ id: string }>()
   const issueId = Number(id)
   const queryClient = useQueryClient()
@@ -91,6 +93,9 @@ export function IssueDetailPage() {
 
   const issue = issueQuery.data
   const activeLabelIds = new Set(issue.labels.map((l) => l.id))
+  // Only the issue's creator can edit it (backend: IsIssueReporter) — the properties panel and
+  // the description are read-only for everyone else, rather than letting an edit bounce off a 403.
+  const canEdit = issue.reporter.id === user?.id
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
@@ -119,7 +124,7 @@ export function IssueDetailPage() {
             <PriorityBadge priority={issue.priority} />
           </div>
 
-          {isEditingDescription ? (
+          {isEditingDescription && canEdit ? (
             <form onSubmit={handleSaveDescription} className="flex flex-col gap-2">
               <textarea
                 aria-label={t('common.description')}
@@ -147,13 +152,20 @@ export function IssueDetailPage() {
             </form>
           ) : (
             <p
-              onClick={() => {
-                setDescription(issue.description)
-                setIsEditingDescription(true)
-              }}
-              className="cursor-text whitespace-pre-wrap text-sm text-fg-muted transition-colors duration-150 hover:text-fg"
+              onClick={
+                canEdit
+                  ? () => {
+                      setDescription(issue.description)
+                      setIsEditingDescription(true)
+                    }
+                  : undefined
+              }
+              title={canEdit ? undefined : t('issue.notYours')}
+              className={`whitespace-pre-wrap text-sm text-fg-muted transition-colors duration-150 ${
+                canEdit ? 'cursor-text hover:text-fg' : ''
+              }`}
             >
-              {issue.description || t('issue.addDescription')}
+              {issue.description || t(canEdit ? 'issue.addDescription' : 'issue.noDescription')}
             </p>
           )}
         </div>
@@ -168,7 +180,8 @@ export function IssueDetailPage() {
       </div>
 
       <aside className="h-fit rounded-2xl border border-border bg-bg-elevated p-4">
-        <h2 className="mb-4 text-sm font-semibold text-fg">{t('issue.properties')}</h2>
+        <h2 className="mb-1 text-sm font-semibold text-fg">{t('issue.properties')}</h2>
+        {!canEdit && <p className="mb-3 text-xs text-fg-muted">{t('issue.notYours')}</p>}
         {updateMutation.isError && (
           <p role="alert" className="mb-3 text-xs text-danger">
             {t('issue.updateFailed')}
@@ -177,8 +190,10 @@ export function IssueDetailPage() {
         <div className="flex flex-col gap-4">
           <Property label={t('common.status')}>
             <select
-              className={`${formInputClass} mt-0!`}
+              aria-label={t('common.status')}
+              className={`${formInputClass} mt-0! disabled:opacity-50`}
               value={issue.status}
+              disabled={!canEdit}
               onChange={(e) => updateMutation.mutate({ status: e.target.value as IssueStatus })}
             >
               {ISSUE_STATUSES.map((s) => (
@@ -190,8 +205,10 @@ export function IssueDetailPage() {
           </Property>
           <Property label={t('common.priority')}>
             <select
-              className={`${formInputClass} mt-0!`}
+              aria-label={t('common.priority')}
+              className={`${formInputClass} mt-0! disabled:opacity-50`}
               value={issue.priority}
+              disabled={!canEdit}
               onChange={(e) => updateMutation.mutate({ priority: e.target.value as Priority })}
             >
               {PRIORITIES.map((p) => (
@@ -203,8 +220,10 @@ export function IssueDetailPage() {
           </Property>
           <Property label={t('common.assignee')}>
             <select
-              className={`${formInputClass} mt-0!`}
+              aria-label={t('common.assignee')}
+              className={`${formInputClass} mt-0! disabled:opacity-50`}
               value={issue.assignee?.id ?? ''}
+              disabled={!canEdit}
               onChange={(e) =>
                 updateMutation.mutate({ assignee_id: e.target.value ? Number(e.target.value) : null })
               }
@@ -221,8 +240,10 @@ export function IssueDetailPage() {
           <Property label={t('common.dueDate')}>
             <input
               type="date"
-              className={`${formInputClass} mt-0!`}
+              aria-label={t('common.dueDate')}
+              className={`${formInputClass} mt-0! disabled:opacity-50`}
               value={issue.due_date ?? ''}
+              disabled={!canEdit}
               onChange={(e) => updateMutation.mutate({ due_date: e.target.value || null })}
             />
           </Property>
@@ -234,9 +255,10 @@ export function IssueDetailPage() {
                   <button
                     key={label.id}
                     type="button"
+                    disabled={!canEdit}
                     aria-pressed={active}
                     onClick={() => toggleLabel(label.id)}
-                    className="rounded-md px-2 py-0.5 text-xs font-medium"
+                    className="rounded-md px-2 py-0.5 text-xs font-medium disabled:opacity-50"
                     style={{
                       backgroundColor: active ? `${label.color}33` : 'transparent',
                       color: active ? label.color : 'var(--color-fg-muted)',

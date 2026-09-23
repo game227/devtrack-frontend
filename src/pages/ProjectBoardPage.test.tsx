@@ -1,9 +1,10 @@
 import { screen } from '@testing-library/react'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderWithProviders } from '../test/utils'
+import { makeAuth, renderWithProviders } from '../test/utils'
 import { ProjectBoardPage } from './ProjectBoardPage'
 import type { Issue } from '../types/issue'
+import type { User } from '../types/auth'
 
 const listIssues = vi.fn()
 const updateIssue = vi.fn()
@@ -35,12 +36,27 @@ function issue(overrides: Partial<Issue>): Issue {
   }
 }
 
-function renderBoard(lang: 'uz' | 'en' = 'uz') {
+function currentUser(overrides: Partial<User> = {}): User {
+  return {
+    id: 1,
+    username: 'jane.dev',
+    email: 'jane@example.com',
+    first_name: '',
+    last_name: '',
+    avatar: null,
+    bio: '',
+    title: '',
+    date_joined: '2026-01-01T00:00:00Z',
+    ...overrides,
+  }
+}
+
+function renderBoard(lang: 'uz' | 'en' = 'uz', user: User | null = null) {
   return renderWithProviders(
     <Routes>
       <Route path="/projects/:id/board" element={<ProjectBoardPage />} />
     </Routes>,
-    { route: '/projects/7/board', lang },
+    { route: '/projects/7/board', lang, auth: makeAuth({ user }) },
   )
 }
 
@@ -72,5 +88,32 @@ describe('ProjectBoardPage', () => {
     await screen.findByText('#1')
     expect(screen.getAllByText('Backlog').length).toBeGreaterThan(0)
     expect(screen.getAllByText('In progress').length).toBeGreaterThan(0)
+  })
+
+  it("lets the issue's creator drag their own card and use the status picker", async () => {
+    listIssues.mockResolvedValue([issue({ id: 21, title: 'Mine', reporter: { id: 1, username: 'jane.dev', avatar: null } })])
+    renderBoard('en', currentUser({ id: 1 }))
+
+    const card = (await screen.findByText('Mine')).closest('[draggable]')
+    expect(card).toHaveAttribute('draggable', 'true')
+    expect(screen.getByRole('combobox', { name: 'Move to' })).toBeEnabled()
+  })
+
+  it('disables drag and the status picker for issues someone else created', async () => {
+    listIssues.mockResolvedValue([issue({ id: 22, title: 'Not mine', reporter: { id: 1, username: 'jane.dev', avatar: null } })])
+    renderBoard('en', currentUser({ id: 99 }))
+
+    const card = (await screen.findByText('Not mine')).closest('[draggable]')
+    expect(card).toHaveAttribute('draggable', 'false')
+    expect(card).toHaveAttribute('title', 'Only the person who created this issue can edit it.')
+    expect(screen.getByRole('combobox', { name: 'Move to' })).toBeDisabled()
+  })
+
+  it('disables drag when signed out (no user to compare against the reporter)', async () => {
+    listIssues.mockResolvedValue([issue({ id: 23, title: 'Anonymous view' })])
+    renderBoard('en', null)
+
+    const card = (await screen.findByText('Anonymous view')).closest('[draggable]')
+    expect(card).toHaveAttribute('draggable', 'false')
   })
 })
