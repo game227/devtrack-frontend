@@ -80,14 +80,14 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
         {membersQuery.data?.map((member) => (
           <li
             key={member.id}
-            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
+            className="flex flex-col gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
             <span className="flex min-w-0 items-center gap-2 text-fg">
               <Avatar name={member.user.username} src={member.user.avatar} size={20} />
               <span className="truncate">{member.user.username}</span>
-              {member.role && <span className="text-fg-muted">· {t(`role.${member.role}`)}</span>}
+              {member.role && <span className="shrink-0 whitespace-nowrap text-fg-muted">· {t(`role.${member.role}`)}</span>}
             </span>
-            <span className="flex shrink-0 items-center gap-3">
+            <span className="flex flex-wrap items-center gap-3 sm:shrink-0">
               <select
                 aria-label={`${t('specialty.label')}: ${member.user.username}`}
                 className={compactSelect}

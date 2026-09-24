@@ -65,9 +65,9 @@ export function ProjectDetailPage() {
             <dt className="text-fg-muted">{t('common.targetDate')}</dt>
             <dd className="text-fg">{project.target_date ? formatDate(project.target_date) : '—'}</dd>
           </div>
-          <div>
+          <div className="min-w-0">
             <dt className="text-fg-muted">{t('common.repository')}</dt>
-            <dd className="text-fg">{project.repository_url ?? '—'}</dd>
+            <dd className="break-all text-fg">{project.repository_url ?? '—'}</dd>
           </div>
           <div>
             <dt className="text-fg-muted">{t('common.team')}</dt>

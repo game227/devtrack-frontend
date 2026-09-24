@@ -177,7 +177,7 @@ export function ProjectBoardPage() {
                           <span className="truncate">{issue.assignee.username}</span>
                         </>
                       ) : (
-                        <span>{t('common.unassigned')}</span>
+                        <span className="min-w-0 truncate">{t('common.unassigned')}</span>
                       )}
                       <span className="ml-auto shrink-0">{t(`issueType.${issue.type}`)}</span>
                     </div>

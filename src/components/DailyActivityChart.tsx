@@ -11,7 +11,7 @@ export function DailyActivityChart({ data }: { data: DailyActivity[] }) {
   const maxCount = Math.max(...data.map((day) => day.count), 1)
 
   return (
-    <div className="flex h-16 items-end gap-1">
+    <div className="flex h-16 items-end gap-1 overflow-x-clip">
       {data.map((day) => {
         const heightPercent = (day.count / maxCount) * 100
         const label = t('profile.activityBar', { date: formatDate(day.date), count: day.count })
