@@ -6,14 +6,20 @@ import { activityLink, describeActivity } from '../features/activity/activityTex
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useI18n } from '../i18n'
 import { PriorityBadge, StatusBadge } from '../components/Badge'
+import { DueChip } from '../components/DueChip'
+import { EmptyState } from '../components/EmptyState'
+import { useAuth } from '../features/auth/authContext'
+import { dueState } from '../lib/dueDate'
+import { sortByUrgency } from '../lib/issueOrder'
 import { StatCard } from '../components/StatCard'
-import { PageSkeleton, Skeleton } from '../components/Skeleton'
+import { PageSkeleton, Skeleton, SkeletonList } from '../components/Skeleton'
 import type { ProjectStatus } from '../types/project'
 
 const PROJECT_STATUSES: ProjectStatus[] = ['planned', 'active', 'paused', 'completed', 'archived']
 
 export function DashboardPage() {
   const { t, formatDate, formatDateTime } = useI18n()
+  const { user } = useAuth()
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const workspaceId = currentWorkspace?.id
 
@@ -65,66 +71,64 @@ export function DashboardPage() {
   }
 
   const data = dashboardQuery.data
-  const myOpenIssues = (myIssuesQuery.data ?? [])
-    .filter((issue) => issue.status !== 'done')
-    .sort((a, b) => {
-      if (!a.due_date && !b.due_date) return 0
-      if (!a.due_date) return 1
-      if (!b.due_date) return -1
-      return a.due_date.localeCompare(b.due_date)
-    })
+  const myOpenIssues = sortByUrgency((myIssuesQuery.data ?? []).filter((issue) => issue.status !== 'done'))
+  const overdueCount = myOpenIssues.filter((i) => dueState(i.due_date, i.status) === 'overdue').length
+  const dueSoonCount = myOpenIssues.filter((i) => dueState(i.due_date, i.status) === 'soon').length
+  const inProgressCount = myOpenIssues.filter((i) => i.status === 'in_progress').length
+  const inReviewCount = myOpenIssues.filter((i) => i.status === 'in_review').length
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold text-fg">{t('dashboard.title')}</h1>
-
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label={t('dashboard.statProjects')} value={data.projects.total} />
-        <StatCard label={t('dashboard.statActiveProjects')} value={data.projects.active} />
-        <StatCard label={t('dashboard.statOpenIssues')} value={data.issues.open} />
-        <StatCard label={t('dashboard.statDoneIssues')} value={data.issues.done} />
+      <div className="mb-5">
+        <h1 className="text-xl font-semibold text-fg">{t('dashboard.title')}</h1>
+        {user && <p className="text-sm text-fg-muted">{t('dashboard.greeting', { name: user.username })}</p>}
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-4 rounded-2xl border border-border bg-bg-elevated px-4 py-3">
-        {PROJECT_STATUSES.map((status) => (
-          <div key={status} className="flex items-center gap-2">
-            <StatusBadge status={status} />
-            <span className="text-sm text-fg-muted">{data.projects[status]}</span>
-          </div>
-        ))}
+      {data.projects.total === 0 && (
+        <EmptyState
+          className="mb-6"
+          icon="projects"
+          title={t('empty.projects.title')}
+          description={t('empty.projects.desc')}
+          action={{ label: t('empty.projects.action'), to: '/projects' }}
+        />
+      )}
+
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label={t('dashboard.focusOverdue')} value={overdueCount} tone="danger" />
+        <StatCard label={t('dashboard.focusDueSoon')} value={dueSoonCount} tone="warning" />
+        <StatCard label={t('dashboard.focusInProgress')} value={inProgressCount} />
+        <StatCard label={t('dashboard.focusInReview')} value={inReviewCount} />
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div>
           <h2 className="mb-2 text-sm font-semibold text-fg">{t('dashboard.myOpenIssues')}</h2>
-          {myIssuesQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
+          {myIssuesQuery.isLoading && <SkeletonList count={3} />}
           {myIssuesQuery.isError && <p className="text-sm text-danger">{t('dashboard.myIssuesFailed')}</p>}
           {myIssuesQuery.isSuccess && myOpenIssues.length === 0 && (
-            <p className="text-sm text-fg-muted">{t('dashboard.noMyIssues')}</p>
+            <EmptyState icon="check" title={t('dashboard.allClearTitle')} description={t('dashboard.noMyIssues')} />
           )}
           <div className="flex flex-col gap-2">
             {myOpenIssues.map((issue) => (
               <Link
                 key={issue.id}
                 to={`/issues/${issue.id}`}
-                className="flex items-center justify-between rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
               >
-                <div>
-                  <div className="text-sm font-medium text-fg">{issue.title}</div>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-fg">{issue.title}</div>
                   <div className="text-xs text-fg-muted">
-                    {issue.due_date
-                      ? t('dashboard.issueMetaDue', {
-                          type: t(`issueType.${issue.type}`),
-                          status: t(`status.${issue.status}`),
-                          date: formatDate(issue.due_date),
-                        })
-                      : t('dashboard.issueMeta', {
-                          type: t(`issueType.${issue.type}`),
-                          status: t(`status.${issue.status}`),
-                        })}
+                    {t('dashboard.issueMeta', {
+                      type: t(`issueType.${issue.type}`),
+                      status: t(`status.${issue.status}`),
+                    })}
                   </div>
                 </div>
-                <PriorityBadge priority={issue.priority} />
+                <div className="flex shrink-0 items-center gap-3">
+                  <DueChip dueDate={issue.due_date} status={issue.status} />
+                  <PriorityBadge priority={issue.priority} />
+                </div>
               </Link>
             ))}
           </div>
@@ -153,6 +157,22 @@ export function DashboardPage() {
             ))}
           </div>
         </div>
+      </div>
+
+      <h2 className="mb-2 text-sm font-semibold text-fg">{t('dashboard.workspaceOverview')}</h2>
+      <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label={t('dashboard.statProjects')} value={data.projects.total} />
+        <StatCard label={t('dashboard.statActiveProjects')} value={data.projects.active} />
+        <StatCard label={t('dashboard.statOpenIssues')} value={data.issues.open} />
+        <StatCard label={t('dashboard.statDoneIssues')} value={data.issues.done} />
+      </div>
+      <div className="mb-6 flex flex-wrap gap-4 rounded-2xl border border-border bg-bg-elevated px-4 py-3">
+        {PROJECT_STATUSES.map((status) => (
+          <div key={status} className="flex items-center gap-2">
+            <StatusBadge status={status} />
+            <span className="text-sm text-fg-muted">{data.projects[status]}</span>
+          </div>
+        ))}
       </div>
 
       <div className="mb-6">
