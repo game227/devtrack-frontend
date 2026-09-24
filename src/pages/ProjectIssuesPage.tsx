@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { SkeletonList } from '../components/Skeleton'
+import { EmptyState } from '../components/EmptyState'
 import type { FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createIssue, listIssues } from '../api/issues'
 import { FormField, formInputClass } from '../components/FormField'
@@ -24,7 +26,9 @@ export function ProjectIssuesPage() {
   const [typeFilter, setTypeFilter] = useState<IssueType | ''>('')
   const [mineOnly, setMineOnly] = useState(false)
 
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  // `?new=1` (board empty state, the "C" shortcut) lands here with the create form already open.
+  const [searchParams] = useSearchParams()
+  const [isFormOpen, setIsFormOpen] = useState(() => searchParams.get('new') === '1')
   const [title, setTitle] = useState('')
   const [type, setType] = useState<IssueType>('task')
   const [priority, setPriority] = useState<Priority>('none')
@@ -162,9 +166,21 @@ export function ProjectIssuesPage() {
         </form>
       )}
 
-      {issuesQuery.isLoading && <p className="text-sm text-fg-muted">{t('issues.loading')}</p>}
+      {issuesQuery.isLoading && <SkeletonList count={4} />}
       {issuesQuery.isError && <p className="text-sm text-danger">{t('issues.loadFailed')}</p>}
-      {issuesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('issues.empty')}</p>}
+      {issuesQuery.data?.length === 0 &&
+        (statusFilter || typeFilter || mineOnly ? (
+          <p className="text-sm text-fg-muted">{t('issues.empty')}</p>
+        ) : (
+          !isFormOpen && (
+            <EmptyState
+              icon="issues"
+              title={t('empty.issues.title')}
+              description={t('empty.issues.desc')}
+              action={{ label: t('empty.issues.action'), onClick: () => setIsFormOpen(true) }}
+            />
+          )
+        ))}
 
       <div className="flex flex-col gap-2">
         {issuesQuery.data?.map((issue) => <IssueRow key={issue.id} issue={issue} />)}

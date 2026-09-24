@@ -116,4 +116,19 @@ describe('ProjectBoardPage', () => {
     const card = (await screen.findByText('Anonymous view')).closest('[draggable]')
     expect(card).toHaveAttribute('draggable', 'false')
   })
+
+  it('shows an empty state with a create action when the project has no issues', async () => {
+    listIssues.mockResolvedValue([])
+    renderBoard('en', currentUser())
+
+    expect(await screen.findByText('The board is empty')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'New issue' })).toHaveAttribute('href', '/projects/7/issues?new=1')
+  })
+
+  it('flags an overdue card', async () => {
+    listIssues.mockResolvedValue([issue({ id: 31, title: 'Late one', due_date: '2020-01-01' })])
+    renderBoard('en', currentUser())
+
+    expect(await screen.findByText(/^Overdue/)).toBeInTheDocument()
+  })
 })

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PageSkeleton } from '../components/Skeleton'
 import type { FormEvent, ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -85,7 +86,7 @@ export function IssueDetailPage() {
   }
 
   if (issueQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">{t('issue.loading')}</p>
+    return <PageSkeleton rows={3} />
   }
   if (issueQuery.isError || !issueQuery.data) {
     return <p className="text-sm text-danger">{t('issue.loadFailed')}</p>

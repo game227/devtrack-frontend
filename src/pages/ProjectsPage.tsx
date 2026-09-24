@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { EmptyState } from '../components/EmptyState'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -8,7 +9,7 @@ import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { FormField, formInputClass } from '../components/FormField'
 import { ImportFromGithub } from '../components/ImportFromGithub'
 import { Icon } from '../components/Icon'
-import { Skeleton } from '../components/Skeleton'
+import { PageSkeleton, SkeletonList } from '../components/Skeleton'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { ProjectStatus, Priority } from '../types/project'
@@ -54,7 +55,7 @@ export function ProjectsPage() {
   }
 
   if (isWorkspaceLoading) {
-    return <p className="text-sm text-fg-muted">{t('common.loadingWorkspace')}</p>
+    return <PageSkeleton rows={4} />
   }
 
   if (!currentWorkspace) {
@@ -155,18 +156,17 @@ export function ProjectsPage() {
         </form>
       )}
 
-      {projectsQuery.isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-14" />
-          ))}
-        </div>
-      )}
+      {projectsQuery.isLoading && <SkeletonList count={4} />}
       {projectsQuery.isError && (
         <p className="text-sm text-danger">{t('projects.loadFailed')}</p>
       )}
-      {projectsQuery.data && projectsQuery.data.length === 0 && (
-        <p className="text-sm text-fg-muted">{t('projects.empty')}</p>
+      {projectsQuery.data && projectsQuery.data.length === 0 && !isFormOpen && (
+        <EmptyState
+          icon="projects"
+          title={t('empty.projects.title')}
+          description={t('empty.projects.desc')}
+          action={{ label: t('empty.projects.action'), onClick: () => setIsFormOpen(true) }}
+        />
       )}
 
       <div className="flex flex-col gap-2">

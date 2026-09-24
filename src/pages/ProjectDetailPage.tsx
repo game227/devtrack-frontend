@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { PageSkeleton } from '../components/Skeleton'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getProject, updateProject } from '../api/projects'
 import { listTeams } from '../api/teams'
@@ -34,7 +35,7 @@ export function ProjectDetailPage() {
   })
 
   if (projectQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">{t('project.loading')}</p>
+    return <PageSkeleton rows={3} />
   }
   if (projectQuery.isError || !projectQuery.data) {
     return <p className="text-sm text-danger">{t('project.loadFailed')}</p>

@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { PageSkeleton, SkeletonList } from '../components/Skeleton'
+import { EmptyState } from '../components/EmptyState'
 import type { FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addTeamMember, createTeam, listTeamMembers, listTeams, removeTeamMember } from '../api/teams'
@@ -126,7 +128,7 @@ export function TeamsPage() {
   }
 
   if (isWorkspaceLoading) {
-    return <p className="text-sm text-fg-muted">{t('common.loadingWorkspace')}</p>
+    return <PageSkeleton rows={4} />
   }
   if (!currentWorkspace) {
     return <p className="text-sm text-fg-muted">{t('common.noWorkspace')}</p>
@@ -175,11 +177,18 @@ export function TeamsPage() {
         </form>
       )}
 
-      {teamsQuery.isLoading && <p className="text-sm text-fg-muted">{t('teams.loading')}</p>}
+      {teamsQuery.isLoading && <SkeletonList count={3} />}
       {teamsQuery.isError && (
         <p className="text-sm text-danger">{t('teams.loadFailed')}</p>
       )}
-      {teamsQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('teams.empty')}</p>}
+      {teamsQuery.data?.length === 0 && !isFormOpen && (
+        <EmptyState
+          icon="teams"
+          title={t('empty.teams.title')}
+          description={t('empty.teams.desc')}
+          action={{ label: t('empty.teams.action'), onClick: () => setIsFormOpen(true) }}
+        />
+      )}
 
       <div className="flex flex-col gap-2">
         {teamsQuery.data?.map((team) => {

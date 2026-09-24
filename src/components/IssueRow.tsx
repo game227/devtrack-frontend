@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import type { Issue } from '../types/issue'
 import { PriorityBadge } from './Badge'
+import { DueChip } from './DueChip'
 
 export function IssueRow({ issue }: { issue: Issue }) {
   const t = useT()
@@ -24,7 +25,10 @@ export function IssueRow({ issue }: { issue: Issue }) {
         </div>
         <div className="text-xs text-fg-muted">{meta}</div>
       </div>
-      <PriorityBadge priority={issue.priority} />
+      <div className="flex shrink-0 items-center gap-3">
+        <DueChip dueDate={issue.due_date} status={issue.status} />
+        <PriorityBadge priority={issue.priority} />
+      </div>
     </Link>
   )
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { PageSkeleton } from '../components/Skeleton'
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { listCycles } from '../api/cycles'
@@ -48,7 +49,7 @@ export function ProjectAnalyticsPage() {
   })
 
   if (issuesQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">{t('analytics.loading')}</p>
+    return <PageSkeleton rows={4} />
   }
   if (issuesQuery.isError || !issuesQuery.data) {
     return <p className="text-sm text-danger">{t('analytics.loadFailed')}</p>

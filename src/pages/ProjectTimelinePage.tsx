@@ -1,4 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
+import { PageSkeleton } from '../components/Skeleton'
+import { EmptyState } from '../components/EmptyState'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { listProjectTimelinePage } from '../api/activities'
 import { Avatar } from '../components/Avatar'
@@ -20,7 +22,7 @@ export function ProjectTimelinePage() {
   })
 
   if (timelineQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">{t('timeline.loading')}</p>
+    return <PageSkeleton rows={5} />
   }
   if (timelineQuery.isError) {
     return <p className="text-sm text-danger">{t('timeline.loadFailed')}</p>
@@ -41,7 +43,9 @@ export function ProjectTimelinePage() {
     <div className="flex flex-col gap-4">
       <h1 className="text-xl font-semibold text-fg">{t('timeline.title')}</h1>
 
-      {activities.length === 0 && <p className="text-sm text-fg-muted">{t('timeline.empty')}</p>}
+      {activities.length === 0 && (
+        <EmptyState icon="timeline" title={t('empty.timeline.title')} description={t('empty.timeline.desc')} />
+      )}
 
       {days.map(({ day, items }) => (
         <section key={day}>

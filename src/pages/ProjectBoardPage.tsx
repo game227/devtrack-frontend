@@ -5,8 +5,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { listIssues, updateIssue } from '../api/issues'
 import { Avatar } from '../components/Avatar'
 import { PriorityBadge } from '../components/Badge'
+import { DueChip } from '../components/DueChip'
+import { EmptyState } from '../components/EmptyState'
+import { Skeleton } from '../components/Skeleton'
 import { useAuth } from '../features/auth/authContext'
 import { STATUS_COLOR } from '../lib/statusColors'
+import { dueState } from '../lib/dueDate'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
@@ -65,7 +69,16 @@ export function ProjectBoardPage() {
   }
 
   if (issuesQuery.isLoading) {
-    return <p className="text-sm text-fg-muted">{t('board.loading')}</p>
+    return (
+      <div role="status" aria-busy="true">
+        <Skeleton className="mb-4 h-7 w-40" />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {ISSUE_STATUSES.map((status) => (
+            <Skeleton key={status} className="h-52" />
+          ))}
+        </div>
+      </div>
+    )
   }
   if (issuesQuery.isError) {
     return <p className="text-sm text-danger">{t('board.loadFailed')}</p>
@@ -84,6 +97,16 @@ export function ProjectBoardPage() {
           {t('board.listView')}
         </Link>
       </div>
+
+      {issues.length === 0 && (
+        <EmptyState
+          className="mb-3"
+          icon="board"
+          title={t('empty.board.title')}
+          description={t('empty.board.desc')}
+          action={{ label: t('empty.board.action'), to: `/projects/${projectId}/issues?new=1` }}
+        />
+      )}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {ISSUE_STATUSES.map((status) => {
@@ -114,6 +137,8 @@ export function ProjectBoardPage() {
                 // using the mobile status picker on someone else's issue would just bounce off a
                 // 403, so it's disabled here instead of letting the user hit that silently.
                 const canEdit = issue.reporter.id === user?.id
+                const isOverdue = dueState(issue.due_date, issue.status) === 'overdue'
+                const isDone = issue.status === 'done'
                 return (
                   <div
                     key={issue.id}
@@ -121,7 +146,10 @@ export function ProjectBoardPage() {
                     onDragStart={canEdit ? (e) => handleDragStart(e, issue.id) : undefined}
                     onDragEnd={canEdit ? handleDragEnd : undefined}
                     title={canEdit ? undefined : t('board.notYours')}
-                    className={`rounded-2xl border border-border bg-bg-elevated p-2.5 transition-all duration-150 ${
+                    // Cards you can't edit sit flat on the page background; editable ones are lifted.
+                    className={`rounded-2xl border p-2.5 transition-all duration-150 ${
+                      isOverdue ? 'border-danger/40' : 'border-border'
+                    } ${canEdit ? 'bg-bg-elevated' : 'bg-bg'} ${
                       canEdit ? 'cursor-grab hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing' : ''
                     } ${draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'}`}
                   >
@@ -131,10 +159,17 @@ export function ProjectBoardPage() {
                     </div>
                     <Link
                       to={`/issues/${issue.id}`}
-                      className="block text-sm text-fg transition-colors duration-150 hover:text-accent"
+                      className={`block text-sm transition-colors duration-150 hover:text-accent ${
+                        isDone ? 'text-fg-muted' : 'text-fg'
+                      }`}
                     >
                       {issue.title}
                     </Link>
+                    {issue.due_date && (
+                      <div className="mt-1.5">
+                        <DueChip dueDate={issue.due_date} status={issue.status} />
+                      </div>
+                    )}
                     <div className="mt-2 flex items-center gap-1.5 text-xs text-fg-muted">
                       {issue.assignee ? (
                         <>

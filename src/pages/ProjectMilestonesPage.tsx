@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { SkeletonList } from '../components/Skeleton'
+import { EmptyState } from '../components/EmptyState'
 import type { FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -105,9 +107,16 @@ export function ProjectMilestonesPage() {
         </form>
       )}
 
-      {milestonesQuery.isLoading && <p className="text-sm text-fg-muted">{t('milestones.loading')}</p>}
+      {milestonesQuery.isLoading && <SkeletonList count={3} className="h-20" />}
       {milestonesQuery.isError && <p className="text-sm text-danger">{t('milestones.loadFailed')}</p>}
-      {milestonesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('milestones.empty')}</p>}
+      {milestonesQuery.data?.length === 0 && !isFormOpen && (
+        <EmptyState
+          icon="milestones"
+          title={t('empty.milestones.title')}
+          description={t('empty.milestones.desc')}
+          action={{ label: t('empty.milestones.action'), onClick: () => setIsFormOpen(true) }}
+        />
+      )}
 
       <div className="flex flex-col gap-2">
         {milestonesQuery.data?.map((milestone) => (

@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { EmptyState } from '../components/EmptyState'
 import { useQuery } from '@tanstack/react-query'
 import { listIssues } from '../api/issues'
 import { formInputClass } from '../components/FormField'
 import { IssueRow } from '../components/IssueRow'
-import { Skeleton } from '../components/Skeleton'
+import { PageSkeleton, SkeletonList } from '../components/Skeleton'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
@@ -28,7 +29,7 @@ export function IssuesPage() {
   })
 
   if (isWorkspaceLoading) {
-    return <p className="text-sm text-fg-muted">{t('common.loadingWorkspace')}</p>
+    return <PageSkeleton rows={4} />
   }
   if (!currentWorkspace) {
     return <p className="text-sm text-fg-muted">{t('common.noWorkspace')}</p>
@@ -58,15 +59,19 @@ export function IssuesPage() {
         </label>
       </div>
 
-      {issuesQuery.isLoading && (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-14" />
-          ))}
-        </div>
-      )}
+      {issuesQuery.isLoading && <SkeletonList count={4} />}
       {issuesQuery.isError && <p className="text-sm text-danger">{t('issues.loadFailed')}</p>}
-      {issuesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('issues.empty')}</p>}
+      {issuesQuery.data?.length === 0 &&
+        (statusFilter || mineOnly ? (
+          <p className="text-sm text-fg-muted">{t('issues.empty')}</p>
+        ) : (
+          <EmptyState
+            icon="issues"
+            title={t('empty.issues.title')}
+            description={t('empty.issuesWorkspace.desc')}
+            action={{ label: t('empty.issuesWorkspace.action'), to: '/projects' }}
+          />
+        ))}
 
       <div className="flex flex-col gap-2">
         {issuesQuery.data?.map((issue) => <IssueRow key={issue.id} issue={issue} />)}

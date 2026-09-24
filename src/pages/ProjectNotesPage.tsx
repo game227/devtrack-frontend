@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { SkeletonList } from '../components/Skeleton'
+import { EmptyState } from '../components/EmptyState'
 import type { FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -169,11 +171,18 @@ export function ProjectNotesPage() {
         </form>
       )}
 
-      {notesQuery.isLoading && <p className="text-sm text-fg-muted">{t('notes.loading')}</p>}
+      {notesQuery.isLoading && <SkeletonList count={3} className="h-24" />}
       {notesQuery.isError && (
         <p className="text-sm text-danger">{t('notes.loadFailed')}</p>
       )}
-      {notesQuery.data?.length === 0 && <p className="text-sm text-fg-muted">{t('notes.empty')}</p>}
+      {notesQuery.data?.length === 0 && !isFormOpen && (
+        <EmptyState
+          icon="notes"
+          title={t('empty.notes.title')}
+          description={t('empty.notes.desc')}
+          action={{ label: t('empty.notes.action'), onClick: () => setIsFormOpen(true) }}
+        />
+      )}
 
       <div className="flex flex-col gap-3">
         {notesQuery.data?.map((note) => (

@@ -7,7 +7,7 @@ import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useI18n } from '../i18n'
 import { PriorityBadge, StatusBadge } from '../components/Badge'
 import { StatCard } from '../components/StatCard'
-import { Skeleton } from '../components/Skeleton'
+import { PageSkeleton, Skeleton } from '../components/Skeleton'
 import type { ProjectStatus } from '../types/project'
 
 const PROJECT_STATUSES: ProjectStatus[] = ['planned', 'active', 'paused', 'completed', 'archived']
@@ -30,7 +30,7 @@ export function DashboardPage() {
   })
 
   if (isWorkspaceLoading) {
-    return <p className="text-sm text-fg-muted">{t('common.loadingWorkspace')}</p>
+    return <PageSkeleton rows={4} />
   }
   if (!currentWorkspace) {
     return <p className="text-sm text-fg-muted">{t('common.noWorkspace')}</p>
