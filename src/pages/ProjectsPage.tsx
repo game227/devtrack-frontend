@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { EmptyState } from '../components/EmptyState'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createProject, listProjects } from '../api/projects'
 import { useWorkspace } from '../features/workspace/workspaceContext'
@@ -18,7 +18,8 @@ export function ProjectsPage() {
   const { t, lang } = useI18n()
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const queryClient = useQueryClient()
-  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [searchParams] = useSearchParams()
+  const [isFormOpen, setIsFormOpen] = useState(() => searchParams.get('new') === '1')
   const [isImportOpen, setIsImportOpen] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')

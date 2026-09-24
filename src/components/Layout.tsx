@@ -1,16 +1,21 @@
-import { useState } from 'react'
-import { NavLink, Outlet, useLocation, useMatch } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { NavLink, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getProject } from '../api/projects'
 import { useAuth } from '../features/auth/authContext'
 import { useWorkspace } from '../features/workspace/workspaceContext'
-import { useT } from '../i18n'
+import { buildCommands, newIssuePath } from '../features/shortcuts/commands'
+import { handleShortcut } from '../features/shortcuts/shortcuts'
+import type { ShortcutState } from '../features/shortcuts/shortcuts'
+import { useI18n } from '../i18n'
 import { Avatar } from './Avatar'
+import { CommandPalette } from './CommandPalette'
 import { GlobalSearch } from './GlobalSearch'
 import { Icon } from './Icon'
 import type { IconName } from './Icon'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { NotificationsMenu } from './NotificationsMenu'
+import { ShortcutsHelp } from './ShortcutsHelp'
 
 interface NavItem {
   to: string
@@ -48,11 +53,14 @@ function SectionLabel({ children }: { children: string }) {
 }
 
 export function Layout() {
-  const t = useT()
+  const { t, lang, setLang } = useI18n()
   const { user, logout } = useAuth()
   const { currentWorkspace, workspaces, selectWorkspace } = useWorkspace()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false)
 
   const projectMatch = useMatch({ path: '/projects/:id', end: false })
   const projectId = projectMatch ? Number(projectMatch.params.id) : NaN
@@ -64,6 +72,55 @@ export function Layout() {
   })
 
   const username = user?.username ?? ''
+  const currentProjectId = inProject ? projectId : null
+
+  const commands = useMemo(
+    () =>
+      buildCommands({
+        t,
+        navigate,
+        projectId: currentProjectId,
+        toggleLanguage: () => setLang(lang === 'uz' ? 'en' : 'uz'),
+        logout: () => void logout(),
+        showShortcuts: () => setHelpOpen(true),
+      }),
+    [t, navigate, currentProjectId, lang, setLang, logout],
+  )
+
+  // Global shortcuts read the latest route/project through a ref so the listener is bound only once.
+  const shortcutContext = useRef({ currentProjectId, navigate })
+  useEffect(() => {
+    shortcutContext.current = { currentProjectId, navigate }
+  }, [currentProjectId, navigate])
+  const shortcutState = useRef<ShortcutState>({ pendingGoAt: null })
+  // Ctrl/Cmd+K toggles the palette; the header button (only reachable while it is closed) opens it.
+  const openPalette = useCallback(() => {
+    setHelpOpen(false)
+    setPaletteOpen((open) => !open)
+  }, [])
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const { currentProjectId: pid, navigate: navigateTo } = shortcutContext.current
+      // Navigating from a shortcut also dismisses the shortcuts list if it is showing.
+      const go = (to: string) => {
+        setHelpOpen(false)
+        navigateTo(to)
+      }
+      const handled = handleShortcut(event, shortcutState.current, {
+        openPalette,
+        toggleHelp: () => setHelpOpen((open) => !open),
+        newIssue: () => go(newIssuePath(pid)),
+        go: (target) => {
+          if (target === 'board') go(pid === null ? '/projects' : `/projects/${pid}/board`)
+          else go(`/${target}`)
+        },
+      })
+      if (handled) event.preventDefault()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [openPalette])
 
   return (
     <div className="flex min-h-screen bg-bg text-fg">
@@ -165,17 +222,36 @@ export function Layout() {
             <Icon name="menu" size={18} />
           </button>
           <GlobalSearch />
+          <button
+            type="button"
+            onClick={openPalette}
+            aria-label={t('cmdk.openHint')}
+            className="hidden items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-fg-muted transition-colors duration-150 hover:text-fg md:flex"
+          >
+            <kbd className="font-mono">Ctrl</kbd>
+            <kbd className="font-mono">K</kbd>
+          </button>
           <div className="ml-auto flex items-center gap-3 text-sm text-fg-muted">
             <LanguageSwitcher />
             <NotificationsMenu />
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6">
-          <div key={pathname} className="animate-fade-in">
+          {/* Keyed by search too, so "?new=1" links remount the page and open its create form. */}
+          <div key={pathname + search} className="animate-fade-in">
             <Outlet />
           </div>
         </main>
       </div>
+      {paletteOpen && (
+        <CommandPalette
+          commands={commands}
+          workspaceId={currentWorkspace?.id}
+          navigate={navigate}
+          onClose={() => setPaletteOpen(false)}
+        />
+      )}
+      {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
     </div>
   )
 }
