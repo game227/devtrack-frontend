@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { getIssueGithubLinks } from '../api/integrations'
+import { useTimeAgo } from '../hooks/useTimeAgo'
 import { useT } from '../i18n'
 import { PullRequestStatusBadge } from './Badge'
 
 export function IssueGithubActivity({ issueId }: { issueId: number }) {
   const t = useT()
+  const timeAgo = useTimeAgo()
   const linksQuery = useQuery({
     queryKey: ['issue-github-links', issueId],
     queryFn: () => getIssueGithubLinks(issueId),
@@ -29,6 +31,11 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
             <a href={pr.url} target="_blank" rel="noreferrer" className="truncate text-fg hover:text-accent">
               #{pr.number} {pr.title}
             </a>
+            {pr.draft && !pr.merged && <span className="shrink-0 text-xs text-fg-muted">{t('github.draftPr')}</span>}
+            <span className="ml-auto flex shrink-0 items-center gap-2 text-xs text-fg-muted">
+              {pr.head_ref && <span className="hidden font-mono sm:inline">{pr.head_ref} → {pr.base_ref}</span>}
+              <span>{timeAgo(pr.merged_at ?? pr.opened_at ?? pr.created_at)}</span>
+            </span>
           </li>
         ))}
         {links.commits.map((commit) => (
@@ -45,8 +52,10 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
               {commit.sha.slice(0, 7)}
             </a>
             <span className="truncate text-fg">{commit.message.split('\n')[0]}</span>
-            <span className="ml-auto shrink-0 text-xs text-fg-muted">
-              {commit.author_username || commit.author_name}
+            <span className="ml-auto flex shrink-0 items-center gap-2 text-xs text-fg-muted">
+              {commit.branch && <span className="hidden font-mono sm:inline">{commit.branch}</span>}
+              <span>{commit.author_username || commit.author_name}</span>
+              <span>{timeAgo(commit.committed_at ?? commit.created_at)}</span>
             </span>
           </li>
         ))}

@@ -10,10 +10,12 @@ import {
 } from '../api/integrations'
 import { describeError } from '../features/auth/errors'
 import { ConfirmButton } from './ConfirmButton'
+import { useTimeAgo } from '../hooks/useTimeAgo'
 import { useI18n } from '../i18n'
 
 export function ProjectGithubLink({ projectId }: { projectId: number }) {
   const { t, lang } = useI18n()
+  const timeAgo = useTimeAgo()
   const queryClient = useQueryClient()
   const [selectedRepo, setSelectedRepo] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -107,12 +109,31 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
               </ConfirmButton>
             </div>
           </div>
-          <p className={`mt-2 text-xs ${link.webhook_installed ? 'text-success' : 'text-fg-muted'}`}>
-            {link.webhook_installed ? t('github.webhookOn') : t('github.noWebhook')}
-          </p>
+          {link.webhook_installed ? (
+            link.last_event_at ? (
+              <p className="mt-2 text-xs text-success">{t('github.lastEvent', { when: timeAgo(link.last_event_at) })}</p>
+            ) : (
+              <p className="mt-2 text-xs text-warning">{t('github.webhookQuiet')}</p>
+            )
+          ) : (
+            <>
+              <p className="mt-2 text-xs text-fg-muted">{t('github.noWebhook')}</p>
+              <p className="mt-1 text-xs text-fg-muted">
+                {link.last_synced_at ? t('github.lastSynced', { when: timeAgo(link.last_synced_at) }) : t('github.neverSynced')}
+              </p>
+            </>
+          )}
+          {link.default_branch && (
+            <p className="mt-1 text-xs text-fg-muted">{t('github.defaultBranch', { branch: link.default_branch })}</p>
+          )}
+          <p className="mt-2 border-t border-border pt-2 text-xs text-fg-muted">{t('github.rules')}</p>
           {syncMutation.isSuccess && (
             <p role="status" className="mt-1 text-xs text-fg-muted">
-              {t('github.synced', { pulls: syncMutation.data.pull_requests, commits: syncMutation.data.commits })}
+              {t('github.synced', {
+                pulls: syncMutation.data.pull_requests,
+                commits: syncMutation.data.commits,
+                issues: syncMutation.data.issues ?? 0,
+              })}
             </p>
           )}
           {syncMutation.isError && (

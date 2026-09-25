@@ -22,6 +22,7 @@ const uz: Record<string, string> = {
   'profile.dailyActivity': 'Kunlik faollik',
   'profile.noActivity': "Bu davrda hali faollik yo'q.",
   'profile.activityBar': '{date}: {count}',
+  'profile.activitySummary': "So'nggi {days} kunda {total} ta harakat · eng faol kun: {date} ({count})",
 
   'settings.title': 'Sozlamalar',
   'settings.language': 'Til',

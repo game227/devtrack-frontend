@@ -22,6 +22,11 @@ interface GitHubRepoLinkedInfo {
   full_name: string
   // False when GitHub cannot reach this server (e.g. localhost): the repo is linked, but only a manual sync updates it.
   webhook_installed: boolean
+  // Kept current from every GitHub delivery; empty until the first one arrives.
+  default_branch: string
+  // When GitHub last delivered anything / when a manual sync last ran (null = never).
+  last_event_at: string | null
+  last_synced_at: string | null
   connected_by: UserBrief
   created_at: string
 }
@@ -40,6 +45,7 @@ export interface GitHubImportResult {
 export interface GitHubSyncResult {
   pull_requests: number
   commits: number
+  issues?: number
 }
 
 export type GitHubRepoLink = { linked: false } | ({ linked: true } & GitHubRepoLinkedInfo)
@@ -56,6 +62,11 @@ export interface GitHubPullRequest {
   url: string
   head_ref: string
   base_ref: string
+  draft?: boolean
+  // GitHub's own timestamps; created_at/updated_at are when DevTrack stored the row.
+  opened_at?: string | null
+  merged_at?: string | null
+  closed_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -67,6 +78,9 @@ export interface GitHubCommit {
   author_username: string
   author_name: string
   url: string
+  branch?: string
+  // When the commit was authored on GitHub (null for rows stored before this was tracked).
+  committed_at?: string | null
   created_at: string
 }
 

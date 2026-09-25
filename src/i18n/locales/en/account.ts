@@ -22,6 +22,7 @@ const en: Record<string, string> = {
   'profile.dailyActivity': 'Daily activity',
   'profile.noActivity': 'No activity in this window yet.',
   'profile.activityBar': '{date}: {count}',
+  'profile.activitySummary': '{total} actions in the last {days} days · busiest day {date} ({count})',
 
   'settings.title': 'Settings',
   'settings.language': 'Language',
