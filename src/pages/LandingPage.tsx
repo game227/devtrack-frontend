@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Icon } from '../components/Icon'
+import { ProductTour } from '../components/landing/ProductTour'
 import type { IconName } from '../components/Icon'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { Reveal } from '../components/Reveal'
@@ -88,6 +89,9 @@ export function LandingPage() {
             DevTrack
           </a>
           <nav className="hidden items-center gap-6 text-sm text-fg-muted md:flex">
+            <a href="#tour" className="transition-colors duration-150 hover:text-fg">
+              {t('landing.nav.tour')}
+            </a>
             <a href="#features" className="transition-colors duration-150 hover:text-fg">
               {t('landing.nav.features')}
             </a>
@@ -164,6 +168,15 @@ export function LandingPage() {
         >
           <Screenshot name="dashboard" alt={t('landing.heroTitle')} priority />
         </div>
+
+        <Section id="tour">
+          <Reveal>
+            <SectionHeading title={t('landing.tourTitle')} text={t('landing.tourText')} />
+          </Reveal>
+          <Reveal delay={STAGGER_MS}>
+            <ProductTour />
+          </Reveal>
+        </Section>
 
         <Section id="features">
           <Reveal>

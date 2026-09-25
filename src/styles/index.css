@@ -64,6 +64,199 @@
   }
 }
 
+/* Landing product tour: small building blocks the scenes compose into a script. Each one starts at
+   --d (set inline) and `both` holds the "before" state until then, so a scene reads top to bottom
+   like a timeline. The last frame of every scene is its meaningful end state. */
+.tour-in {
+  animation: tour-in 500ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both;
+}
+.tour-show {
+  animation: tour-show 300ms ease-out var(--d, 0ms) both;
+}
+.tour-hide {
+  animation: tour-hide 300ms ease-out var(--d, 0ms) forwards;
+}
+.tour-flash {
+  animation: tour-flash var(--dur, 1500ms) ease-in-out var(--d, 0ms) both;
+}
+.tour-type {
+  animation: tour-type var(--dur, 1s) steps(var(--n, 20), end) var(--d, 0ms) both;
+}
+.tour-press {
+  animation: tour-press 360ms ease-in-out var(--d, 0ms) both;
+}
+.tour-caret {
+  animation: tour-caret 1s steps(1) infinite;
+}
+.tour-progress {
+  animation: tour-progress var(--step-ms, 6500ms) linear both;
+}
+.tour-move {
+  animation: tour-move 6s cubic-bezier(0.65, 0, 0.35, 1) 400ms both;
+}
+.tour-cursor {
+  animation: tour-cursor 6s linear 400ms both;
+}
+.tour-col-a {
+  animation: tour-col-a 6s linear 400ms both;
+}
+.tour-col-b {
+  animation: tour-col-b 6s linear 400ms both;
+}
+
+@keyframes tour-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes tour-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes tour-hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes tour-flash {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes tour-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes tour-press {
+  0%,
+  100% {
+    transform: scale(1);
+    border-color: var(--color-border);
+  }
+  50% {
+    transform: translateY(1px) scale(0.93);
+    border-color: var(--color-fg);
+  }
+}
+@keyframes tour-caret {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes tour-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+/* A card picked up in column 1, dropped in column 2, then picked up again and dropped in column 3
+   (translateX % is relative to the card, which is exactly one column wide; 0.5rem is the grid gap). */
+@keyframes tour-move {
+  0%,
+  8% {
+    transform: translateX(0) scale(1);
+    border-color: var(--color-border);
+  }
+  14% {
+    transform: translateX(0) scale(1.04);
+    border-color: var(--color-fg);
+  }
+  32% {
+    transform: translateX(calc(100% + 0.5rem)) scale(1.04);
+    border-color: var(--color-fg);
+  }
+  38%,
+  52% {
+    transform: translateX(calc(100% + 0.5rem)) scale(1);
+    border-color: var(--color-border);
+  }
+  58% {
+    transform: translateX(calc(100% + 0.5rem)) scale(1.04);
+    border-color: var(--color-fg);
+  }
+  78% {
+    transform: translateX(calc(200% + 1rem)) scale(1.04);
+    border-color: var(--color-fg);
+  }
+  84%,
+  100% {
+    transform: translateX(calc(200% + 1rem)) scale(1);
+    border-color: var(--color-success);
+  }
+}
+@keyframes tour-cursor {
+  0%,
+  11% {
+    opacity: 0;
+  }
+  14%,
+  34% {
+    opacity: 1;
+  }
+  37%,
+  55% {
+    opacity: 0;
+  }
+  58%,
+  80% {
+    opacity: 1;
+  }
+  83%,
+  100% {
+    opacity: 0;
+  }
+}
+/* The column the card is currently being dragged over lights up. */
+@keyframes tour-col-a {
+  0%,
+  18%,
+  38%,
+  100% {
+    border-color: var(--color-border);
+  }
+  24%,
+  34% {
+    border-color: var(--color-fg);
+  }
+}
+@keyframes tour-col-b {
+  0%,
+  62%,
+  84%,
+  100% {
+    border-color: var(--color-border);
+  }
+  68%,
+  80% {
+    border-color: var(--color-fg);
+  }
+}
+
 html {
   color-scheme: dark;
   scroll-behavior: smooth;
@@ -79,6 +272,8 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    /* No waiting either: scripted animations jump straight to their end state. */
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
