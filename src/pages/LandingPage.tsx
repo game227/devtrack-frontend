@@ -5,6 +5,7 @@ import { ProductTour } from '../components/landing/ProductTour'
 import type { IconName } from '../components/Icon'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { Reveal } from '../components/Reveal'
+import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { useAuth } from '../features/auth/authContext'
 import { useI18n } from '../i18n'
 
@@ -103,6 +104,7 @@ export function LandingPage() {
             </a>
           </nav>
           <div className="flex items-center gap-2 text-sm sm:gap-3">
+            <ThemeSwitcher className="hidden sm:inline-flex" />
             <LanguageSwitcher />
             <Link to="/login" className="hidden text-fg-muted transition-colors duration-150 hover:text-fg sm:inline">
               {t('landing.signIn')}
@@ -187,7 +189,7 @@ export function LandingPage() {
               <Reveal key={feature.key} delay={index * STAGGER_MS}>
                 <div className="group rounded-2xl border border-border bg-bg-elevated p-5 transition-all duration-300 hover:-translate-y-1 hover:border-fg/40">
                   <div
-                    className="mb-3 inline-flex rounded-md p-2 text-fg transition-transform duration-300 group-hover:scale-110"
+                    className="mb-3 inline-flex rounded-md p-2 text-white transition-transform duration-300 group-hover:scale-110"
                     style={{ background: 'linear-gradient(135deg, var(--color-code), var(--color-merged))' }}
                   >
                     <Icon name={feature.icon} size={18} />
@@ -265,7 +267,10 @@ export function LandingPage() {
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-fg-muted sm:px-6">
           <span>{t('landing.footer', { year: new Date().getFullYear() })}</span>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-3">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </div>
         </div>
       </footer>
     </div>

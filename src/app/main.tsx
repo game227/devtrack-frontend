@@ -6,7 +6,10 @@ import { AuthProvider } from '../features/auth/AuthContext'
 import { WorkspaceProvider } from '../features/workspace/WorkspaceContext'
 import { I18nProvider } from '../i18n'
 import { App } from './App'
+import { initTheme } from '../lib/theme'
 import '../styles/index.css'
+
+initTheme()
 
 const queryClient = new QueryClient()
 

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 export function AuthShell({ title, children }: { title: string; children: ReactNode }) {
   const t = useT()
@@ -11,7 +12,10 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
         <Link to="/" className="text-lg font-semibold tracking-tight">
           DevTrack
         </Link>
-        <LanguageSwitcher />
+        <div className="flex items-center gap-3">
+          <ThemeSwitcher />
+          <LanguageSwitcher />
+        </div>
       </header>
       <main className="flex flex-1 items-center justify-center px-4 pb-16">
         <div className="w-full max-w-sm rounded-md border border-border bg-bg-elevated p-6">

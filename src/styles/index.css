@@ -262,6 +262,42 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Light theme: the same tokens, redefined. Everything in the app reads colours through these
+   variables (never raw palette classes), so this one block is the whole theme. Status colours are
+   darkened so they keep their contrast on white. It is chosen with data-theme on <html>, set
+   before first paint by the inline script in index.html and by lib/theme.ts. */
+/* Theme switch (see lib/theme.ts): no cross-fade — the new theme is revealed by an animated clip-path
+   drawn from JavaScript, sitting on top of a still picture of the old one. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 0;
+}
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-bg: #ffffff;
+  --color-bg-elevated: #fafafa;
+  --color-border: #e4e4e7;
+  --color-fg: #0a0a0b;
+  --color-fg-muted: #5f6368;
+  --color-accent: #0b62c4;
+  --color-code: #6a55d6;
+
+  --color-subtle: #8a8f98;
+  --color-success: #0d8a53;
+  --color-warning: #9a6200;
+  --color-info: #0b62c4;
+  --color-danger: #c4302b;
+  --color-merged: #6f4fd6;
+}
+
 body {
   background-color: var(--color-bg);
   font-family: var(--font-sans);

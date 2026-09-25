@@ -107,7 +107,7 @@ export function BoardScene() {
                     aria-hidden="true"
                     className="tour-cursor absolute -bottom-3 right-1"
                   >
-                    <path d="M5 3l14 7-6 2-2 6z" fill="#fff" stroke="#000" strokeWidth="1.5" strokeLinejoin="round" />
+                    <path d="M5 3l14 7-6 2-2 6z" fill="var(--color-fg)" stroke="var(--color-bg)" strokeWidth="1.5" strokeLinejoin="round" />
                   </svg>
                 </div>
               )}

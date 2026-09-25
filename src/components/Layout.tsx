@@ -15,6 +15,7 @@ import { Icon } from './Icon'
 import type { IconName } from './Icon'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { NotificationsMenu } from './NotificationsMenu'
+import { ThemeSwitcher } from './ThemeSwitcher'
 import { ShortcutsHelp } from './ShortcutsHelp'
 
 interface NavItem {
@@ -232,6 +233,7 @@ export function Layout() {
             <kbd className="font-mono">K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-3 text-sm text-fg-muted">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             <NotificationsMenu />
           </div>
