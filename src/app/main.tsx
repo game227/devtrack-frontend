@@ -7,8 +7,10 @@ import { WorkspaceProvider } from '../features/workspace/WorkspaceContext'
 import { I18nProvider } from '../i18n'
 import { App } from './App'
 import { initTheme } from '../lib/theme'
+import { initSentry } from '../lib/sentry'
 import '../styles/index.css'
 
+initSentry()
 initTheme()
 
 const queryClient = new QueryClient()
