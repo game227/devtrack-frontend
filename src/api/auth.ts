@@ -2,7 +2,9 @@ import { apiClient } from './client'
 import type {
   AuthResponse,
   ChangePasswordPayload,
+  ConfirmEmailVerificationPayload,
   ConfirmPasswordResetPayload,
+  DeleteAccountPayload,
   LoginPayload,
   RegisterPayload,
   RequestPasswordResetPayload,
@@ -68,6 +70,22 @@ export async function confirmPasswordReset(
     payload,
   )
   return data
+}
+
+export async function confirmEmailVerification(
+  payload: ConfirmEmailVerificationPayload,
+): Promise<{ detail: string }> {
+  const { data } = await apiClient.post<{ detail: string }>('/auth/email/verify/confirm/', payload)
+  return data
+}
+
+export async function resendEmailVerification(lang?: 'uz' | 'en'): Promise<{ detail: string }> {
+  const { data } = await apiClient.post<{ detail: string }>('/auth/email/verify/resend/', { lang })
+  return data
+}
+
+export async function deleteAccount(payload: DeleteAccountPayload): Promise<void> {
+  await apiClient.post('/auth/me/delete/', payload)
 }
 
 export { refreshAccessToken as refreshToken } from './client'

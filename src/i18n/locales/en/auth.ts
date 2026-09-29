@@ -31,6 +31,11 @@ const en: Record<string, string> = {
   'auth.resetDone': 'Your password has been reset. You can now sign in.',
   'auth.goToSignIn': 'Go to sign in',
   'auth.backHome': 'Back to home',
+  'auth.verifyEmailTitle': 'Verifying your email',
+  'auth.verifyingEmail': 'Verifying…',
+  'auth.verifyEmailSuccess': 'Your email is verified.',
+  'auth.verifyEmailError': 'This verification link is invalid or has already been used.',
+  'auth.goToDashboard': 'Go to dashboard',
 }
 
 export default en

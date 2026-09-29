@@ -7,12 +7,15 @@ import { renderWithProviders } from '../test/utils'
 import { ForgotPasswordPage } from './ForgotPasswordPage'
 import { LoginPage } from './LoginPage'
 import { ResetPasswordPage } from './ResetPasswordPage'
+import { VerifyEmailPage } from './VerifyEmailPage'
 
 const requestPasswordReset = vi.fn()
 const confirmPasswordReset = vi.fn()
+const confirmEmailVerification = vi.fn()
 vi.mock('../api/auth', () => ({
   requestPasswordReset: (...args: unknown[]) => requestPasswordReset(...args),
   confirmPasswordReset: (...args: unknown[]) => confirmPasswordReset(...args),
+  confirmEmailVerification: (...args: unknown[]) => confirmEmailVerification(...args),
 }))
 
 function badRequest(data: unknown) {
@@ -28,6 +31,7 @@ function badRequest(data: unknown) {
 beforeEach(() => {
   requestPasswordReset.mockReset()
   confirmPasswordReset.mockReset()
+  confirmEmailVerification.mockReset()
 })
 
 describe('LoginPage', () => {
@@ -120,5 +124,33 @@ describe('ResetPasswordPage', () => {
     await user.click(screen.getByRole('button', { name: 'Parolni tiklash' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Tiklash havolasi yaroqsiz yoki muddati tugagan.')
+  })
+})
+
+describe('VerifyEmailPage', () => {
+  function renderVerify() {
+    return renderWithProviders(
+      <Routes>
+        <Route path="/verify-email/:uid/:token" element={<VerifyEmailPage />} />
+      </Routes>,
+      { route: '/verify-email/abc/tok-123' },
+    )
+  }
+
+  it('confirms the link on mount and shows success', async () => {
+    confirmEmailVerification.mockResolvedValue({ detail: 'done' })
+    renderVerify()
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Emailingiz tasdiqlandi.')
+    expect(confirmEmailVerification).toHaveBeenCalledWith({ uid: 'abc', token: 'tok-123' })
+  })
+
+  it('shows an error for an invalid or already-used link', async () => {
+    confirmEmailVerification.mockRejectedValue(badRequest({ token: 'Invalid or expired token.' }))
+    renderVerify()
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "Bu tasdiqlash havolasi noto'g'ri yoki allaqachon ishlatilgan.",
+    )
   })
 })

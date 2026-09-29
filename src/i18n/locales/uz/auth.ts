@@ -31,6 +31,11 @@ const uz: Record<string, string> = {
   'auth.resetDone': 'Parolingiz tiklandi. Endi tizimga kirishingiz mumkin.',
   'auth.goToSignIn': "Kirishga o'tish",
   'auth.backHome': 'Bosh sahifaga qaytish',
+  'auth.verifyEmailTitle': 'Email tasdiqlanmoqda',
+  'auth.verifyingEmail': 'Tasdiqlanmoqda…',
+  'auth.verifyEmailSuccess': 'Emailingiz tasdiqlandi.',
+  'auth.verifyEmailError': "Bu tasdiqlash havolasi noto'g'ri yoki allaqachon ishlatilgan.",
+  'auth.goToDashboard': "Boshqaruv paneliga o'tish",
 }
 
 export default uz

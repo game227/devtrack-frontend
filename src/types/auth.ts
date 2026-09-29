@@ -8,6 +8,7 @@ export interface User {
   id: number
   username: string
   email: string
+  email_verified: boolean
   first_name: string
   last_name: string
   avatar: string | null
@@ -32,6 +33,7 @@ export interface RegisterPayload {
   password_confirm: string
   first_name?: string
   last_name?: string
+  lang?: 'uz' | 'en'
 }
 
 export interface LoginPayload {
@@ -64,4 +66,13 @@ export interface ConfirmPasswordResetPayload {
   token: string
   new_password: string
   new_password_confirm: string
+}
+
+export interface ConfirmEmailVerificationPayload {
+  uid: string
+  token: string
+}
+
+export interface DeleteAccountPayload {
+  password: string
 }

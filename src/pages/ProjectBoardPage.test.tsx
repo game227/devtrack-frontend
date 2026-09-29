@@ -41,6 +41,7 @@ function currentUser(overrides: Partial<User> = {}): User {
     id: 1,
     username: 'jane.dev',
     email: 'jane@example.com',
+    email_verified: true,
     first_name: '',
     last_name: '',
     avatar: null,

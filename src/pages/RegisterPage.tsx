@@ -55,6 +55,7 @@ export function RegisterPage() {
         password_confirm: form.passwordConfirm,
         first_name: form.firstName || undefined,
         last_name: form.lastName || undefined,
+        lang,
       })
       navigate('/dashboard', { replace: true })
     } catch (error) {

@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { changePassword as changePasswordRequest, updateMe } from '../api/auth'
+import {
+  changePassword as changePasswordRequest,
+  deleteAccount,
+  resendEmailVerification,
+  updateMe,
+} from '../api/auth'
 import { getUserAnalytics } from '../api/analytics'
 import { FormField, formInputClass } from '../components/FormField'
 import { StatCard } from '../components/StatCard'
@@ -23,10 +28,96 @@ export function ProfilePage() {
   return (
     <div className="max-w-xl space-y-6">
       <h1 className="text-xl font-semibold text-fg">{t('profile.title')}</h1>
+      {!user.email_verified && <EmailVerificationBanner />}
       <ProfileForm user={user} onSaved={refreshUser} />
       <PasswordForm />
       <DeveloperAnalyticsCard userId={user.id} />
+      <DeleteAccountForm />
     </div>
+  )
+}
+
+function EmailVerificationBanner() {
+  const { t, lang } = useI18n()
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
+
+  async function handleResend() {
+    setStatus('sending')
+    try {
+      await resendEmailVerification(lang)
+      setStatus('sent')
+    } catch {
+      setStatus('idle')
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated p-4 text-sm">
+      <span className="text-fg-muted">{t('profile.emailUnverified')}</span>
+      {status === 'sent' ? (
+        <span role="status" className="text-fg-muted">{t('profile.verificationSent')}</span>
+      ) : (
+        <button
+          type="button"
+          onClick={handleResend}
+          disabled={status === 'sending'}
+          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg disabled:opacity-50"
+        >
+          {t('profile.resendVerification')}
+        </button>
+      )}
+    </div>
+  )
+}
+
+function DeleteAccountForm() {
+  const { t, lang } = useI18n()
+  const { logout } = useAuth()
+  const [password, setPassword] = useState('')
+  const [errors, setErrors] = useState<FieldErrors>({})
+  const [status, setStatus] = useState<'idle' | 'deleting'>('idle')
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    setErrors({})
+    setStatus('deleting')
+    try {
+      await deleteAccount({ password })
+      await logout()
+    } catch (error) {
+      setErrors(extractFieldErrors(error, lang))
+      setStatus('idle')
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 rounded-2xl border border-danger/40 bg-bg-elevated p-5"
+    >
+      <h2 className="text-sm font-semibold text-danger">{t('profile.deleteAccount')}</h2>
+      <p className="text-sm text-fg-muted">{t('profile.deleteAccountHelp')}</p>
+      {errors.non_field_errors && (
+        <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
+      )}
+      <FormField label={t('profile.deleteAccountConfirm')} errors={errors.password}>
+        <input
+          type="password"
+          className={formInputClass}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+          required
+        />
+      </FormField>
+      <button
+        type="submit"
+        disabled={status === 'deleting'}
+        className="rounded-md border border-danger px-3 py-2 text-sm font-medium text-danger transition-colors duration-150 hover:bg-danger/10 active:scale-[0.98] disabled:opacity-50"
+      >
+        {status === 'deleting' ? t('profile.deleting') : t('profile.deleteAccountButton')}
+      </button>
+    </form>
   )
 }
 
