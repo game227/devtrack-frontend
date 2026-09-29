@@ -10,7 +10,10 @@ test('register, create a project, create an issue, and move it on the board', as
   const stamp = Date.now()
   const username = `e2e_${stamp}`
   const email = `${username}@example.com`
-  const password = `E2e-Test-Pass-${stamp}`
+  // Deliberately shares no substring with the username/email (Django's
+  // UserAttributeSimilarityValidator rejects a password too similar to
+  // either) — a fixed, unrelated passphrase plus a short random suffix.
+  const password = `Correct-Horse-Battery-Staple-${Math.random().toString(36).slice(2, 8)}`
 
   await page.goto('/register')
   await page.getByLabel('Foydalanuvchi nomi').fill(username)
