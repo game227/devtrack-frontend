@@ -26,6 +26,8 @@ const TeamsPage = lazy(() => import('../pages/TeamsPage').then((m) => ({ default
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
+const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })))
+const TermsOfServicePage = lazy(() => import('../pages/TermsOfServicePage').then((m) => ({ default: m.TermsOfServicePage })))
 
 export function AppRoutes() {
   return (
@@ -37,6 +39,9 @@ export function AppRoutes() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>
+
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsOfServicePage />} />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />

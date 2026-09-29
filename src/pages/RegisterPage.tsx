@@ -147,6 +147,18 @@ export function RegisterPage() {
           {isSubmitting ? t('auth.creatingAccount') : t('auth.createAccount')}
         </button>
 
+        <p className="mt-3 text-center text-xs text-fg-muted">
+          {t('legal.agreementPrefix')}{' '}
+          <Link to="/terms" className="text-accent hover:underline">
+            {t('legal.footerTerms')}
+          </Link>{' '}
+          {t('legal.agreementAnd')}{' '}
+          <Link to="/privacy" className="text-accent hover:underline">
+            {t('legal.footerPrivacy')}
+          </Link>
+          {t('legal.agreementSuffix')}
+        </p>
+
         <p className="mt-4 text-center text-sm text-fg-muted">
           {t('auth.haveAccount')}{' '}
           <Link to="/login" className="text-accent hover:underline">

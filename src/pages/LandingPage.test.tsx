@@ -39,4 +39,10 @@ describe('LandingPage', () => {
     renderLanding({ auth: makeAuth({ isAuthenticated: true }) })
     expect(screen.getByText('dashboard page')).toBeInTheDocument()
   })
+
+  it('links to the privacy policy and terms of service in the footer', () => {
+    renderLanding()
+    expect(screen.getByRole('link', { name: 'Maxfiylik siyosati' })).toHaveAttribute('href', '/privacy')
+    expect(screen.getByRole('link', { name: 'Foydalanish shartlari' })).toHaveAttribute('href', '/terms')
+  })
 })

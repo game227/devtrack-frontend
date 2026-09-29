@@ -266,7 +266,15 @@ export function LandingPage() {
 
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs text-fg-muted sm:px-6">
-          <span>{t('landing.footer', { year: new Date().getFullYear() })}</span>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span>{t('landing.footer', { year: new Date().getFullYear() })}</span>
+            <Link to="/privacy" className="hover:text-fg hover:underline">
+              {t('legal.footerPrivacy')}
+            </Link>
+            <Link to="/terms" className="hover:text-fg hover:underline">
+              {t('legal.footerTerms')}
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             <ThemeSwitcher />
             <LanguageSwitcher />
