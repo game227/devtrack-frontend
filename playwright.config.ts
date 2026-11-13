@@ -1,16 +1,17 @@
 import { defineConfig } from '@playwright/test'
 
-// E2E smoke test against real backend + frontend servers. Locally, start
-// both yourself (backend: `python manage.py runserver`, frontend:
-// `npm run dev`) and run `npm run test:e2e`. In CI, the workflow starts
-// them; PLAYWRIGHT_BASE_URL there points at the frontend dev server.
+// End-to-end tests against a real backend and the built frontend. Locally, start
+// the backend (`python manage.py runserver`) and serve a build of the frontend
+// (`npm run build && npm run preview -- --port 5173`), then `npm run test:e2e`.
+// A dev server works too, but its first page loads compile on demand and can
+// outlast a navigation's timeout. In CI the workflow starts both servers.
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  // The servers are dev servers (on-demand compilation, a real password hash per sign-in), so give
-  // navigations that wait on them more than the default 5 s before calling it a failure.
+  // Each sign-in hashes a real password on the server, so give navigations that wait on it more than
+  // the default 5 s before calling it a failure.
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {

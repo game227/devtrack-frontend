@@ -108,11 +108,15 @@ jobs:
           npm run build
           node scripts/check-csp.mjs ../backend/render.yaml
 
-      - name: Run the frontend dev server
+      # The production bundle, not the dev server: nothing is compiled on demand while the tests wait
+      # (a cold dev server can take longer than a navigation's timeout), and what is tested is what ships.
+      - name: Build the frontend and serve the production bundle
         working-directory: frontend
         env:
           VITE_API_BASE_URL: http://localhost:8000/api/v1
-        run: nohup npm run dev -- --host 127.0.0.1 --port 5173 > ../frontend.log 2>&1 &
+        run: |
+          npm run build
+          nohup npm run preview -- --host 127.0.0.1 --port 5173 --strictPort > ../frontend.log 2>&1 &
 
       - name: Wait for both servers to be ready
         run: |

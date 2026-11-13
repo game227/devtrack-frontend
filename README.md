@@ -86,6 +86,7 @@ and capture the dashboard, board, issue, timeline, analytics, project and settin
 - checks the production Content-Security-Policy (in the backend's `render.yaml`) still allows the built
   page's only inline script by its hash — `npm run build && npm run check:csp` locally, with the backend
   repository checked out next to this one;
-- runs the Playwright specs in `e2e/`: the golden path, and who may change an issue (creator, assignee,
-  bystander, outsider). Locally: start both servers, then `npm run test:e2e` (`E2E_API_URL` points the
+- runs the Playwright specs in `e2e/` against the production build (`vite preview`): the golden path,
+  and who may change an issue (creator, assignee, bystander, outsider). Locally: start the backend, then
+  `npm run build && npm run preview -- --port 5173` and `npm run test:e2e` (`E2E_API_URL` points the
   specs' API setup at the backend, default `http://localhost:8000/api/v1`).
