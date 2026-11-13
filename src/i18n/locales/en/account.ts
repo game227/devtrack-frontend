@@ -52,6 +52,8 @@ const en: Record<string, string> = {
   'github.error.invalid_state': 'the request expired — please try again',
   'github.error.connection_failed': 'GitHub could not be reached',
   'github.error.account_already_linked': 'this GitHub account is already linked to another user',
+  'github.error.authorization_failed': 'GitHub did not complete the authorization',
+  'github.error.invalid_or_expired': 'the connection expired or was started in another browser — please try again',
 
   'notFound.title': 'Page not found',
   'notFound.text': "The page you're looking for doesn't exist or was moved.",

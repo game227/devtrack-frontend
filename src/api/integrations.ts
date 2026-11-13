@@ -8,8 +8,15 @@ import type {
   IssueGitHubLinks,
 } from '../types/integrations'
 
-export async function getGithubAuthorizeUrl(): Promise<{ authorize_url: string }> {
-  const { data } = await apiClient.get('/integrations/github/connect/')
+// Connecting GitHub is bound to this browser: it sends a random nonce it keeps to itself, and only the
+// same browser, signed in as the same user, can finish the connection (completeGithubConnection).
+export async function getGithubAuthorizeUrl(nonce: string): Promise<{ authorize_url: string }> {
+  const { data } = await apiClient.get('/integrations/github/connect/', { params: { nonce } })
+  return data
+}
+
+export async function completeGithubConnection(pending: string, nonce: string): Promise<GitHubConnectionStatus> {
+  const { data } = await apiClient.post('/integrations/github/complete/', { pending, nonce })
   return data
 }
 

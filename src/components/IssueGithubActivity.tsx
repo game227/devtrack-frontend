@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { githubUrl } from '../lib/safeUrl'
 import { getIssueGithubLinks } from '../api/integrations'
 import { useTimeAgo } from '../hooks/useTimeAgo'
 import { useT } from '../i18n'
@@ -28,7 +29,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
             className="flex items-center gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
           >
             <PullRequestStatusBadge state={pr.state} merged={pr.merged} />
-            <a href={pr.url} target="_blank" rel="noreferrer" className="truncate text-fg hover:text-accent">
+            <a href={githubUrl(pr.url)} target="_blank" rel="noreferrer" className="truncate text-fg hover:text-accent">
               #{pr.number} {pr.title}
             </a>
             {pr.draft && !pr.merged && <span className="shrink-0 text-xs text-fg-muted">{t('github.draftPr')}</span>}
@@ -44,7 +45,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
             className="flex items-center gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
           >
             <a
-              href={commit.url}
+              href={githubUrl(commit.url)}
               target="_blank"
               rel="noreferrer"
               className="font-mono text-xs text-code hover:underline"

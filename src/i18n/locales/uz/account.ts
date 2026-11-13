@@ -52,6 +52,8 @@ const uz: Record<string, string> = {
   'github.error.invalid_state': "so'rov muddati tugadi — qayta urinib ko'ring",
   'github.error.connection_failed': "GitHub bilan bog'lanib bo'lmadi",
   'github.error.account_already_linked': "bu GitHub akkaunti boshqa foydalanuvchiga ulangan",
+  'github.error.authorization_failed': "GitHub ruxsat berishni yakunlamadi",
+  'github.error.invalid_or_expired': "ulanish muddati tugagan yoki boshqa brauzerda boshlangan — qayta urinib ko'ring",
 
   'notFound.title': 'Sahifa topilmadi',
   'notFound.text': "Siz izlayotgan sahifa mavjud emas yoki ko'chirilgan.",

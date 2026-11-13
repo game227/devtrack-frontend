@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { isAxiosError } from 'axios'
 import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  completeGithubConnection,
   disconnectGithub,
   getGithubAuthorizeUrl,
   getGithubConnectionStatus,
@@ -54,6 +56,34 @@ function LanguageCard() {
   )
 }
 
+const GITHUB_NONCE_KEY = 'devtrack_github_nonce'
+// Error codes the backend may send back; anything else in the URL is not echoed (a crafted link could
+// otherwise put any sentence in this banner).
+const GITHUB_ERRORS = new Set([
+  'access_denied',
+  'authorization_failed',
+  'missing_params',
+  'invalid_state',
+  'connection_failed',
+  'account_already_linked',
+  'invalid_or_expired',
+])
+
+function newNonce(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(24))
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+function takeNonce(): string {
+  try {
+    const nonce = sessionStorage.getItem(GITHUB_NONCE_KEY) ?? ''
+    sessionStorage.removeItem(GITHUB_NONCE_KEY)
+    return nonce
+  } catch {
+    return ''
+  }
+}
+
 function GithubConnectionCard() {
   const { t } = useI18n()
   const queryClient = useQueryClient()
@@ -65,26 +95,39 @@ function GithubConnectionCard() {
     queryFn: getGithubConnectionStatus,
   })
 
-  // The OAuth callback is handled entirely by the backend, which 302s back
-  // here with ?github=connected or ?github_error=... — this just surfaces
-  // that one-time result, then strips the params so a refresh doesn't re-show it.
+  const showError = (code: string) =>
+    setBanner({
+      kind: 'error',
+      text: t('settings.githubConnectFailed', {
+        reason: t(`github.error.${GITHUB_ERRORS.has(code) ? code : 'authorization_failed'}`),
+      }),
+    })
+
+  // GitHub sends the browser back through the backend, which parks the authorization and redirects here
+  // with ?github_pending=<id> (or ?github_error=<code>). This browser then claims it with the nonce it
+  // kept, signed in as the user who started; the params are stripped so a refresh does not repeat it.
+  const handled = useRef(false)
   useEffect(() => {
-    const connected = searchParams.get('github')
+    if (handled.current) return
+    handled.current = true
+    const pending = searchParams.get('github_pending')
     const error = searchParams.get('github_error')
-    if (connected === 'connected') {
-      setBanner({ kind: 'success', text: t('settings.githubConnected') })
-      void queryClient.invalidateQueries({ queryKey: ['github-connection'] })
+    if (pending) {
+      completeGithubConnection(pending, takeNonce())
+        .then(() => {
+          setBanner({ kind: 'success', text: t('settings.githubConnected') })
+          void queryClient.invalidateQueries({ queryKey: ['github-connection'] })
+        })
+        .catch((failure: unknown) => {
+          const detail = isAxiosError(failure) ? String(failure.response?.data?.detail ?? '') : ''
+          showError(detail)
+        })
     } else if (error) {
-      const key = `github.error.${error}`
-      const known = t(key)
-      setBanner({
-        kind: 'error',
-        text: t('settings.githubConnectFailed', { reason: known === key ? error.replace(/_/g, ' ') : known }),
-      })
+      showError(error)
     }
-    if (connected || error) {
+    if (pending || error) {
       setSearchParams((params) => {
-        params.delete('github')
+        params.delete('github_pending')
         params.delete('github_error')
         return params
       }, { replace: true })
@@ -94,7 +137,15 @@ function GithubConnectionCard() {
   }, [])
 
   const connectMutation = useMutation({
-    mutationFn: getGithubAuthorizeUrl,
+    mutationFn: () => {
+      const nonce = newNonce()
+      try {
+        sessionStorage.setItem(GITHUB_NONCE_KEY, nonce)
+      } catch {
+        // Without storage the connection cannot be finished; the server will say so.
+      }
+      return getGithubAuthorizeUrl(nonce)
+    },
     onSuccess: ({ authorize_url }) => {
       // Full browser navigation, not apiClient — GitHub's consent page can't be fetched via XHR.
       window.location.href = authorize_url

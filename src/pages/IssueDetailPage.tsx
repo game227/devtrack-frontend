@@ -14,6 +14,7 @@ import { formInputClass } from '../components/FormField'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
 import { useAuth } from '../features/auth/authContext'
 import { issueEditRights } from '../features/issues/permissions'
+import { githubUrl } from '../lib/safeUrl'
 import { useI18n } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus } from '../types/issue'
@@ -111,9 +112,9 @@ export function IssueDetailPage() {
           <div className="mb-2 mt-2 flex flex-wrap items-center gap-2">
             <span className="font-mono text-sm text-code">#{issue.number}</span>
             <h1 className="text-xl font-semibold text-fg">{issue.title}</h1>
-            {issue.github_url && (
+            {githubUrl(issue.github_url) && (
               <a
-                href={issue.github_url}
+                href={githubUrl(issue.github_url)}
                 target="_blank"
                 rel="noreferrer"
                 className="font-mono text-xs text-accent hover:underline"
