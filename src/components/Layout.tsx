@@ -123,8 +123,57 @@ export function Layout() {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [openPalette])
 
+  // Every page is called "DevTrack" otherwise, so tabs, history and screen readers cannot tell them apart
+  // (WCAG 2.4.2). The page's own <h1> names it; it is read from the DOM because most headings appear only
+  // after the page's data has loaded. A polite live region says it after each navigation within the app,
+  // never for the page the user landed on (even when that page's heading only appears later).
+  const [announcement, setAnnouncement] = useState('')
+  const lastPath = useRef<string | null>(null)
+  useEffect(() => {
+    const main = document.getElementById('main-content')
+    if (!main) return undefined
+    const isNavigation = lastPath.current !== null && lastPath.current !== pathname
+    lastPath.current = pathname
+    let announced = ''
+    let pending: number | null = null
+    const syncTitle = () => {
+      pending = null
+      const heading = main.querySelector('h1')?.textContent?.trim()
+      const title = heading ? `${heading} · DevTrack` : 'DevTrack'
+      if (document.title !== title) document.title = title
+      if (isNavigation && heading && heading !== announced) {
+        announced = heading
+        // Two pages can share a heading ("Board"): toggle an invisible character so the live region's
+        // text still changes and is read out again.
+        setAnnouncement((previous) => (previous === heading ? `${heading}\u200b` : heading))
+      }
+    }
+    syncTitle()
+    // Bursts of DOM changes (a list re-rendering, a refetch) are folded into one check.
+    const observer = new MutationObserver(() => {
+      pending ??= window.setTimeout(syncTitle, 50)
+    })
+    observer.observe(main, { childList: true, subtree: true, characterData: true })
+    return () => {
+      observer.disconnect()
+      if (pending !== null) window.clearTimeout(pending)
+      // Pages outside this layout (sign-in, landing, legal) must not keep the last page's title.
+      document.title = 'DevTrack'
+    }
+  }, [pathname])
+
   return (
     <div className="flex min-h-screen bg-bg text-fg">
+      <div role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
+      {/* First stop for keyboard users: jump past the sidebar to the page itself (WCAG 2.4.1). */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:border focus:border-fg focus:bg-bg focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-fg"
+      >
+        {t('nav.skipToContent')}
+      </a>
       {menuOpen && (
         <button
           type="button"
@@ -134,8 +183,11 @@ export function Layout() {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex w-60 shrink-0 flex-col border-r border-border bg-bg p-4 transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0 ${
-          menuOpen ? 'translate-x-0' : '-translate-x-full'
+        aria-label={t('nav.sidebar')}
+        // Off-screen on small screens until the menu is opened: `invisible` also takes its links out of the
+        // tab order and the accessibility tree (visibility switches only when the slide finishes).
+        className={`fixed inset-y-0 left-0 z-30 flex w-60 shrink-0 flex-col border-r border-border bg-bg p-4 transition-[transform,visibility] duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0 ${
+          menuOpen ? 'translate-x-0' : '-translate-x-full max-md:invisible'
         }`}
       >
         <div className="mb-5">
@@ -147,7 +199,7 @@ export function Layout() {
               aria-label={t('nav.switchWorkspace')}
               value={currentWorkspace?.id ?? ''}
               onChange={(event) => selectWorkspace(Number(event.target.value))}
-              className="mt-1 w-full rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg"
+              className="mt-1 w-full rounded-md border border-border-strong bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg"
             >
               {workspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>
@@ -226,11 +278,12 @@ export function Layout() {
           <button
             type="button"
             onClick={openPalette}
-            aria-label={t('cmdk.openHint')}
-            className="hidden items-center gap-1 rounded-md border border-border px-2 py-1 text-xs text-fg-muted transition-colors duration-150 hover:text-fg md:flex"
+            // The visible text is the shortcut, so the accessible name has to contain it (WCAG 2.5.3).
+            aria-label={`${t('cmdk.openHint')}, Ctrl K`}
+            aria-keyshortcuts="Control+K"
+            className="hidden items-center rounded-md border border-border px-2 py-1 text-xs text-fg-muted transition-colors duration-150 hover:text-fg md:flex"
           >
-            <kbd className="font-mono">Ctrl</kbd>
-            <kbd className="font-mono">K</kbd>
+            <kbd className="font-mono">Ctrl K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-3 text-sm text-fg-muted">
             <ThemeSwitcher />
@@ -238,7 +291,7 @@ export function Layout() {
             <NotificationsMenu />
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-6">
+        <main id="main-content" tabIndex={-1} className="flex-1 p-4 outline-none md:p-6">
           {/* Keyed by search too, so "?new=1" links remount the page and open its create form. */}
           <div key={pathname + search} className="animate-fade-in">
             <Outlet />

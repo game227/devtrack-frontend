@@ -5,6 +5,9 @@ on:
     branches: [master, main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -48,10 +51,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: frontend
+      # Test against the backend branch with the same name when there is one (a change that spans both
+      # repositories), else master. The branch name is passed through env, never spliced into the script.
+      - name: Pick the backend branch
+        id: backend-ref
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if git ls-remote --exit-code --heads https://github.com/game227/devtrack-backend.git "$BRANCH" > /dev/null; then
+            echo "ref=$BRANCH" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=master" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@v4
         with:
           repository: game227/devtrack-backend
           path: backend
+          ref: ${{ steps.backend-ref.outputs.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
@@ -84,6 +100,14 @@ jobs:
         run: |
           npm ci
           npx playwright install --with-deps chromium
+      - name: The production CSP (backend/render.yaml) still allows exactly the built page's inline script
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: https://example.invalid/api/v1
+        run: |
+          npm run build
+          node scripts/check-csp.mjs ../backend/render.yaml
+
       - name: Run the frontend dev server
         working-directory: frontend
         env:
@@ -104,6 +128,7 @@ jobs:
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:5173
+          E2E_API_URL: http://localhost:8000/api/v1
         run: npm run test:e2e
 
       - name: Upload logs and the Playwright report on failure

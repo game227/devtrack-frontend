@@ -70,7 +70,10 @@ export function NotificationsMenu() {
     <div ref={containerRef} className="relative">
       <button
         type="button"
-        aria-label={t('notifications.title')}
+        // The visible text is the unread count, so the accessible name has to contain it (WCAG 2.5.3).
+        aria-label={
+          unreadCount > 0 ? `${t('notifications.title')}, ${unreadCount > 9 ? '9+' : unreadCount}` : t('notifications.title')
+        }
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
         className="relative flex rounded-md border border-border p-1.5 transition-colors duration-150 hover:text-fg"

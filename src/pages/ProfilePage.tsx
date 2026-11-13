@@ -158,6 +158,9 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   )
 }
 
+const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024
+
 function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<void> }) {
   const { t, lang } = useI18n()
   const [firstName, setFirstName] = useState(user.first_name)
@@ -169,12 +172,39 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
   const [errors, setErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
 
+  // The preview always shows exactly what Save would upload (or the saved avatar when nothing will be).
+  function showPreview(next: string | null) {
+    setAvatarPreview((previous) => {
+      if (previous?.startsWith('blob:')) URL.revokeObjectURL(previous)
+      return next
+    })
+  }
+
   function handleAvatarChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null
-    setAvatarFile(file)
-    if (file) {
-      setAvatarPreview(URL.createObjectURL(file))
+    if (!file) {
+      // The picker was cancelled: nothing new will be uploaded.
+      setAvatarFile(null)
+      showPreview(user.avatar)
+      return
     }
+    // The same limits the server enforces (JPEG/PNG/WebP, at most 2 MB), checked up front so the user is
+    // told immediately instead of after an upload. A rejected file also drops any earlier pick.
+    const problem = !AVATAR_TYPES.includes(file.type)
+      ? t('profile.avatarType')
+      : file.size > AVATAR_MAX_BYTES
+        ? t('profile.avatarTooLarge')
+        : null
+    if (problem) {
+      event.target.value = ''
+      setAvatarFile(null)
+      showPreview(user.avatar)
+      setErrors((previous) => ({ ...previous, avatar: [problem] }))
+      return
+    }
+    setErrors((previous) => Object.fromEntries(Object.entries(previous).filter(([field]) => field !== 'avatar')))
+    showPreview(URL.createObjectURL(file))
+    setAvatarFile(file)
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -214,9 +244,14 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
           <span className="block rounded-md border border-border px-3 py-1.5 text-fg-muted transition-colors duration-150 hover:border-fg hover:text-fg">
             {t('profile.changeAvatar')}
           </span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          <input type="file" accept={AVATAR_TYPES.join(',')} className="hidden" onChange={handleAvatarChange} />
         </label>
       </div>
+      {errors.avatar && (
+        <p role="alert" className="text-sm text-danger">
+          {errors.avatar.join(' ')}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <FormField label={t('profile.firstName')} errors={errors.first_name}>

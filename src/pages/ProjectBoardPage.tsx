@@ -9,11 +9,16 @@ import { DueChip } from '../components/DueChip'
 import { EmptyState } from '../components/EmptyState'
 import { Skeleton } from '../components/Skeleton'
 import { useAuth } from '../features/auth/authContext'
+import { issueEditRights } from '../features/issues/permissions'
 import { STATUS_COLOR } from '../lib/statusColors'
 import { dueState } from '../lib/dueDate'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
+
+// A long-running project piles up finished work; only the most recently completed cards are shown
+// until the user asks for the rest, so the board stays about what is still moving.
+const DONE_PREVIEW = 10
 
 export function ProjectBoardPage() {
   const t = useT()
@@ -24,6 +29,7 @@ export function ProjectBoardPage() {
   const queryKey = ['issues', projectId, 'board']
   const [dragOverColumn, setDragOverColumn] = useState<IssueStatus | null>(null)
   const [draggingIssueId, setDraggingIssueId] = useState<number | null>(null)
+  const [showAllDone, setShowAllDone] = useState(false)
 
   const issuesQuery = useQuery({
     queryKey,
@@ -38,7 +44,10 @@ export function ProjectBoardPage() {
       await queryClient.cancelQueries({ queryKey })
       const previous = queryClient.getQueryData<Issue[]>(queryKey)
       queryClient.setQueryData<Issue[]>(queryKey, (issues) =>
-        issues?.map((issue) => (issue.id === issueId ? { ...issue, status } : issue)),
+        // updated_at too, so a card dropped into a collapsed Done column sorts first instead of vanishing.
+        issues?.map((issue) =>
+          issue.id === issueId ? { ...issue, status, updated_at: new Date().toISOString() } : issue,
+        ),
       )
       return { previous }
     },
@@ -111,6 +120,14 @@ export function ProjectBoardPage() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {ISSUE_STATUSES.map((status) => {
           const columnIssues = issues.filter((issue) => issue.status === status)
+          const isDoneColumn = status === 'done'
+          const collapsed = isDoneColumn && !showAllDone && columnIssues.length > DONE_PREVIEW
+          // Done is ordered most recently updated first whether collapsed or not, so expanding it only
+          // appends older cards instead of reshuffling the ones already on screen.
+          const ordered = isDoneColumn
+            ? [...columnIssues].sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+            : columnIssues
+          const visibleIssues = collapsed ? ordered.slice(0, DONE_PREVIEW) : ordered
           return (
             <div
               key={status}
@@ -132,11 +149,11 @@ export function ProjectBoardPage() {
               {columnIssues.length === 0 && (
                 <p className="px-1 py-2 text-xs text-fg-muted/70">{t('board.emptyColumn')}</p>
               )}
-              {columnIssues.map((issue) => {
-                // Only the issue's creator can edit it (backend: IsIssueReporter) — dragging or
-                // using the mobile status picker on someone else's issue would just bounce off a
-                // 403, so it's disabled here instead of letting the user hit that silently.
-                const canEdit = issue.reporter.id === user?.id
+              {visibleIssues.map((issue) => {
+                // The creator and the assignee can change an issue's status (backend: CanEditIssue);
+                // for anyone else dragging or the status picker would just bounce off a 403, so it is
+                // disabled here instead of letting the user hit that silently.
+                const canEdit = issueEditRights(issue, user?.id) !== 'none'
                 const isOverdue = dueState(issue.due_date, issue.status) === 'overdue'
                 const isDone = issue.status === 'done'
                 return (
@@ -147,14 +164,14 @@ export function ProjectBoardPage() {
                     onDragEnd={canEdit ? handleDragEnd : undefined}
                     title={canEdit ? undefined : t('board.notYours')}
                     // Cards you can't edit sit flat on the page background; editable ones are lifted.
-                    className={`rounded-2xl border p-2.5 transition-all duration-150 ${
+                    className={`group rounded-2xl border p-2.5 transition-all duration-150 ${
                       isOverdue ? 'border-danger/40' : 'border-border'
                     } ${canEdit ? 'bg-bg-elevated' : 'bg-bg'} ${
                       canEdit ? 'cursor-grab hover:-translate-y-0.5 hover:border-fg active:cursor-grabbing' : ''
                     } ${draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'}`}
                   >
                     <div className="mb-1 flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs text-code">#{issue.id}</span>
+                      <span className="font-mono text-xs text-code">#{issue.number}</span>
                       <PriorityBadge priority={issue.priority} />
                     </div>
                     <Link
@@ -181,23 +198,34 @@ export function ProjectBoardPage() {
                       )}
                       <span className="ml-auto shrink-0">{t(`issueType.${issue.type}`)}</span>
                     </div>
-                    {/* Touch screens cannot drag cards, so small screens get an explicit status control. */}
-                    <select
-                      aria-label={t('board.moveTo')}
-                      value={issue.status}
-                      disabled={!canEdit}
-                      onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus })}
-                      className="mt-2 w-full rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg disabled:opacity-40 md:hidden"
-                    >
-                      {ISSUE_STATUSES.map((value) => (
-                        <option key={value} value={value}>
-                          {t(`status.${value}`)}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Dragging needs a mouse, so every card also has a status control: always visible on touch
+                        screens, and on desktop it appears on hover and as soon as it gets keyboard focus. */}
+                    {canEdit && (
+                      <select
+                        aria-label={t('board.moveTo')}
+                        value={issue.status}
+                        onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus })}
+                        className="mt-2 w-full rounded-md border border-border-strong bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100 [@media(pointer:coarse)]:opacity-100"
+                      >
+                        {ISSUE_STATUSES.map((value) => (
+                          <option key={value} value={value}>
+                            {t(`status.${value}`)}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 )
               })}
+              {isDoneColumn && columnIssues.length > DONE_PREVIEW && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllDone((current) => !current)}
+                  className="rounded-md px-2 py-1 text-xs text-accent hover:underline"
+                >
+                  {collapsed ? t('board.showAllDone', { count: columnIssues.length }) : t('board.showFewerDone')}
+                </button>
+              )}
             </div>
           )
         })}

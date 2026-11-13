@@ -13,6 +13,7 @@ import { CommentThread } from '../components/CommentThread'
 import { formInputClass } from '../components/FormField'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
 import { useAuth } from '../features/auth/authContext'
+import { issueEditRights } from '../features/issues/permissions'
 import { useI18n } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus } from '../types/issue'
@@ -94,9 +95,11 @@ export function IssueDetailPage() {
 
   const issue = issueQuery.data
   const activeLabelIds = new Set(issue.labels.map((l) => l.id))
-  // Only the issue's creator can edit it (backend: IsIssueReporter) — the properties panel and
-  // the description are read-only for everyone else, rather than letting an edit bounce off a 403.
-  const canEdit = issue.reporter.id === user?.id
+  // Backend rule (CanEditIssue): the creator may change anything, the assignee only status and
+  // priority, nobody else anything. The panel mirrors it instead of letting an edit bounce off a 403.
+  const rights = issueEditRights(issue, user?.id)
+  const canEdit = rights === 'full'
+  const canUpdateProgress = rights !== 'none'
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
@@ -106,7 +109,7 @@ export function IssueDetailPage() {
             {t('issue.backToIssues')}
           </Link>
           <div className="mb-2 mt-2 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-sm text-code">#{issue.id}</span>
+            <span className="font-mono text-sm text-code">#{issue.number}</span>
             <h1 className="text-xl font-semibold text-fg">{issue.title}</h1>
             {issue.github_url && (
               <a
@@ -180,9 +183,10 @@ export function IssueDetailPage() {
         />
       </div>
 
-      <aside className="h-fit rounded-2xl border border-border bg-bg-elevated p-4">
+      <aside aria-label={t('issue.properties')} className="h-fit rounded-2xl border border-border bg-bg-elevated p-4">
         <h2 className="mb-1 text-sm font-semibold text-fg">{t('issue.properties')}</h2>
-        {!canEdit && <p className="mb-3 text-xs text-fg-muted">{t('issue.notYours')}</p>}
+        {rights === 'progress' && <p className="mb-3 text-xs text-fg-muted">{t('issue.progressOnly')}</p>}
+        {rights === 'none' && <p className="mb-3 text-xs text-fg-muted">{t('issue.notYours')}</p>}
         {updateMutation.isError && (
           <p role="alert" className="mb-3 text-xs text-danger">
             {t('issue.updateFailed')}
@@ -194,7 +198,7 @@ export function IssueDetailPage() {
               aria-label={t('common.status')}
               className={`${formInputClass} mt-0! disabled:opacity-50`}
               value={issue.status}
-              disabled={!canEdit}
+              disabled={!canUpdateProgress}
               onChange={(e) => updateMutation.mutate({ status: e.target.value as IssueStatus })}
             >
               {ISSUE_STATUSES.map((s) => (
@@ -209,7 +213,7 @@ export function IssueDetailPage() {
               aria-label={t('common.priority')}
               className={`${formInputClass} mt-0! disabled:opacity-50`}
               value={issue.priority}
-              disabled={!canEdit}
+              disabled={!canUpdateProgress}
               onChange={(e) => updateMutation.mutate({ priority: e.target.value as Priority })}
             >
               {PRIORITIES.map((p) => (

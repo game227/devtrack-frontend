@@ -65,7 +65,7 @@ export function GlobalSearch() {
           setIsOpen(true)
         }}
         onFocus={() => setIsOpen(true)}
-        className="w-full rounded-md border border-border bg-bg py-1.5 pl-8 pr-3 text-sm text-fg outline-none placeholder:text-fg-muted focus:border-fg"
+        className="w-full rounded-md border border-border-strong bg-bg py-1.5 pl-8 pr-3 text-sm text-fg outline-none placeholder:text-fg-muted focus:border-fg"
       />
       {isOpen && debouncedQuery.length >= 2 && (
         <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-96 origin-top animate-scale-in overflow-y-auto rounded-md border border-border bg-bg-elevated">

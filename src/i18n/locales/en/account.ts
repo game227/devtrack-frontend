@@ -8,6 +8,8 @@ const en: Record<string, string> = {
   'profile.bio': 'Bio',
   'profile.saveChanges': 'Save changes',
   'profile.changePassword': 'Change password',
+  'profile.avatarTooLarge': 'The image must be at most 2 MB.',
+  'profile.avatarType': 'Use a JPEG, PNG or WebP image.',
   'profile.currentPassword': 'Current password',
   'profile.newPassword': 'New password',
   'profile.confirmNewPassword': 'Confirm new password',

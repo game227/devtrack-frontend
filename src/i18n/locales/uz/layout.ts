@@ -10,6 +10,8 @@ const uz: Record<string, string> = {
   'nav.closeMenu': 'Menyuni yopish',
   'nav.switchWorkspace': 'Ish maydonini almashtirish',
   'nav.mainNavigation': 'Asosiy navigatsiya',
+  'nav.sidebar': 'Yon panel',
+  'nav.skipToContent': "Asosiy kontentga o'tish",
 
   'search.placeholder': 'Qidirish…',
   'search.aria': 'Loyiha, vazifa va odamlarni qidirish',

@@ -1,3 +1,4 @@
+import { setAccessToken, setStoredRefreshToken } from '../features/auth/tokenStore'
 import { apiClient } from './client'
 import type {
   AuthResponse,
@@ -48,11 +49,22 @@ export async function updateMe(payload: UpdateMePayload): Promise<User> {
   return data
 }
 
+// Changing the password ends every other session on the server (a stolen refresh token must not outlive
+// the old password); this one carries on with the fresh pair the server returns, so it is stored here —
+// otherwise the user would be signed out the next time the short-lived access token expires.
 export async function changePassword(
   payload: ChangePasswordPayload,
 ): Promise<{ detail: string }> {
-  const { data } = await apiClient.post<{ detail: string }>('/auth/password/change/', payload)
-  return data
+  const { data } = await apiClient.post<{ detail: string; access: string; refresh: string }>(
+    '/auth/password/change/',
+    payload,
+  )
+  // An older backend answers with only `detail`: keep the current session rather than storing nothing.
+  if (data.access && data.refresh) {
+    setAccessToken(data.access)
+    setStoredRefreshToken(data.refresh)
+  }
+  return { detail: data.detail }
 }
 
 export async function requestPasswordReset(

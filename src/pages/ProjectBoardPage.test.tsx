@@ -1,4 +1,5 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeAuth, renderWithProviders } from '../test/utils'
@@ -17,6 +18,7 @@ function issue(overrides: Partial<Issue>): Issue {
   return {
     id: 1,
     project: 7,
+    number: 101,
     title: 'Sample',
     description: '',
     type: 'task',
@@ -69,8 +71,8 @@ describe('ProjectBoardPage', () => {
 
   it('shows all five columns, including the backlog, with Uzbek titles', async () => {
     listIssues.mockResolvedValue([
-      issue({ id: 11, title: 'In the backlog', status: 'backlog' }),
-      issue({ id: 12, title: 'Being reviewed', status: 'in_review', assignee: null }),
+      issue({ id: 11, number: 5, title: 'In the backlog', status: 'backlog' }),
+      issue({ id: 12, number: 6, title: 'Being reviewed', status: 'in_review', assignee: null }),
     ])
     renderBoard()
 
@@ -79,14 +81,16 @@ describe('ProjectBoardPage', () => {
       // Titles also appear as options of each card's touch-friendly status select.
       expect(screen.getAllByText(title).length).toBeGreaterThan(0)
     }
-    expect(screen.getByText('#11')).toBeInTheDocument()
+    // The card shows the issue's number within its project, not the global id used in URLs.
+    expect(screen.getByText('#5')).toBeInTheDocument()
+    expect(screen.queryByText('#11')).not.toBeInTheDocument()
     expect(screen.getByText('Tayinlanmagan')).toBeInTheDocument()
   })
 
   it('renders English column titles when English is selected', async () => {
     listIssues.mockResolvedValue([issue({ id: 1, status: 'done' })])
     renderBoard('en')
-    await screen.findByText('#1')
+    await screen.findByText('#101')
     expect(screen.getAllByText('Backlog').length).toBeGreaterThan(0)
     expect(screen.getAllByText('In progress').length).toBeGreaterThan(0)
   })
@@ -100,14 +104,77 @@ describe('ProjectBoardPage', () => {
     expect(screen.getByRole('combobox', { name: 'Move to' })).toBeEnabled()
   })
 
-  it('disables drag and the status picker for issues someone else created', async () => {
+  it('disables drag and offers no status picker for issues someone else created', async () => {
     listIssues.mockResolvedValue([issue({ id: 22, title: 'Not mine', reporter: { id: 1, username: 'jane.dev', avatar: null } })])
     renderBoard('en', currentUser({ id: 99 }))
 
     const card = (await screen.findByText('Not mine')).closest('[draggable]')
     expect(card).toHaveAttribute('draggable', 'false')
-    expect(card).toHaveAttribute('title', 'Only the person who created this issue can edit it.')
-    expect(screen.getByRole('combobox', { name: 'Move to' })).toBeDisabled()
+    expect(card).toHaveAttribute(
+      'title',
+      'Only the person who created this issue, or the person it is assigned to, can move it.',
+    )
+    // Nothing to offer on a card you cannot move: no (greyed-out) picker is rendered at all.
+    expect(screen.queryByRole('combobox', { name: 'Move to' })).not.toBeInTheDocument()
+  })
+
+  it('lets the assignee move a card someone else created (they report progress)', async () => {
+    listIssues.mockResolvedValue([
+      issue({
+        id: 24,
+        title: 'Assigned to me',
+        reporter: { id: 1, username: 'jane.dev', avatar: null },
+        assignee: { id: 2, username: 'alex.k', avatar: null },
+      }),
+    ])
+    renderBoard('en', currentUser({ id: 2, username: 'alex.k' }))
+
+    const card = (await screen.findByText('Assigned to me')).closest('[draggable]')
+    expect(card).toHaveAttribute('draggable', 'true')
+    expect(screen.getByRole('combobox', { name: 'Move to' })).toBeEnabled()
+  })
+
+  it('keeps the status picker in the page for keyboard users on every screen size', async () => {
+    listIssues.mockResolvedValue([issue({ id: 25, title: 'Keyboard' })])
+    renderBoard('en', currentUser({ id: 1 }))
+    const picker = await screen.findByRole('combobox', { name: 'Move to' })
+    expect(picker).not.toHaveClass('md:hidden') // it used to disappear from tablets and desktops
+    picker.focus()
+    expect(picker).toHaveFocus()
+  })
+
+  it('collapses a long Done column to the latest cards and lets the user expand it', async () => {
+    const user = userEvent.setup()
+    const finished = Array.from({ length: 13 }, (_, index) =>
+      issue({
+        id: 200 + index,
+        number: 300 + index,
+        title: `Finished ${index}`,
+        status: 'done',
+        updated_at: `2026-09-${String(10 + index).padStart(2, '0')}T10:00:00Z`,
+      }),
+    )
+    listIssues.mockResolvedValue(finished)
+    renderBoard('en', currentUser({ id: 1 }))
+
+    expect(await screen.findByText('Finished 12')).toBeInTheDocument() // the most recently updated is kept
+    expect(screen.queryByText('Finished 0')).not.toBeInTheDocument() // the oldest are folded away
+    expect(screen.getAllByText(/^Finished \d+$/)).toHaveLength(10)
+
+    await user.click(screen.getByRole('button', { name: 'Show all (13)' }))
+    expect(screen.getAllByText(/^Finished \d+$/)).toHaveLength(13)
+    expect(screen.getByText('Finished 0')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show fewer' }))
+    expect(screen.getAllByText(/^Finished \d+$/)).toHaveLength(10)
+  })
+
+  it('does not collapse a short Done column', async () => {
+    listIssues.mockResolvedValue([issue({ id: 1, title: 'Only one', status: 'done' })])
+    renderBoard('en', currentUser())
+    await screen.findByText('Only one')
+    expect(screen.queryByRole('button', { name: /Show all/ })).not.toBeInTheDocument()
+    expect(within(document.body).getAllByText('Only one')).toHaveLength(1)
   })
 
   it('disables drag when signed out (no user to compare against the reporter)', async () => {

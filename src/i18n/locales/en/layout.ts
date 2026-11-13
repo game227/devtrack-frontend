@@ -10,6 +10,8 @@ const en: Record<string, string> = {
   'nav.closeMenu': 'Close menu',
   'nav.switchWorkspace': 'Switch workspace',
   'nav.mainNavigation': 'Main navigation',
+  'nav.sidebar': 'Sidebar',
+  'nav.skipToContent': 'Skip to content',
 
   'search.placeholder': 'Search…',
   'search.aria': 'Search projects, issues and people',

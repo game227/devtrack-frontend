@@ -63,7 +63,7 @@ export function CommandPalette({ commands, workspaceId, navigate, onClose }: Com
       items.push({
         key: `issue-${issue.id}`,
         group: 'results',
-        label: `#${issue.id} ${issue.title}`,
+        label: `#${issue.number} ${issue.title}`,
         hint: t(`status.${issue.status}`),
         run: () => navigate(`/issues/${issue.id}`),
       })

@@ -44,6 +44,7 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
   return {
     id,
     project: 1,
+    number: id + 100,  // deliberately not equal to the id: the UI must show the number
     title: `Issue ${id}`,
     description: '',
     type: 'task',

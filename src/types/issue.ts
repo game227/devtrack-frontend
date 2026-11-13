@@ -17,6 +17,9 @@ export interface IssueLabel {
 export interface Issue {
   id: number
   project: number
+  // The issue's number within its project (#1, #2, ...): what people see and what "#12" in a commit
+  // or pull request refers to. Not the same as `id`, which is global and only used in URLs.
+  number: number
   title: string
   description: string
   type: IssueType
@@ -28,7 +31,7 @@ export interface Issue {
   cycle: number | null
   milestone: number | null
   due_date: string | null
-  // Set on issues imported from GitHub.
+  // Set on issues imported from GitHub (for those, `number` is GitHub's number too).
   github_number: number | null
   github_url: string
   created_at: string

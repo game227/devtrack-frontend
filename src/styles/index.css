@@ -9,7 +9,11 @@
   --color-accent: #70b8ff;
   --color-code: #9281f7;
 
-  --color-subtle: #6e727a;
+  /* Text on black needs 4.5:1: #767b82 is 4.9:1 (the old #6e727a was 4.35:1). */
+  --color-subtle: #767b82;
+  /* Outline of form controls. WCAG 1.4.11 asks 3:1 for the boundary of a control; the decorative
+     --color-border (1.5:1 on black) stays for cards and dividers, where it is not what identifies a control. */
+  --color-border-strong: #5c6166;
   --color-success: #3ad389;
   --color-warning: #ffca16;
   --color-info: #70b8ff;
@@ -290,8 +294,9 @@ html {
   --color-accent: #0b62c4;
   --color-code: #6a55d6;
 
-  --color-subtle: #8a8f98;
-  --color-success: #0d8a53;
+  --color-subtle: #6e727a; /* 4.8:1 on white (was 3.3:1) */
+  --color-border-strong: #8a8f98; /* 3.2:1 on white */
+  --color-success: #0a7d4a; /* 5.0:1 on the elevated #fafafa (was 4.2:1) */
   --color-warning: #9a6200;
   --color-info: #0b62c4;
   --color-danger: #c4302b;

@@ -5,7 +5,8 @@ const uz: Record<string, string> = {
   'issue.addDescription': "Tavsif qo'shish uchun bosing…",
   'issue.noDescription': "Tavsif yo'q.",
   'issue.properties': 'Xususiyatlar',
-  'issue.notYours': "Bu vazifani faqat uni yaratgan foydalanuvchi tahrirlay oladi.",
+  'issue.notYours': "Bu vazifani faqat uni yaratgan yoki unga tayinlangan foydalanuvchi o'zgartira oladi.",
+  'issue.progressOnly': "Vazifa sizga tayinlangan: holat va ustuvorlikni o'zgartira olasiz. Qolganini uni yaratgan foydalanuvchi tahrirlaydi.",
   'issue.noLabels': "Bu ish maydonida hali yorliqlar yo'q.",
   'issue.updateFailed': "O'zgarishni saqlab bo'lmadi. Qayta urinib ko'ring.",
 }

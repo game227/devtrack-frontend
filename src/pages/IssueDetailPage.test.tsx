@@ -31,6 +31,7 @@ function issue(overrides: Partial<Issue> = {}): Issue {
   return {
     id: 42,
     project: 7,
+    number: 12,
     title: 'Sample issue',
     description: 'Some details',
     type: 'task',
@@ -75,7 +76,7 @@ function renderIssue(user: User | null) {
   )
 }
 
-describe('IssueDetailPage — reporter-only editing', () => {
+describe('IssueDetailPage — who can edit', () => {
   beforeEach(() => {
     getIssue.mockReset()
     updateIssue.mockReset()
@@ -90,7 +91,27 @@ describe('IssueDetailPage — reporter-only editing', () => {
     expect(screen.getByLabelText('Assignee')).toBeEnabled()
     expect(screen.getByLabelText('Due date')).toBeEnabled()
     expect(screen.getByText('Some details')).toHaveClass('cursor-text')
-    expect(screen.queryByText('Only the person who created this issue can edit it.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Only the person who created this issue, or the person it is assigned to, can change it.')).not.toBeInTheDocument()
+    // The number shown is the issue's number within its project, not the global id in the URL.
+    expect(screen.getByText('#12')).toBeInTheDocument()
+    expect(screen.queryByText('#42')).not.toBeInTheDocument()
+  })
+
+  it('lets the assignee update status and priority but nothing else', async () => {
+    getIssue.mockResolvedValue(
+      issue({
+        reporter: { id: 1, username: 'jane.dev', avatar: null },
+        assignee: { id: 2, username: 'alex.k', avatar: null },
+      }),
+    )
+    renderIssue(currentUser({ id: 2, username: 'alex.k' }))
+
+    expect(await screen.findByLabelText('Status')).toBeEnabled()
+    expect(screen.getByLabelText('Priority')).toBeEnabled()
+    expect(screen.getByLabelText('Assignee')).toBeDisabled()
+    expect(screen.getByLabelText('Due date')).toBeDisabled()
+    expect(screen.getByText(/It is assigned to you: you can update its status and priority/)).toBeInTheDocument()
+    expect(screen.getByText('Some details')).not.toHaveClass('cursor-text') // the description stays the creator's
   })
 
   it('shows the properties as read-only for anyone other than the creator', async () => {
@@ -101,11 +122,11 @@ describe('IssueDetailPage — reporter-only editing', () => {
     expect(screen.getByLabelText('Priority')).toBeDisabled()
     expect(screen.getByLabelText('Assignee')).toBeDisabled()
     expect(screen.getByLabelText('Due date')).toBeDisabled()
-    expect(screen.getByText('Only the person who created this issue can edit it.')).toBeInTheDocument()
+    expect(screen.getAllByText('Only the person who created this issue, or the person it is assigned to, can change it.').length).toBeGreaterThan(0)
     // The description is shown but isn't clickable-to-edit.
     const description = screen.getByText('Some details')
     expect(description).not.toHaveClass('cursor-text')
-    expect(description).toHaveAttribute('title', 'Only the person who created this issue can edit it.')
+    expect(description).toHaveAttribute('title', 'Only the person who created this issue, or the person it is assigned to, can change it.')
   })
 
   it('offers a neutral empty-description message instead of "click to add" for read-only viewers', async () => {

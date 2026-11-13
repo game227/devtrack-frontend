@@ -41,6 +41,21 @@ npm run dev
 violet `#9281f7` only for code/ids, status colors (`success/warning/info/danger/merged`) only next to a
 text label. Use the tokens (`text-danger`, `bg-fg`, …) — not raw Tailwind palette classes. No shadows.
 
+Contrast is part of the system (WCAG 2.1 AA, checked with axe-core in both themes): every text token meets
+4.5:1 on its background, and form controls use `border-border-strong` (3:1, WCAG 1.4.11) — `border-border`
+is for cards and dividers only. `formInputClass` already does this.
+
+## Accessibility conventions
+
+- Wrap fields in `FormField`: the label names the control, and errors are announced (`role="alert"`) and
+  tied to it (`aria-invalid`, `aria-describedby`).
+- `Layout` provides a skip link, named landmarks, and the page title: it reads the page's `<h1>`, so every
+  page needs exactly one and the tab/history entry says where you are.
+- An icon button's accessible name must contain any text it shows (a count, a shortcut) — write it as
+  `"Notifications, 3"`, not `"Notifications (3)"` (axe rejects the brackets).
+- Interactive targets are at least 24×24 px. Anything draggable also has a keyboard/touch alternative
+  (the board's per-card status picker).
+
 ## Structure
 
 ```
@@ -65,4 +80,12 @@ and capture the dashboard, board, issue, timeline, analytics, project and settin
 
 ## CI
 
-`.github/workflows/ci.yml` runs lint, tests and the production build on every push and pull request.
+`.github/workflows/ci.yml` runs lint, tests and the production build on every push and pull request,
+`npm audit` for production dependencies, and an end-to-end job against a real backend that:
+
+- checks the production Content-Security-Policy (in the backend's `render.yaml`) still allows the built
+  page's only inline script by its hash — `npm run build && npm run check:csp` locally, with the backend
+  repository checked out next to this one;
+- runs the Playwright specs in `e2e/`: the golden path, and who may change an issue (creator, assignee,
+  bystander, outsider). Locally: start both servers, then `npm run test:e2e` (`E2E_API_URL` points the
+  specs' API setup at the backend, default `http://localhost:8000/api/v1`).

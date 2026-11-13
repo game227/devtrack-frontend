@@ -8,6 +8,8 @@ const uz: Record<string, string> = {
   'profile.bio': "O'zi haqida",
   'profile.saveChanges': "O'zgarishlarni saqlash",
   'profile.changePassword': "Parolni o'zgartirish",
+  'profile.avatarTooLarge': "Rasm hajmi 2 MB dan oshmasligi kerak.",
+  'profile.avatarType': "JPEG, PNG yoki WebP rasm tanlang.",
   'profile.currentPassword': 'Joriy parol',
   'profile.newPassword': 'Yangi parol',
   'profile.confirmNewPassword': 'Yangi parolni tasdiqlang',

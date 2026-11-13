@@ -27,7 +27,7 @@ export function ThemeSwitcher({ className = '' }: { className?: string }) {
             aria-label={t(`theme.${option}`)}
             aria-pressed={active}
             onClick={() => setPreference(option)}
-            className={`rounded p-1 transition-colors ${active ? 'bg-fg text-bg' : 'text-fg-muted hover:text-fg'}`}
+            className={`rounded p-1.5 transition-colors ${active ? 'bg-fg text-bg' : 'text-fg-muted hover:text-fg'}`}
           >
             <Icon name={ICONS[option]} size={14} />
           </button>

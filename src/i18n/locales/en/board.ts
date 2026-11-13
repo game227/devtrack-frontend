@@ -5,7 +5,9 @@ const en: Record<string, string> = {
   'board.listView': 'List view',
   'board.moveTo': 'Move to',
   'board.emptyColumn': 'No issues',
-  'board.notYours': 'Only the person who created this issue can edit it.',
+  'board.notYours': 'Only the person who created this issue, or the person it is assigned to, can move it.',
+  'board.showAllDone': 'Show all ({count})',
+  'board.showFewerDone': 'Show fewer',
 }
 
 export default en

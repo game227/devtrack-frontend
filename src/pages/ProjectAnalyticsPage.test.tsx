@@ -15,6 +15,7 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
   return {
     id,
     project: 3,
+    number: id + 100,
     title: `Issue ${id}`,
     description: '',
     type: 'task',
