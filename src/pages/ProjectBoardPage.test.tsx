@@ -12,6 +12,11 @@ const updateIssue = vi.fn()
 vi.mock('../api/issues', () => ({
   listIssues: (...args: unknown[]) => listIssues(...args),
   updateIssue: (...args: unknown[]) => updateIssue(...args),
+  // The board's loader, fed from the same fixture: everything open, finished ones newest first.
+  loadBoard: async () => {
+    const issues: Issue[] = await listIssues()
+    return { issues, doneTotal: issues.filter((issue) => issue.status === 'done').length }
+  },
 }))
 
 function issue(overrides: Partial<Issue>): Issue {
@@ -32,6 +37,7 @@ function issue(overrides: Partial<Issue>): Issue {
     due_date: null,
     github_number: null,
     github_url: '',
+    completed_at: null,
     created_at: '2026-09-01T10:00:00Z',
     updated_at: '2026-09-01T10:00:00Z',
     ...overrides,
@@ -44,6 +50,7 @@ function currentUser(overrides: Partial<User> = {}): User {
     username: 'jane.dev',
     email: 'jane@example.com',
     email_verified: true,
+    totp_enabled: false,
     first_name: '',
     last_name: '',
     avatar: null,

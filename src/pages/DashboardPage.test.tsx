@@ -11,6 +11,7 @@ import type { Workspace } from '../types/workspace'
 const getDashboard = vi.fn()
 const listIssues = vi.fn()
 vi.mock('../api/dashboard', () => ({ getDashboard: (...args: unknown[]) => getDashboard(...args) }))
+vi.mock('../api/invitations', () => ({ listMyInvitations: () => Promise.resolve([]), acceptInvitation: vi.fn(), declineInvitation: vi.fn() }))
 vi.mock('../api/issues', () => ({ listIssues: (...args: unknown[]) => listIssues(...args) }))
 
 const workspace = { id: 3, name: 'Nova Labs' } as Workspace
@@ -20,6 +21,7 @@ const user: User = {
   username: 'jane.dev',
   email: 'jane@example.com',
   email_verified: true,
+  totp_enabled: false,
   first_name: '',
   last_name: '',
   avatar: null,
@@ -58,6 +60,7 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
     due_date: null,
     github_number: null,
     github_url: '',
+    completed_at: null,
     created_at: '2026-09-01T10:00:00Z',
     updated_at: '2026-09-01T10:00:00Z',
     ...overrides,

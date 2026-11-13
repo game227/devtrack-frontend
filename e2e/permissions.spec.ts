@@ -40,10 +40,12 @@ test('the assignee moves their issue on the board; nobody else can change what i
   const dev = await register(request, `dev_${stamp}`)
   const stranger = await register(request, `stranger_${stamp}`)
 
-  // The owner's personal workspace is created at registration; the developer joins it.
+  // The owner's personal workspace is created at registration; the developer is invited and accepts
+  // (being added is only an invitation until the invitee says yes).
   const listed = await (await request.get(`${API}/workspaces/`, { headers: owner.headers })).json()
   const workspace = (listed.results ?? listed)[0]
-  await post(request, `/workspaces/${workspace.id}/members/`, owner, { username: dev.username })
+  const invitation = await post(request, `/workspaces/${workspace.id}/members/`, owner, { username: dev.username })
+  await post(request, `/workspaces/invitations/${invitation.id}/accept/`, dev, {})
   const project = await post(request, '/projects/', owner, { workspace: workspace.id, name: `Permissions ${stamp}` })
   const assigned = await post(request, '/issues/', owner, { project: project.id, title: `Assigned ${stamp}`, assignee_id: dev.id })
   const others = await post(request, '/issues/', owner, { project: project.id, title: `Not mine ${stamp}` })

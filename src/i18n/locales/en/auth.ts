@@ -36,6 +36,8 @@ const en: Record<string, string> = {
   'auth.verifyEmailSuccess': 'Your email is verified.',
   'auth.verifyEmailError': 'This verification link is invalid or has already been used.',
   'auth.goToDashboard': 'Go to dashboard',
+  'auth.otp': 'Authentication code',
+  'auth.otpHint': 'The 6-digit code from your authenticator app, or one of your recovery codes.',
 }
 
 export default en

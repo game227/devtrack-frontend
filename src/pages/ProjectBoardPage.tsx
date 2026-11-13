@@ -2,7 +2,8 @@ import { useState } from 'react'
 import type { DragEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { listIssues, updateIssue } from '../api/issues'
+import { loadBoard, updateIssue } from '../api/issues'
+import type { BoardIssues } from '../api/issues'
 import { Avatar } from '../components/Avatar'
 import { PriorityBadge } from '../components/Badge'
 import { DueChip } from '../components/DueChip'
@@ -26,15 +27,16 @@ export function ProjectBoardPage() {
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
   const queryClient = useQueryClient()
-  const queryKey = ['issues', projectId, 'board']
   const [dragOverColumn, setDragOverColumn] = useState<IssueStatus | null>(null)
   const [draggingIssueId, setDraggingIssueId] = useState<number | null>(null)
   const [showAllDone, setShowAllDone] = useState(false)
+  const queryKey = ['issues', projectId, 'board', showAllDone ? 'all-done' : 'latest-done']
 
   const issuesQuery = useQuery({
     queryKey,
-    queryFn: () => listIssues({ project: projectId }),
+    queryFn: () => loadBoard(projectId, showAllDone),
     enabled: Number.isFinite(projectId),
+    placeholderData: (previous) => previous, // expanding Done keeps the board on screen while it loads
   })
 
   const moveMutation = useMutation({
@@ -42,19 +44,28 @@ export function ProjectBoardPage() {
       updateIssue(issueId, { status }),
     onMutate: async ({ issueId, status }) => {
       await queryClient.cancelQueries({ queryKey })
-      const previous = queryClient.getQueryData<Issue[]>(queryKey)
-      queryClient.setQueryData<Issue[]>(queryKey, (issues) =>
-        // updated_at too, so a card dropped into a collapsed Done column sorts first instead of vanishing.
-        issues?.map((issue) =>
-          issue.id === issueId ? { ...issue, status, updated_at: new Date().toISOString() } : issue,
-        ),
-      )
+      const previous = queryClient.getQueryData<BoardIssues>(queryKey)
+      const now = new Date().toISOString()
+      queryClient.setQueryData<BoardIssues>(queryKey, (board) => {
+        if (!board) return board
+        const moved = board.issues.find((issue) => issue.id === issueId)
+        const delta = moved ? Number(status === 'done') - Number(moved.status === 'done') : 0
+        return {
+          // completed_at too, so a card dropped into Done sorts first instead of vanishing below the fold.
+          issues: board.issues.map((issue) =>
+            issue.id === issueId
+              ? { ...issue, status, updated_at: now, completed_at: status === 'done' ? now : null }
+              : issue,
+          ),
+          doneTotal: board.doneTotal + delta,
+        }
+      })
       return { previous }
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous)
     },
-    onSettled: () => void queryClient.invalidateQueries({ queryKey }),
+    onSettled: () => void queryClient.invalidateQueries({ queryKey: ['issues', projectId, 'board'] }),
   })
 
   function handleDragStart(event: DragEvent<HTMLDivElement>, issueId: number) {
@@ -93,7 +104,8 @@ export function ProjectBoardPage() {
     return <p className="text-sm text-danger">{t('board.loadFailed')}</p>
   }
 
-  const issues = issuesQuery.data ?? []
+  const issues = issuesQuery.data?.issues ?? []
+  const doneTotal = issuesQuery.data?.doneTotal ?? 0
 
   return (
     <div>
@@ -121,11 +133,13 @@ export function ProjectBoardPage() {
         {ISSUE_STATUSES.map((status) => {
           const columnIssues = issues.filter((issue) => issue.status === status)
           const isDoneColumn = status === 'done'
-          const collapsed = isDoneColumn && !showAllDone && columnIssues.length > DONE_PREVIEW
-          // Done is ordered most recently updated first whether collapsed or not, so expanding it only
+          const columnTotal = isDoneColumn ? Math.max(doneTotal, columnIssues.length) : columnIssues.length
+          const collapsed = isDoneColumn && !showAllDone && columnTotal > DONE_PREVIEW
+          // Done is ordered most recently completed first whether collapsed or not, so expanding it only
           // appends older cards instead of reshuffling the ones already on screen.
+          const finishedAt = (issue: Issue) => issue.completed_at ?? issue.updated_at
           const ordered = isDoneColumn
-            ? [...columnIssues].sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+            ? [...columnIssues].sort((a, b) => finishedAt(b).localeCompare(finishedAt(a)))
             : columnIssues
           const visibleIssues = collapsed ? ordered.slice(0, DONE_PREVIEW) : ordered
           return (
@@ -144,7 +158,7 @@ export function ProjectBoardPage() {
               <div className="flex items-center gap-2 px-1 text-xs font-semibold uppercase text-fg-muted">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: STATUS_COLOR[status] }} />
                 {t(`status.${status}`)}
-                <span className="ml-auto font-mono font-normal text-fg-muted/70">{columnIssues.length}</span>
+                <span className="ml-auto font-mono font-normal text-fg-muted/70">{columnTotal}</span>
               </div>
               {columnIssues.length === 0 && (
                 <p className="px-1 py-2 text-xs text-fg-muted/70">{t('board.emptyColumn')}</p>
@@ -217,13 +231,13 @@ export function ProjectBoardPage() {
                   </div>
                 )
               })}
-              {isDoneColumn && columnIssues.length > DONE_PREVIEW && (
+              {isDoneColumn && columnTotal > DONE_PREVIEW && (
                 <button
                   type="button"
                   onClick={() => setShowAllDone((current) => !current)}
                   className="rounded-md px-2 py-1 text-xs text-accent hover:underline"
                 >
-                  {collapsed ? t('board.showAllDone', { count: columnIssues.length }) : t('board.showFewerDone')}
+                  {collapsed ? t('board.showAllDone', { count: columnTotal }) : t('board.showFewerDone')}
                 </button>
               )}
             </div>

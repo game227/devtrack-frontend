@@ -13,6 +13,7 @@ import { StatCard } from '../components/StatCard'
 import { DailyActivityChart } from '../components/DailyActivityChart'
 import { useAuth } from '../features/auth/authContext'
 import { useWorkspace } from '../features/workspace/workspaceContext'
+import { TwoFactorCard } from '../components/TwoFactorCard'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { User } from '../types/auth'
@@ -31,6 +32,7 @@ export function ProfilePage() {
       {!user.email_verified && <EmailVerificationBanner />}
       <ProfileForm user={user} onSaved={refreshUser} />
       <PasswordForm />
+      <TwoFactorCard enabled={user.totp_enabled} onChanged={refreshUser} />
       <DeveloperAnalyticsCard userId={user.id} />
       <DeleteAccountForm />
     </div>

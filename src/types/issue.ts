@@ -34,6 +34,8 @@ export interface Issue {
   // Set on issues imported from GitHub (for those, `number` is GitHub's number too).
   github_number: number | null
   github_url: string
+  // When the issue last reached Done (null while it is open).
+  completed_at: string | null
   created_at: string
   updated_at: string
 }

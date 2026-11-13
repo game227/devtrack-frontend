@@ -9,6 +9,8 @@ export interface User {
   username: string
   email: string
   email_verified: boolean
+  // Two-factor authentication (an authenticator app code at sign-in) is on.
+  totp_enabled: boolean
   first_name: string
   last_name: string
   avatar: string | null
@@ -39,6 +41,8 @@ export interface RegisterPayload {
 export interface LoginPayload {
   username: string
   password: string
+  // The authenticator (or recovery) code, for accounts with two-factor authentication on.
+  otp?: string
 }
 
 export interface UpdateMePayload {

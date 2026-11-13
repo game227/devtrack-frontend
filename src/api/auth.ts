@@ -99,3 +99,28 @@ export async function resendEmailVerification(lang?: 'uz' | 'en'): Promise<{ det
 export async function deleteAccount(payload: DeleteAccountPayload): Promise<void> {
   await apiClient.post('/auth/me/delete/', payload)
 }
+
+// Two-factor authentication. Setup returns a secret for the authenticator app that only takes effect
+// once enable() has confirmed a code from it.
+export async function setupTwoFactor(password: string): Promise<{ secret: string; otpauth_uri: string }> {
+  const { data } = await apiClient.post<{ secret: string; otpauth_uri: string }>('/auth/2fa/setup/', { password })
+  return data
+}
+
+// Turning it on ends every other session; this one continues on the fresh pair returned with the
+// one-time recovery codes.
+export async function enableTwoFactor(code: string): Promise<string[]> {
+  const { data } = await apiClient.post<{ recovery_codes: string[]; access: string; refresh: string }>(
+    '/auth/2fa/enable/',
+    { code },
+  )
+  if (data.access && data.refresh) {
+    setAccessToken(data.access)
+    setStoredRefreshToken(data.refresh)
+  }
+  return data.recovery_codes
+}
+
+export async function disableTwoFactor(password: string, code: string): Promise<void> {
+  await apiClient.post('/auth/2fa/disable/', { password, code })
+}

@@ -8,6 +8,7 @@ import { useI18n } from '../i18n'
 import { PriorityBadge, StatusBadge } from '../components/Badge'
 import { DueChip } from '../components/DueChip'
 import { EmptyState } from '../components/EmptyState'
+import { PendingInvitations } from '../components/PendingInvitations'
 import { useAuth } from '../features/auth/authContext'
 import { dueState } from '../lib/dueDate'
 import { sortByUrgency } from '../lib/issueOrder'
@@ -83,6 +84,7 @@ export function DashboardPage() {
         <h1 className="text-xl font-semibold text-fg">{t('dashboard.title')}</h1>
         {user && <p className="text-sm text-fg-muted">{t('dashboard.greeting', { name: user.username })}</p>}
       </div>
+      <PendingInvitations />
 
       {data.projects.total === 0 && (
         <EmptyState
