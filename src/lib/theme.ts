@@ -4,7 +4,7 @@
 // keep the storage key and default there in step with this file.
 
 export type ThemePreference = 'system' | 'light' | 'dark'
-export type ResolvedTheme = 'light' | 'dark'
+type ResolvedTheme = 'light' | 'dark'
 
 export const THEME_STORAGE_KEY = 'devtrack_theme'
 export const DEFAULT_PREFERENCE: ThemePreference = 'dark'
@@ -13,7 +13,7 @@ export const THEME_PREFERENCES: ThemePreference[] = ['light', 'dark', 'system']
 const DARK_QUERY = '(prefers-color-scheme: dark)'
 const THEME_COLOR: Record<ResolvedTheme, string> = { dark: '#000000', light: '#ffffff' }
 
-export function isPreference(value: unknown): value is ThemePreference {
+function isPreference(value: unknown): value is ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system'
 }
 
@@ -27,7 +27,7 @@ export function readPreference(): ThemePreference {
   return DEFAULT_PREFERENCE
 }
 
-export function systemPrefersDark(): boolean {
+function systemPrefersDark(): boolean {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(DARK_QUERY).matches
 }
 
@@ -86,7 +86,7 @@ type ViewTransitionDocument = Document & {
   startViewTransition?: (update: () => void) => { ready: Promise<void> }
 }
 
-export function applyThemeAnimated(theme: ResolvedTheme) {
+function applyThemeAnimated(theme: ResolvedTheme) {
   const doc = document as ViewTransitionDocument
   if (typeof doc.startViewTransition !== 'function' || prefersReducedMotion()) {
     applyTheme(theme)

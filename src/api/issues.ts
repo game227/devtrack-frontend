@@ -28,7 +28,3 @@ export async function updateIssue(id: number, payload: UpdateIssuePayload): Prom
   const { data } = await apiClient.patch<Issue>(`/issues/${id}/`, payload)
   return data
 }
-
-export async function deleteIssue(id: number): Promise<void> {
-  await apiClient.delete(`/issues/${id}/`)
-}

@@ -17,7 +17,7 @@ export interface User {
   date_joined: string
 }
 
-export interface AuthTokens {
+interface AuthTokens {
   access: string
   refresh: string
 }

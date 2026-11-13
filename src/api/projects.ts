@@ -9,7 +9,7 @@ import type {
   UpdateProjectPayload,
 } from '../types/project'
 
-export interface ProjectFilters {
+interface ProjectFilters {
   status?: string
   priority?: string
 }
@@ -34,10 +34,6 @@ export async function getProject(id: number): Promise<Project> {
 export async function updateProject(id: number, payload: UpdateProjectPayload): Promise<Project> {
   const { data } = await apiClient.patch<Project>(`/projects/${id}/`, payload)
   return data
-}
-
-export async function deleteProject(id: number): Promise<void> {
-  await apiClient.delete(`/projects/${id}/`)
 }
 
 export async function listProjectMembers(projectId: number): Promise<ProjectMember[]> {

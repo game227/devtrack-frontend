@@ -12,15 +12,3 @@ export interface Workspace {
   my_role: WorkspaceRole
   created_at: string
 }
-
-export interface CreateWorkspacePayload {
-  name: string
-  description?: string
-}
-
-export interface WorkspaceMember {
-  id: number
-  user: UserBrief
-  role: WorkspaceRole
-  joined_at: string
-}

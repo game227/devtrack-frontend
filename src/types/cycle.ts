@@ -17,5 +17,3 @@ export interface CreateCyclePayload {
   start_date: string
   end_date: string
 }
-
-export type UpdateCyclePayload = Partial<Omit<CreateCyclePayload, 'project'>>

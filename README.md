@@ -5,7 +5,7 @@ landing page. It talks to [devtrack-backend](https://github.com/game227/devtrack
 (`/api/v1/`) and shares no code with it.
 
 Stack: React 19, React Router 7, TanStack Query 5, Tailwind CSS 4 (design tokens in
-`src/styles/index.css`), Radix UI, Axios, Vitest + Testing Library.
+`src/styles/index.css`), Axios, Vitest + Testing Library.
 
 ## Setup
 

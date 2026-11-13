@@ -87,5 +87,3 @@ export async function resendEmailVerification(lang?: 'uz' | 'en'): Promise<{ det
 export async function deleteAccount(payload: DeleteAccountPayload): Promise<void> {
   await apiClient.post('/auth/me/delete/', payload)
 }
-
-export { refreshAccessToken as refreshToken } from './client'

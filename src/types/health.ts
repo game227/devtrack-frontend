@@ -6,7 +6,7 @@ export type ProjectHealthFactorKey = 'task_progress' | 'development_activity' | 
 // then left out of the score instead of counting as good or bad.
 export type ProjectHealthFactors = Record<ProjectHealthFactorKey, number | null>
 
-export type ProjectRiskCode =
+type ProjectRiskCode =
   | 'stale_in_progress'
   | 'stale_review'
   | 'stale_pull_requests'

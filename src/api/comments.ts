@@ -19,12 +19,3 @@ export async function createProjectComment(projectId: number, body: string): Pro
   const { data } = await apiClient.post<Comment>(`/projects/${projectId}/comments/`, { body })
   return data
 }
-
-export async function updateComment(id: number, body: string): Promise<Comment> {
-  const { data } = await apiClient.patch<Comment>(`/comments/${id}/`, { body })
-  return data
-}
-
-export async function deleteComment(id: number): Promise<void> {
-  await apiClient.delete(`/comments/${id}/`)
-}

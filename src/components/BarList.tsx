@@ -1,6 +1,6 @@
 import { useT } from '../i18n'
 
-export interface BarRow {
+interface BarRow {
   key: string
   label: string
   value: number
