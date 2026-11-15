@@ -54,7 +54,7 @@ export function Dialog({
         aria-modal="true"
         aria-label={title}
         onKeyDown={onKeyDown}
-        className={`relative w-full ${width} animate-scale-in rounded-xl border border-border bg-surface shadow-float`}
+        className={`relative w-full ${width} animate-scale-in glass rounded-xl shadow-float`}
       >
         {children}
       </div>

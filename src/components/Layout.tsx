@@ -45,15 +45,16 @@ const PROJECT_NAV: Array<{ path: string; labelKey: string; end?: boolean }> = [
 ]
 
 // The current section is marked by a stretch of the line under it (the same brand rail as the logo).
+// The current section is a light pill lifted off the glass bar.
 function topLinkClass({ isActive }: { isActive: boolean }) {
-  return `relative flex h-14 items-center px-3 text-sm font-semibold transition-colors duration-150 after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:rounded-full ${
-    isActive ? 'text-fg after:bg-brand' : 'text-fg-muted after:bg-transparent hover:text-fg'
+  return `flex h-9 items-center rounded-lg px-3 text-sm font-medium transition-[background-color,color,box-shadow] duration-150 ${
+    isActive ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:bg-surface/60 hover:text-fg'
   }`
 }
 
 function tabLinkClass({ isActive }: { isActive: boolean }) {
-  return `relative flex h-11 shrink-0 items-center px-3 text-sm font-semibold transition-colors duration-150 after:absolute after:inset-x-3 after:bottom-0 after:h-[3px] after:rounded-full ${
-    isActive ? 'text-fg after:bg-brand' : 'text-fg-muted after:bg-transparent hover:text-fg'
+  return `flex h-8 shrink-0 items-center rounded-lg px-3 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-150 ${
+    isActive ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:text-fg'
   }`
 }
 
@@ -69,7 +70,7 @@ function WorkspaceSwitcher() {
       label={t('shell.workspaceMenu', { name: currentWorkspace.name })}
       align="left"
       panelClassName="w-64 p-1.5"
-      triggerClassName="flex h-9 max-w-52 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-fg-muted transition-colors duration-150 hover:bg-well hover:text-fg"
+      triggerClassName="flex h-9 max-w-52 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-fg-muted transition-colors duration-150 hover:bg-brand-soft/60 hover:text-fg"
       trigger={
         <>
           <span className="truncate">{currentWorkspace.name}</span>
@@ -89,7 +90,7 @@ function WorkspaceSwitcher() {
                     data-closes
                     aria-current={current ? 'true' : undefined}
                     onClick={() => selectWorkspace(workspace.id)}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-fg hover:bg-well"
+                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-fg hover:bg-brand-soft/60"
                   >
                     <span className="min-w-0 flex-1 truncate">{workspace.name}</span>
                     {current && <Icon name="check" className="text-brand" />}
@@ -99,7 +100,7 @@ function WorkspaceSwitcher() {
             })}
           </ul>
           <div className="mt-1 border-t border-border pt-1">
-            <Link to="/members" className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted hover:bg-well hover:text-fg">
+            <Link to="/members" className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted hover:bg-brand-soft/60 hover:text-fg">
               <Icon name="teams" />
               {t('shell.manageMembers')}
             </Link>
@@ -113,12 +114,12 @@ function UserMenu({ onShortcuts }: { onShortcuts: () => void }) {
   const { t } = useI18n()
   const { user, logout } = useAuth()
   const username = user?.username ?? ''
-  const item = 'flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm text-fg hover:bg-well'
+  const item = 'flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm text-fg hover:bg-brand-soft/60'
   return (
     <Popover
       label={t('shell.account', { name: username })}
       panelClassName="w-72 p-1.5"
-      triggerClassName="flex h-9 items-center gap-1 rounded-full pl-0.5 pr-1.5 text-fg-muted transition-colors duration-150 hover:bg-well hover:text-fg"
+      triggerClassName="flex h-9 items-center gap-1 rounded-full pl-0.5 pr-1.5 text-fg-muted transition-colors duration-150 hover:bg-brand-soft/60 hover:text-fg"
       trigger={
         <>
           <Avatar name={username} src={user?.avatar} size={30} />
@@ -336,8 +337,9 @@ export function Layout() {
           {t('nav.skipToContent')}
         </a>
 
-        <header className="sticky top-0 z-30 border-b border-border bg-bg">
-          <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-1 px-3 sm:gap-2 lg:px-6">
+        {/* A floating glass bar: it keeps a margin from the edges and blurs what scrolls beneath it. */}
+        <header className="sticky top-0 z-30 px-2 pt-2 sm:px-3 sm:pt-3 lg:px-6">
+          <div className="glass mx-auto flex h-14 max-w-[1600px] items-center gap-1 rounded-2xl px-2 sm:gap-2 lg:px-3">
             <button
               ref={menuButtonRef}
               type="button"
@@ -354,7 +356,7 @@ export function Layout() {
             <div className="hidden md:block">
               <WorkspaceSwitcher />
             </div>
-            <nav aria-label={t('nav.mainNavigation')} className="ml-2 hidden h-14 items-stretch lg:flex">
+            <nav aria-label={t('nav.mainNavigation')} className="ml-2 hidden items-center gap-0.5 lg:flex">
               {MAIN_NAV.map((item) => (
                 <NavLink key={item.to} to={item.to} className={topLinkClass}>
                   {t(item.labelKey)}
@@ -369,7 +371,7 @@ export function Layout() {
                 // The visible text is "Search" and the shortcut, so the accessible name contains both (WCAG 2.5.3).
                 aria-label={t('shell.searchHint')}
                 aria-keyshortcuts="Control+K"
-                className="flex h-9 items-center gap-2 rounded-md border border-border-strong bg-surface px-2.5 text-sm text-fg-muted transition-colors duration-150 hover:border-fg-muted hover:text-fg max-md:w-9 max-md:justify-center max-md:border-transparent max-md:px-0 md:w-56"
+                className="flex h-10 items-center gap-2 rounded-xl border border-fg/15 bg-surface/50 px-3 text-sm text-fg-muted transition-colors duration-150 hover:bg-surface/90 hover:text-fg max-md:w-10 max-md:justify-center max-md:border-transparent max-md:bg-transparent max-md:px-0 md:w-56"
               >
                 <Icon name="search" />
                 <span className="hidden flex-1 text-left md:inline">{t('shell.search')}</span>
@@ -382,8 +384,8 @@ export function Layout() {
               {/* What is on screen keeps itself current (useLiveUpdates); this says so. */}
               <span title={t('shell.live')} className="relative hidden h-9 w-5 items-center justify-center sm:flex">
                 <span className="sr-only">{t('shell.live')}</span>
-                <span aria-hidden="true" className="live-ring absolute h-2 w-2 rounded-full bg-st-done" />
-                <span aria-hidden="true" className="relative h-2 w-2 rounded-full bg-st-done" />
+                <span aria-hidden="true" className="live-ring absolute h-2 w-2 rounded-full bg-orange" />
+                <span aria-hidden="true" className="relative h-2 w-2 rounded-full bg-orange" />
               </span>
               <NotificationsMenu />
               <UserMenu onShortcuts={() => setHelpOpen(true)} />
@@ -394,7 +396,7 @@ export function Layout() {
         {menuOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <button type="button" aria-label={t('nav.closeMenu')} tabIndex={-1} onClick={() => setMenuOpen(false)} className="absolute inset-0 bg-scrim" />
-            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] animate-slide-in-left flex-col border-r border-border bg-surface shadow-float">
+            <div className="glass absolute inset-y-2 left-2 flex w-72 max-w-[85vw] animate-slide-in-left flex-col rounded-2xl shadow-float">
               <div className="flex h-14 items-center justify-between border-b border-border px-3">
                 <Logo />
                 <button type="button" autoFocus aria-label={t('nav.closeMenu')} onClick={() => setMenuOpen(false)} className={iconButton()}>
@@ -429,8 +431,8 @@ export function Layout() {
                     key={item.to}
                     to={item.to}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 rounded-md px-3 py-2.5 text-[15px] font-semibold ${
-                        isActive ? 'bg-brand-soft text-fg' : 'text-fg-muted hover:bg-well hover:text-fg'
+                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium ${
+                        isActive ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:bg-surface/60 hover:text-fg'
                       }`
                     }
                   >
@@ -444,21 +446,21 @@ export function Layout() {
 
         {inProject && (
           // The project's name and its sections form one navigation landmark (nothing outside landmarks).
-          <nav aria-label={t('shell.projectSections')} className="border-b border-border bg-bg">
-            <div className="mx-auto max-w-[1600px] px-3 lg:px-6">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pt-4">
-                <Link to={`/projects/${projectId}`} className="flex min-w-0 items-center gap-2.5">
+          <nav aria-label={t('shell.projectSections')}>
+            <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-4 gap-y-3 px-4 pt-6 lg:px-7">
+              <div className="flex min-w-0 items-center gap-3">
+                <Link to={`/projects/${projectId}`} className="flex min-w-0 items-center gap-2.5 rounded-lg">
                   <span
                     aria-hidden="true"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brand-soft text-sm font-extrabold text-brand-strong"
+                    className="btn-ink flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-semibold"
                   >
                     {project?.icon || project?.name.slice(0, 1).toUpperCase() || ''}
                   </span>
-                  <span className="truncate text-[15px] font-bold text-fg">{project?.name ?? t('nav.sectionProject')}</span>
+                  <span className="truncate text-[15px] font-semibold text-fg">{project?.name ?? t('nav.sectionProject')}</span>
                 </Link>
                 {project && <StatusBadge status={project.status} />}
               </div>
-              <div className="scroll-quiet -mb-px flex overflow-x-auto">
+              <div className="glass scroll-quiet flex max-w-full gap-0.5 overflow-x-auto rounded-xl p-1 lg:ml-auto">
                 {PROJECT_NAV.map((item) => (
                   <NavLink key={item.path} to={`/projects/${projectId}${item.path}`} end={item.end} className={tabLinkClass}>
                     {t(item.labelKey)}
@@ -469,7 +471,7 @@ export function Layout() {
           </nav>
         )}
 
-        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] px-4 py-6 outline-none lg:px-7 lg:py-8">
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] px-4 py-7 outline-none lg:px-7 lg:py-9">
           {/* Keyed by search too, so "?new=1" links remount the page and open its create form. */}
           <div key={pathname + search} className="animate-fade-in">
             <Outlet />

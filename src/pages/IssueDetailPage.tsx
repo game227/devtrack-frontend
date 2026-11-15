@@ -117,12 +117,12 @@ export function IssueDetailPage() {
             </a>
           )}
         </div>
-        <h1 className="mt-1.5 max-w-4xl text-[28px] font-extrabold leading-tight tracking-[-0.02em] text-fg">{issue.title}</h1>
+        <h1 className="mt-1.5 max-w-4xl text-[32px] font-medium leading-tight tracking-[-0.035em] text-fg">{issue.title}</h1>
       </header>
 
       <div className="grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-8">
-          <div className="rounded-xl border border-border bg-surface px-3 pb-3 pt-4">
+          <div className="rounded-xl border border-edge bg-surface shadow-panel px-3 pb-3 pt-4">
             <StatusStepper
               status={issue.status}
               disabled={!canUpdateProgress}
@@ -165,7 +165,7 @@ export function IssueDetailPage() {
                 }
                 title={canEdit ? undefined : t('issue.notYours')}
                 className={`max-w-3xl whitespace-pre-wrap rounded-lg text-[15px] leading-relaxed ${issue.description ? 'text-fg' : 'text-fg-muted'} ${
-                  canEdit ? '-mx-2 cursor-text px-2 py-1 transition-colors duration-150 hover:bg-well' : ''
+                  canEdit ? '-mx-2 cursor-text px-2 py-1 transition-colors duration-150 hover:bg-brand-soft/60' : ''
                 }`}
               >
                 {issue.description || t(canEdit ? 'issue.addDescription' : 'issue.noDescription')}
@@ -182,7 +182,7 @@ export function IssueDetailPage() {
           />
         </div>
 
-        <aside aria-label={t('issue.properties')} className="h-fit rounded-xl border border-border bg-surface p-5 lg:sticky lg:top-20">
+        <aside aria-label={t('issue.properties')} className="h-fit rounded-xl border border-edge bg-surface shadow-panel p-5 lg:sticky lg:top-20">
           <h2 className="mb-1 text-base font-bold text-fg">{t('issue.properties')}</h2>
           {rights === 'progress' && <p className="mb-4 text-sm text-fg-muted">{t('issue.progressOnly')}</p>}
           {rights === 'none' && <p className="mb-4 text-sm text-fg-muted">{t('issue.notYours')}</p>}

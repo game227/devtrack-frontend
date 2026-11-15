@@ -1,17 +1,16 @@
 @import "tailwindcss";
 
 /*
-  DevTrack "Yo'l" (the line). Every issue rides the same five stations — backlog, to do, in progress,
-  review, done — and the interface draws that line: in the logo, across the top of the board, as the
-  status stepper on an issue and as the small track in every issue row. The line is the only ornament;
-  everything around it is plain.
+  DevTrack: monochrome glass. A soft grey canvas ruled with a faint grid, frosted panels with a light
+  edge, ink-black actions, and one warm accent (orange) for "live" and "you are here". The work itself
+  still rides the line of five stations (backlog, to do, in progress, review, done); the station
+  colours are the only other colours, and always sit next to a label or a position on the line.
 
-  - Colour means something. Turquoise (firuza, the glaze of Samarkand's domes) marks actions and "you
-    are here"; the five station colours mark status and always sit next to a text label.
-  - Lists, not card grids: rows on a white page, separated by hairlines.
-  - Radii follow hierarchy: controls 6px (rounded-md), cards 8px (rounded-lg), panels and dialogs 12px
-    (rounded-xl), station chips fully round.
-  - Shadows only under things that float above the page: menus, dialogs, a card being dragged.
+  - Panels are frosted surfaces with a light edge (border-edge) and a hairline shadow; things that float
+    (top bar, menus, dialogs, toasts) are real glass with a backdrop blur.
+  - Primary actions are ink pills (.btn-ink), secondary ones are outlined; radii follow hierarchy:
+    controls 10px (rounded-md), cards 12px (rounded-lg), panels 18px (rounded-xl), chips round.
+  - Technical marks (corner brackets, crosshairs) frame the few illustrations, never content.
 
   Contrast is part of the system (WCAG 2.1 AA, checked with axe in both themes): text tokens meet 4.5:1
   on bg, surface and well; border-strong and the station colours meet 3:1 (WCAG 1.4.11).
@@ -19,40 +18,52 @@
 
 @theme {
   /* Light is the default theme; :root[data-theme='dark'] below redefines the same names. */
-  --color-bg: #ffffff;
-  --color-surface: #ffffff;
-  --color-well: #f2f4f7;
-  --color-border: #e1e5ea;
-  --color-border-strong: #7f8995;
-  --color-fg: #121820;
-  --color-fg-muted: #56606c;
-  --color-subtle: #5f6974;
-  --color-accent: #0a6d77;
-  --color-scrim: rgb(18 24 32 / 0.45);
+  --color-bg: #cececc;
+  --color-grid: rgb(255 255 255 / 0.34);
+  --color-surface: #e4e4e2;
+  --color-well: #d8d8d6;
+  --color-edge: rgb(255 255 255 / 0.72);
+  --color-border: rgb(17 17 17 / 0.1);
+  --color-border-strong: #6a6a68;
+  --color-fg: #111111;
+  --color-fg-muted: #474745;
+  --color-subtle: #525250;
+  --color-accent: #8f3104;
+  --color-scrim: rgb(40 40 38 / 0.42);
+  --color-corner: #ffffff;
 
-  --color-brand: #0a7782;
-  --color-brand-strong: #08636c;
-  --color-brand-soft: #ddf1f3;
+  /* Ink: the primary action colour (and its text). */
+  --color-brand: #121212;
+  --color-brand-strong: #000000;
+  --color-brand-hi: #343432;
+  --color-brand-soft: #f1f1ef;
   --color-on-brand: #ffffff;
+  /* The one warm accent: live dots, the logo's last station, the badge dot. Decorative only. */
+  --color-orange: #f05a16;
 
   /* Text-safe state colours. */
-  --color-success: #1d7a3a;
-  --color-warning: #8f5500;
-  --color-info: #2e52c4;
-  --color-danger: #be2a2a;
-  --color-merged: #7a3dbe;
+  --color-success: #135a32;
+  --color-warning: #744600;
+  --color-info: #2a48a8;
+  --color-danger: #9a1e1e;
+  --color-merged: #653aa8;
 
   /* The five stations. */
-  --color-st-backlog: #7e8893;
-  --color-st-todo: #3c5cd6;
-  --color-st-progress: #c76a00;
-  --color-st-review: #8742c6;
-  --color-st-done: #21843d;
+  --color-st-backlog: #6a6a68;
+  --color-st-todo: #3354c4;
+  --color-st-progress: #bf4c0b;
+  --color-st-review: #7a4bcf;
+  --color-st-done: #197a43;
 
-  --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Atkinson Hyperlegible Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --shadow-float: 0 16px 40px -12px rgb(16 24 32 / 0.22), 0 2px 8px rgb(16 24 32 / 0.08);
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.125rem;
+
+  --shadow-panel: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 1px 2px rgb(20 20 20 / 0.05), 0 8px 24px -16px rgb(20 20 20 / 0.18);
+  --shadow-float: 0 24px 60px -18px rgb(20 20 20 / 0.32), 0 2px 8px rgb(20 20 20 / 0.08);
 
   --animate-fade-in: fade-in 160ms ease-out;
   --animate-scale-in: scale-in 140ms ease-out;
@@ -67,35 +78,41 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-bg: #0d1317;
-  --color-surface: #131b21;
-  --color-well: #0a0f13;
-  --color-border: #25303a;
-  --color-border-strong: #5f6c78;
-  --color-fg: #e8edf1;
-  --color-fg-muted: #9ba7b2;
-  --color-subtle: #8d9aa6;
-  --color-accent: #5ec8d2;
-  --color-scrim: rgb(0 0 0 / 0.6);
+  --color-bg: #151515;
+  --color-grid: rgb(255 255 255 / 0.045);
+  --color-surface: #1f1f1f;
+  --color-well: #1a1a1a;
+  --color-edge: rgb(255 255 255 / 0.08);
+  --color-border: rgb(255 255 255 / 0.09);
+  --color-border-strong: #7a7a78;
+  --color-fg: #f2f2f0;
+  --color-fg-muted: #a9a9a6;
+  --color-subtle: #9a9a97;
+  --color-accent: #ff9a5c;
+  --color-scrim: rgb(0 0 0 / 0.62);
+  --color-corner: #8a8a88;
 
-  --color-brand: #3db8c3;
-  --color-brand-strong: #63cad3;
-  --color-brand-soft: #0f3238;
-  --color-on-brand: #03272b;
+  --color-brand: #f2f2f0;
+  --color-brand-strong: #ffffff;
+  --color-brand-hi: #ffffff;
+  --color-brand-soft: #2b2b2b;
+  --color-on-brand: #111111;
+  --color-orange: #ff7a33;
 
-  --color-success: #52c47e;
-  --color-warning: #edb04a;
-  --color-info: #86a2ff;
-  --color-danger: #ff8f8b;
-  --color-merged: #c79eff;
+  --color-success: #5ccb8a;
+  --color-warning: #f2b84b;
+  --color-info: #8fa8ff;
+  --color-danger: #ff8a84;
+  --color-merged: #c4a1ff;
 
-  --color-st-backlog: #73818d;
-  --color-st-todo: #7290ff;
-  --color-st-progress: #ee9f3a;
-  --color-st-review: #b888ee;
+  --color-st-backlog: #8e8e8b;
+  --color-st-todo: #7b96ff;
+  --color-st-progress: #ff7a33;
+  --color-st-review: #b48cf2;
   --color-st-done: #4fc27b;
 
-  --shadow-float: 0 18px 44px -10px rgb(0 0 0 / 0.7), 0 2px 8px rgb(0 0 0 / 0.4);
+  --shadow-panel: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-float: 0 24px 60px -16px rgb(0 0 0 / 0.75), 0 2px 8px rgb(0 0 0 / 0.45);
 }
 
 html {
@@ -104,29 +121,113 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* The canvas: soft grey, ruled with a faint grid. */
 body {
   background-color: var(--color-bg);
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: -1px -1px;
   color: var(--color-fg);
   font-family: var(--font-sans);
-  font-optical-sizing: auto;
+  font-feature-settings: "ss01";
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: var(--color-brand-soft);
-  color: var(--color-fg);
+  background-color: var(--color-fg);
+  color: var(--color-bg);
 }
 
 /* One focus ring everywhere: keyboard users always see where they are. */
 :focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-fg);
   outline-offset: 2px;
 }
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline-offset: 0;
+}
+
+/* Frosted glass for whatever floats above the page. */
+.glass {
+  background-color: color-mix(in srgb, var(--color-surface) 66%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  backdrop-filter: blur(16px) saturate(1.15);
+  border: 1px solid var(--color-edge);
+  box-shadow: var(--shadow-panel);
+}
+
+/* Ink buttons: a soft vertical gradient and a hairline highlight, like a pressed key. */
+.btn-ink {
+  background-image: linear-gradient(180deg, var(--color-brand-hi), var(--color-brand) 60%);
+  background-color: var(--color-brand);
+  color: var(--color-on-brand);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.14), 0 1px 2px rgb(0 0 0 / 0.25), 0 6px 16px -8px rgb(0 0 0 / 0.45);
+}
+.btn-ink:hover {
+  background-image: linear-gradient(180deg, var(--color-brand), var(--color-brand-strong));
+}
+:root[data-theme='dark'] .btn-ink {
+  background-image: linear-gradient(180deg, #ffffff, #dcdcda);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(0 0 0 / 0.5);
+}
+:root[data-theme='dark'] .btn-ink:hover {
+  background-image: linear-gradient(180deg, #f2f2f0, #cfcfcd);
+}
+
+/* Viewfinder corners around an illustration (set --corner-size / --corner-color to adjust). */
+.corners {
+  --c: var(--corner-color, var(--color-corner));
+  --l: var(--corner-size, 22px);
+  --w: 1.5px;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) top left / var(--w) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--w) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--w) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--l) var(--w) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--w) var(--l) no-repeat;
+}
+
+/* Inside ink objects (the landing device, the sign-in panel) the stations use their bright colours. */
+.on-ink {
+  --color-st-backlog: #8e8e8b;
+  --color-st-todo: #7b96ff;
+  --color-st-progress: #ff7a33;
+  --color-st-review: #b48cf2;
+  --color-st-done: #4fc27b;
+}
+
+/* A small "+" registration mark. */
+.crosshair {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.crosshair::before,
+.crosshair::after {
+  content: "";
+  position: absolute;
+  background: var(--color-corner);
+}
+.crosshair::before {
+  left: 6.25px;
+  top: 0;
+  width: 1.5px;
+  height: 14px;
+}
+.crosshair::after {
+  top: 6.25px;
+  left: 0;
+  width: 14px;
+  height: 1.5px;
 }
 
 /* Numbers in tables and counters line up. */
@@ -208,11 +309,11 @@ textarea:focus-visible {
 /* A card that just arrived in a column glows with the brand ring, then settles. */
 @keyframes land {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-brand) 60%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-orange) 60%, transparent);
     transform: scale(1.02);
   }
   30% {
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand) 35%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-orange) 40%, transparent);
     transform: scale(1);
   }
   100% {
@@ -306,6 +407,63 @@ textarea:focus-visible {
   100% {
     transform: scale(2.6);
     opacity: 0;
+  }
+}
+
+/* Landing device: it floats gently; its board fills in once, then one card keeps moving to review. */
+.device-float {
+  animation: device-float 7s ease-in-out infinite;
+}
+@keyframes device-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.device-card {
+  animation: device-card 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
+}
+@keyframes device-card {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.device-traveller {
+  animation: device-traveller 6.5s cubic-bezier(0.65, 0, 0.35, 1) 1.8s infinite both;
+}
+@keyframes device-traveller {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translate(0, 6px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(0, -5px) rotate(-3deg) scale(1.06);
+  }
+  58% {
+    transform: translate(calc(100% + 6px), -5px) rotate(2deg) scale(1.06);
+  }
+  66%,
+  86% {
+    opacity: 1;
+    transform: translate(calc(100% + 6px), 0) rotate(0) scale(1);
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: translate(calc(100% + 6px), 0);
   }
 }
 

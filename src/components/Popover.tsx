@@ -64,7 +64,7 @@ export function Popover({
       {open && (
         <div
           id={panelId}
-          className={`absolute top-full z-40 mt-2 max-w-[calc(100vw-2rem)] origin-top animate-scale-in rounded-xl border border-border bg-surface shadow-float ${
+          className={`absolute top-full z-40 mt-2 max-w-[calc(100vw-2rem)] origin-top animate-scale-in glass rounded-xl shadow-float ${
             align === 'right' ? 'right-0' : 'left-0'
           } ${panelClassName}`}
           onClick={(event) => {

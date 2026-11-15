@@ -85,7 +85,7 @@ export function ProjectHealthCard({ projectId }: { projectId: number }) {
   const breakdown = health.breakdown ?? []
 
   return (
-    <section aria-labelledby="project-health" className="rounded-xl border border-border bg-surface p-5">
+    <section aria-labelledby="project-health" className="rounded-xl border border-edge bg-surface shadow-panel p-5">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 id="project-health" className="text-base font-bold text-fg">
@@ -94,7 +94,7 @@ export function ProjectHealthCard({ projectId }: { projectId: number }) {
           {health.confidence === 'low' && <p className="mt-1 max-w-md text-sm text-fg-muted">{t('health.lowConfidence')}</p>}
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-4xl font-extrabold leading-none tracking-[-0.02em] text-fg tabular">
+          <span className="text-4xl font-semibold leading-none tracking-[-0.02em] text-fg tabular">
             <CountUp value={health.score} />
             <span className="text-base font-bold text-fg-muted">/100</span>
           </span>

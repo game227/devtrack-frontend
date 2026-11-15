@@ -21,7 +21,7 @@ const dangerButton = button('danger')
 
 function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings'; children: ReactNode }) {
   return (
-    <section className="rounded-xl border border-border bg-surface p-5">
+    <section className="rounded-xl border border-edge bg-surface shadow-panel p-5">
       <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-fg">
         {icon && <Icon name={icon} size={18} />}
         {title}

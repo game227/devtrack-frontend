@@ -55,7 +55,7 @@ export function ProjectCyclesPage() {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
-        <h1 className="text-2xl font-extrabold tracking-[-0.015em] text-fg">{t('cycles.title')}</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.015em] text-fg">{t('cycles.title')}</h1>
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
@@ -66,7 +66,7 @@ export function ProjectCyclesPage() {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-8 max-w-xl rounded-xl border border-border bg-surface p-5">
+        <form onSubmit={handleSubmit} className="mb-8 max-w-xl rounded-xl border border-edge bg-surface shadow-panel p-5">
           {errors.non_field_errors && (
             <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
               {errors.non_field_errors.join(' ')}
@@ -118,7 +118,7 @@ export function ProjectCyclesPage() {
         />
       )}
 
-      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface empty:hidden">
+      <div className="divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel empty:hidden">
         {cyclesQuery.data?.map((cycle) => (
           <div key={cycle.id} className="px-5 py-4">
             <div className="mb-3 flex items-start justify-between gap-3">

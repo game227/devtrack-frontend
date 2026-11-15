@@ -12,7 +12,7 @@ export const THEME_PREFERENCES: ThemePreference[] = ['light', 'dark', 'system']
 
 const DARK_QUERY = '(prefers-color-scheme: dark)'
 // Browser chrome colour: the page background of each theme (styles/index.css --color-bg).
-const THEME_COLOR: Record<ResolvedTheme, string> = { dark: '#0d1317', light: '#ffffff' }
+const THEME_COLOR: Record<ResolvedTheme, string> = { dark: '#151515', light: '#cececc' }
 
 function isPreference(value: unknown): value is ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system'

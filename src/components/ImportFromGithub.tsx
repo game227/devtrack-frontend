@@ -50,7 +50,7 @@ export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
   }
 
   return (
-    <div className="mb-8 max-w-xl rounded-xl border border-border bg-surface p-5">
+    <div className="mb-8 max-w-xl rounded-xl border border-edge bg-surface shadow-panel p-5">
       <h2 className="mb-1 flex items-center gap-2 text-base font-bold text-fg">
         <Icon name="github" />
         {t('github.import.title')}

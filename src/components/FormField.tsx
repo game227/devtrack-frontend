@@ -23,7 +23,7 @@ export function FormField({ label, errors, children }: FormFieldProps) {
 
   return (
     <div className="text-sm">
-      <label className="block font-semibold text-fg">
+      <label className="block font-medium text-fg">
         {label}
         {control}
       </label>
@@ -41,4 +41,4 @@ export function FormField({ label, errors, children }: FormFieldProps) {
 // The label above is semibold; the control resets to regular weight. border-strong is the 3:1 control
 // boundary (WCAG 1.4.11); focus adds the brand outline from styles/index.css.
 export const formInputClass =
-  'mt-1.5 block w-full rounded-md border border-border-strong bg-surface px-3 py-2 text-sm font-normal text-fg placeholder:text-subtle transition-colors duration-150 hover:border-fg-muted focus:border-brand disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger'
+  'mt-1.5 block w-full rounded-md border border-border-strong bg-surface/80 px-3 py-2.5 text-sm font-normal text-fg placeholder:text-subtle transition-colors duration-150 hover:border-fg-muted focus:border-fg focus:bg-surface disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger'

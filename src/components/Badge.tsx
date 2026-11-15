@@ -36,7 +36,7 @@ const PULL_REQUEST_STATE_COLORS: Record<'open' | 'closed' | 'merged', string> = 
 
 function Chip({ label, color }: { label: string; color: string | null }) {
   return (
-    <span className="inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-surface px-2.5 text-xs font-semibold text-fg">
+    <span className="inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-surface/70 px-2.5 text-xs font-medium text-fg">
       {color && <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />}
       {label}
     </span>

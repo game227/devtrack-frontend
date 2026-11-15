@@ -43,7 +43,7 @@ function StatusLine({ issues }: { issues: Issue[] }) {
 
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-xl border border-border bg-surface p-5">
+    <section className="rounded-xl border border-edge bg-surface shadow-panel p-5">
       <h2 className="mb-4 text-base font-bold text-fg">{title}</h2>
       {children}
     </section>

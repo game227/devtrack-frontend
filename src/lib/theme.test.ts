@@ -62,9 +62,9 @@ describe('theme', () => {
   it('applies a theme to <html> and to the browser chrome colour', () => {
     applyTheme('light')
     expect(document.documentElement.dataset.theme).toBe('light')
-    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#ffffff')
+    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#cececc')
     applyTheme('dark')
-    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#0d1317')
+    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#151515')
   })
 
   it('saves a new choice, applies it and tells subscribers', () => {

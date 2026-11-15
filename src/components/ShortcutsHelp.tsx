@@ -31,7 +31,7 @@ export function ShortcutsHelp({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label={t('shortcuts.title')}
-        className="relative w-full max-w-md animate-scale-in rounded-xl border border-border bg-surface p-5 shadow-float"
+        className="relative w-full max-w-md animate-scale-in glass rounded-xl p-5 shadow-float"
       >
         <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
           <h2 className="text-base font-bold text-fg">{t('shortcuts.title')}</h2>

@@ -170,10 +170,10 @@ export function ProjectsPage() {
         <ul className={listPanel}>
           {projectsQuery.data.map((project) => (
             <li key={project.id}>
-              <Link to={`/projects/${project.id}`} className="flex items-center gap-4 px-4 py-3.5 transition-colors duration-150 hover:bg-well">
+              <Link to={`/projects/${project.id}`} className="flex items-center gap-4 px-4 py-3.5 transition-colors duration-150 hover:bg-brand-soft/60">
                 <span
                   aria-hidden="true"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-sm font-extrabold text-brand-strong"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-sm font-semibold text-brand-strong"
                 >
                   {project.icon || project.name.slice(0, 1).toUpperCase()}
                 </span>

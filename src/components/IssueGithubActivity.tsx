@@ -26,7 +26,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
         <Icon name="github" size={18} />
         {t('github.linkedActivity')}
       </h2>
-      <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel">
         {links.pull_requests.map((pr) => (
           <li
             key={`pr-${pr.id}`}

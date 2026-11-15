@@ -115,7 +115,7 @@ export function CommandPalette({ commands, workspaceId, navigate, onClose }: Com
         aria-modal="true"
         aria-label={t('cmdk.title')}
         onKeyDown={handleKeyDown}
-        className="relative w-full max-w-xl animate-scale-in overflow-hidden rounded-xl border border-border bg-surface shadow-float"
+        className="relative w-full max-w-xl animate-scale-in overflow-hidden glass rounded-xl shadow-float"
       >
         <div className="flex items-center gap-2 border-b border-border px-4">
           <Icon name="search" size={18} className="text-fg-muted" />

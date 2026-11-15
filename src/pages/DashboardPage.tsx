@@ -59,10 +59,10 @@ function MyLine({
                 aria-label={`${label}, ${counts[station]}`}
                 onClick={() => onSelect(pressed ? null : station)}
                 className={`group flex w-full flex-col items-center rounded-lg px-1 pb-2 pt-1 transition-colors duration-150 ${
-                  pressed ? 'bg-brand-soft' : 'hover:bg-well'
+                  pressed ? 'bg-brand-soft' : 'hover:bg-brand-soft/60'
                 }`}
               >
-                <span className={`h-9 text-[28px] font-extrabold leading-9 tabular ${counts[station] ? 'text-fg' : 'text-subtle'}`}>
+                <span className={`h-9 text-[28px] font-semibold leading-9 tabular ${counts[station] ? 'text-fg' : 'text-subtle'}`}>
                   <CountUp value={counts[station]} />
                 </span>
                 <span aria-hidden="true" className="flex h-6 items-center">
@@ -255,10 +255,10 @@ export function DashboardPage() {
             </h2>
             {data.upcoming_deadlines.length === 0 && <p className="text-sm text-fg-muted">{t('dashboard.noDeadlines')}</p>}
             {data.upcoming_deadlines.length > 0 && (
-              <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+              <ul className="divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel">
                 {data.upcoming_deadlines.slice(0, 6).map((item) => (
                   <li key={item.id}>
-                    <Link to={`/issues/${item.id}`} className="block px-4 py-3 transition-colors duration-150 hover:bg-well">
+                    <Link to={`/issues/${item.id}`} className="block px-4 py-3 transition-colors duration-150 hover:bg-brand-soft/60">
                       <span className="block truncate text-sm font-semibold text-fg">{item.title}</span>
                       <span className="mt-1 flex items-center justify-between gap-3">
                         <span className="min-w-0 truncate text-xs text-fg-muted">{item.project.name}</span>
@@ -311,7 +311,7 @@ export function DashboardPage() {
               ).map(([key, value]) => (
                 <div key={key} className="bg-surface px-4 py-3">
                   <dt className="text-xs text-fg-muted">{t(`dashboard.${key}`)}</dt>
-                  <dd className="mt-0.5 text-xl font-extrabold text-fg tabular">{value}</dd>
+                  <dd className="mt-0.5 text-xl font-semibold text-fg tabular">{value}</dd>
                 </div>
               ))}
             </dl>

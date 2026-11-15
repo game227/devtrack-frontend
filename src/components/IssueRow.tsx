@@ -16,7 +16,7 @@ export function IssueRow({ issue, index = 0 }: { issue: Issue; index?: number })
     <li style={{ '--i': index } as CSSProperties}>
       <Link
         to={`/issues/${issue.id}`}
-        className="group flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 transition-colors duration-150 hover:bg-well sm:flex-nowrap"
+        className="group flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 transition-colors duration-150 hover:bg-brand-soft/60 sm:flex-nowrap"
       >
         <StatusTrack status={issue.status} />
         <span className="w-10 shrink-0 font-mono text-xs text-fg-muted tabular">#{issue.number}</span>
@@ -66,7 +66,7 @@ export function IssueRow({ issue, index = 0 }: { issue: Issue; index?: number })
 
 export function IssueList({ children, label }: { children: ReactNode; label?: string }) {
   return (
-    <ul aria-label={label} className="stagger divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+    <ul aria-label={label} className="stagger divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel">
       {children}
     </ul>
   )

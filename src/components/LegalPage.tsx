@@ -31,9 +31,9 @@ export function LegalPage({ titleKey, bodyKey }: { titleKey: string; bodyKey: st
   const { t, lang } = useI18n()
 
   return (
-    <div className="min-h-screen bg-bg text-fg">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+    <div className="min-h-screen px-3 text-fg">
+      <header className="px-3 pt-3 sm:pt-5">
+        <div className="glass mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 rounded-2xl px-3 sm:px-4">
           <Link to="/" className="flex h-9 items-center rounded-md">
             <Logo />
           </Link>
@@ -44,8 +44,8 @@ export function LegalPage({ titleKey, bodyKey }: { titleKey: string; bodyKey: st
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl font-extrabold tracking-[-0.02em] text-fg">{t(titleKey)}</h1>
+      <main className="glass mx-auto my-8 max-w-3xl rounded-[24px] px-6 py-10 sm:px-10">
+        <h1 className="text-4xl font-medium tracking-[-0.04em] text-fg">{t(titleKey)}</h1>
         <p className="mb-10 mt-2 text-sm text-fg-muted">{t('legal.updated', { date: formatDate(lang, LAST_UPDATED_ISO) })}</p>
         <div className="space-y-3">{renderBody(t(bodyKey))}</div>
         <Link to="/" className="mt-12 inline-block text-sm font-semibold text-accent hover:underline">

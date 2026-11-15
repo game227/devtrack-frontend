@@ -7,7 +7,7 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
     <div
       role="group"
       aria-label={t('lang.switch')}
-      className={`inline-flex items-center gap-0.5 rounded-md bg-well p-0.5 ${className}`}
+      className={`inline-flex items-center gap-0.5 rounded-xl bg-fg/[0.07] p-1 ${className}`}
     >
       {LANGS.map((code) => {
         const active = lang === code
@@ -20,8 +20,8 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
             aria-label={`${code.toUpperCase()} — ${t(`lang.${code}`)}`}
             aria-pressed={active}
             onClick={() => setLang(code)}
-            className={`flex h-7 min-w-9 items-center justify-center rounded px-2 text-xs font-bold transition-colors ${
-              active ? 'bg-surface text-fg shadow-[0_1px_2px_rgb(0_0_0/0.12)] ring-1 ring-border' : 'text-fg-muted hover:text-fg'
+            className={`flex h-7 min-w-9 items-center justify-center rounded-lg px-2 text-xs font-semibold transition-colors ${
+              active ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:text-fg'
             }`}
           >
             {code.toUpperCase()}

@@ -55,7 +55,7 @@ function EmailVerificationBanner() {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-4 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-edge bg-surface shadow-panel p-4 text-sm">
       <span className="text-fg-muted">{t('profile.emailUnverified')}</span>
       {status === 'sent' ? (
         <span role="status" className="text-fg-muted">{t('profile.verificationSent')}</span>
@@ -145,7 +145,7 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   const analytics = analyticsQuery.data
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-5">
+    <div className="rounded-xl border border-edge bg-surface shadow-panel p-5">
       <h2 className="mb-4 flex flex-wrap items-center gap-2 text-base font-bold text-fg">
         {t('profile.myActivity')}
         <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold text-fg-muted">{currentWorkspace.name}</span>
@@ -234,7 +234,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-border bg-surface p-5"
+      className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5"
     >
       <div className="flex items-center gap-4">
         {avatarPreview ? (
@@ -245,7 +245,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
           </div>
         )}
         <label className="cursor-pointer rounded-md text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand">
-          <span className="block rounded-md border border-border-strong bg-surface px-3 py-1.5 font-semibold text-fg transition-colors duration-150 hover:bg-well">
+          <span className="block rounded-md border border-border-strong bg-surface px-3 py-1.5 font-semibold text-fg transition-colors duration-150 hover:bg-brand-soft/60">
             {t('profile.changeAvatar')}
           </span>
           <input type="file" accept={AVATAR_TYPES.join(',')} className="sr-only" onChange={handleAvatarChange} />
@@ -341,7 +341,7 @@ function PasswordForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 rounded-xl border border-border bg-surface p-5"
+      className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5"
     >
       <h2 className="text-base font-bold text-fg">{t('profile.changePassword')}</h2>
       {errors.non_field_errors && (

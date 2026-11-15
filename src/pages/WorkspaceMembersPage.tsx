@@ -167,7 +167,7 @@ export function WorkspaceMembersPage() {
       )}
 
       {canInvite(me) && (
-        <section aria-labelledby="invite-title" className="rounded-xl border border-border bg-surface p-5">
+        <section aria-labelledby="invite-title" className="rounded-xl border border-edge bg-surface shadow-panel p-5">
           <h2 id="invite-title" className="mb-1 text-base font-bold text-fg">{t('members.inviteTitle')}</h2>
           <p className="mb-4 text-sm text-fg-muted">{t('members.inviteHint', { days: INVITATION_DAYS })}</p>
           <form onSubmit={submitInvite} className="flex flex-wrap items-end gap-3">
@@ -212,13 +212,13 @@ export function WorkspaceMembersPage() {
         </section>
       )}
 
-      <section aria-labelledby="members-title" className="rounded-xl border border-border bg-surface px-5">
+      <section aria-labelledby="members-title" className="rounded-xl border border-edge bg-surface shadow-panel px-5">
         <h2 id="members-title" className="sr-only">{t('members.title')}</h2>
         <ul className="divide-y divide-border">{members.map(memberRow)}</ul>
       </section>
 
       {canLeave(me) && (
-        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-5">
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-edge bg-surface shadow-panel p-5">
           <p className="text-sm text-fg-muted">{t('members.leaveHint')}</p>
           <ConfirmButton onConfirm={() => leave.mutate()} disabled={leave.isPending} className={dangerClass}>
             {t('members.leave')}

@@ -95,8 +95,8 @@ export function NotificationsMenu() {
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 top-full z-40 mt-2 max-h-[28rem] w-96 max-w-[calc(100vw-1.5rem)] origin-top-right animate-scale-in overflow-y-auto rounded-xl border border-border bg-surface shadow-float max-sm:-right-12">
-          <div className="sticky top-0 flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+        <div className="absolute right-0 top-full z-40 mt-2 max-h-[28rem] w-96 max-w-[calc(100vw-1.5rem)] origin-top-right animate-scale-in overflow-y-auto glass rounded-xl shadow-float max-sm:-right-12">
+          <div className="sticky top-0 flex items-center justify-between border-b border-border bg-surface/90 px-4 py-3">
             <h2 className="text-sm font-bold text-fg">{t('notifications.title')}</h2>
             {unreadCount > 0 && (
               <button
@@ -118,13 +118,13 @@ export function NotificationsMenu() {
               key={notification.id}
               type="button"
               onClick={() => handleClick(notification)}
-              className={`flex w-full gap-3 border-b border-border px-4 py-3 text-left text-sm transition-colors duration-150 last:border-b-0 hover:bg-well ${
+              className={`flex w-full gap-3 border-b border-border px-4 py-3 text-left text-sm transition-colors duration-150 last:border-b-0 hover:bg-brand-soft/60 ${
                 notification.is_read ? 'text-fg-muted' : 'text-fg'
               }`}
             >
               <span
                 aria-hidden="true"
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.is_read ? 'bg-transparent' : 'bg-brand'}`}
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.is_read ? 'bg-transparent' : 'bg-orange'}`}
               />
               <span className="min-w-0">
                 <span className={`block ${notification.is_read ? '' : 'font-semibold'}`}>{notificationText(notification)}</span>

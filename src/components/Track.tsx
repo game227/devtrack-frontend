@@ -157,14 +157,14 @@ export function LogoMark({ size = 28 }: { size?: number }) {
       <line x1="3" y1="6" x2="24" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <circle cx="3.5" cy="6" r="2.5" fill="currentColor" />
       <circle cx="13.5" cy="6" r="2.5" fill="currentColor" />
-      <circle cx="23" cy="6" r="4.25" fill="var(--color-brand)" stroke="var(--color-bg)" strokeWidth="1.5" className="origin-[23px_6px] transition-transform duration-300 group-hover/logo:scale-125" />
+      <circle cx="23" cy="6" r="4.25" fill="var(--color-orange)" stroke="var(--color-surface)" strokeWidth="1.5" className="origin-[23px_6px] transition-transform duration-300 group-hover/logo:scale-125" />
     </svg>
   )
 }
 
 export function Logo({ className = '' }: { className?: string }) {
   return (
-    <span className={`group/logo inline-flex items-center gap-2 text-[17px] font-extrabold tracking-[-0.02em] text-fg ${className}`}>
+    <span className={`group/logo inline-flex items-center gap-2 text-[17px] font-semibold tracking-[-0.03em] text-fg ${className}`}>
       <LogoMark />
       DevTrack
     </span>

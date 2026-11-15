@@ -37,27 +37,35 @@ npm run dev
 
 ## Design system
 
-"Yo'l" (the line). Every issue rides the same five stations, backlog to done, and the interface draws
-that line: the logo, the station line across the top of the board, the status stepper on an issue,
-the small track at the start of every issue row, the home page's count per station, and the project
-timeline. The line is the only ornament; everything else stays plain.
+Monochrome glass. A soft grey canvas ruled with a faint grid, frosted panels with a light edge, ink-black
+primary actions, and one warm accent (orange) for "live" and "you are here". The work itself rides the
+line of five stations (backlog, to do, in progress, review, done): the logo, the station line across the
+board, the status stepper on an issue, the small track in every issue row, the home page's count per
+station and the project timeline all draw it. Station colours are the only other colours, and always sit
+next to a label or a position on the line.
 
-- **Tokens** live in `src/styles/index.css` (light by default, `data-theme="dark"` redefines them).
-  Firuza turquoise (`brand`) marks actions and "you are here"; the station colours (`st-backlog` …
-  `st-done`) mark status and always sit next to a label or a position on the line. Use the tokens
-  (`bg-surface`, `text-fg-muted`, `bg-brand`, …), never raw palette classes.
-- **Recipes** in `src/components/ui.ts` (`button()`, `listPanel`, `pageHeader`, `notice`, …) and the
-  line pieces in `src/components/Track.tsx` (`StatusTrack`, `StatusStepper`, `TrackProgress`, `Logo`).
-  Compose these instead of writing new button or panel classes.
-- **Type**: Atkinson Hyperlegible Next for everything, its Mono sibling only for code-like text (issue
-  keys, commit SHAs, branches, shortcuts). Both are self-hosted through `@fontsource-variable`, so the
-  CSP allows no third-party font host.
-- **Layout**: a top bar (workspace, sections, search, New issue, notifications, account menu) and, inside
-  a project, a second bar with its sections. Lists are rows separated by hairlines, not card grids.
-  Radii follow hierarchy (controls 6px, cards 8px, panels 12px, chips round); shadows only under
-  things that float (menus, dialogs, a dragged card).
+- **Tokens** live in `src/styles/index.css` (light by default, `data-theme="dark"` redefines them):
+  `bg` (canvas) and `grid`, `surface`/`well`/`edge` (panels), `brand` (ink), `orange`, the `st-*`
+  stations, text-safe state colours. Use the tokens, never raw palette classes.
+- **Utilities** in the same file: `.glass` (frosted, blurred: top bar, menus, dialogs, toasts), `.btn-ink`
+  (the primary button's gradient), `.corners` and `.crosshair` (viewfinder marks around illustrations
+  only), `.on-ink` (bright station colours inside dark objects).
+- **Recipes** in `src/components/ui.ts` (`button()`, `panel`, `listPanel`, `badge`, `pageHeader`, …) and
+  the line pieces in `src/components/Track.tsx`. Compose these instead of writing new button or panel
+  classes.
+- **Type**: Geist for everything (headings medium weight with tight tracking), Geist Mono only for
+  code-like text (issue keys, commit SHAs, branches, shortcuts). Both are self-hosted through
+  `@fontsource-variable`, so the CSP allows no third-party font host.
+- **Layout**: a floating glass top bar (workspace, sections as pills, search, New issue, live dot,
+  notifications, account menu) and, inside a project, its sections as a segmented control. Lists are
+  rows separated by hairlines. Radii follow hierarchy (controls 10px, cards 12px, panels 18px, chips
+  round); shadows are hairline, deeper only under things that float.
 - **One dialog creates issues** (`features/issues/NewIssueDialog.tsx`), opened through
-  `useNewIssue()`: the top bar, the C shortcut, the palette, empty states and `?new=1` links.
+  `useNewIssue()` from the top bar, the C shortcut, the palette, a board column's "+" and `?new=1`.
+- **Motion answers actions** (a card landing, the stepper's train, a burst on Done, toasts) plus one
+  orchestrated moment on the landing page; all of it stops under `prefers-reduced-motion`.
+
+The Django admin wears the same tokens (`devtrack-backend/apps/adminui`).
 
 Contrast is part of the system (WCAG 2.1 AA, checked with axe-core in both themes and at phone width):
 text tokens meet 4.5:1 on `bg`, `surface` and `well`; `border-strong` and the station colours meet
@@ -105,9 +113,9 @@ public/screens/ # product screenshots (uz/en) used by the landing page
 
 ## Landing page and screenshots
 
-`/` is the landing page (`src/pages/LandingPage.tsx`): the hero draws the line and five example issues
-ride to their stations once (the only animation; reduced motion shows the end state), then real
-screenshots from `public/screens/<lang>/` (`board`, `issue`, `analytics`, `timeline`, `dashboard`).
+`/` is the landing page (`src/pages/LandingPage.tsx`): the hero is an ink device
+(`components/landing/HeroDevice.tsx`) whose screen is a tiny live board, framed by viewfinder corners;
+then real screenshots from `public/screens/<lang>/` (`board`, `issue`, `analytics`, `timeline`, `dashboard`).
 To regenerate them without touching your own data, seed a scratch database (`createdb
 devtrack_screens`, then `DATABASE_URL=…/devtrack_screens python manage.py migrate && python manage.py
 seed_demo`), run that backend, sign in as `jane.dev`/`demo1234` in the demo workspace, capture each page

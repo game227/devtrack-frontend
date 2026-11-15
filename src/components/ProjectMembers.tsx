@@ -79,7 +79,7 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
         {t('common.members')}
       </h2>
       {membersQuery.isLoading && <p className="text-sm text-fg-muted">{t('project.membersLoading')}</p>}
-      <ul className="mb-4 divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+      <ul className="mb-4 divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel">
         {membersQuery.data?.map((member) => (
           <li key={member.id} className="flex flex-col gap-2 px-4 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <span className="flex min-w-0 items-center gap-2.5 text-fg">

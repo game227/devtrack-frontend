@@ -9,10 +9,10 @@ import { App } from './App'
 import { ToastProvider } from '../features/toast/ToastViewport'
 import { initTheme } from '../lib/theme'
 import { initSentry } from '../lib/sentry'
-// Self-hosted (no third-party font requests): Atkinson Hyperlegible Next for everything, its mono
-// sibling for code-like text (issue keys, commit SHAs, branches, shortcuts).
-import '@fontsource-variable/atkinson-hyperlegible-next'
-import '@fontsource-variable/atkinson-hyperlegible-mono'
+// Self-hosted (no third-party font requests): Geist for everything, Geist Mono for code-like text
+// (issue keys, commit SHAs, branches, shortcuts).
+import '@fontsource-variable/geist'
+import '@fontsource-variable/geist-mono'
 import '../styles/index.css'
 
 initSentry()

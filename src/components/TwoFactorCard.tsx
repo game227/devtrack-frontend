@@ -65,7 +65,7 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
   const general = errors.detail ?? errors.non_field_errors
 
   return (
-    <section aria-labelledby="two-factor-title" className="space-y-4 rounded-xl border border-border bg-surface p-5">
+    <section aria-labelledby="two-factor-title" className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5">
       <h2 id="two-factor-title" className="flex items-center gap-2 text-base font-bold text-fg">
         {t('twoFactor.title')}
       </h2>

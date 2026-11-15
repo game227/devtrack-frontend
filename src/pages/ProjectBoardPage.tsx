@@ -252,7 +252,7 @@ export function ProjectBoardPage() {
                   className="relative block h-[13px] w-[13px] shrink-0 rounded-full ring-4 ring-bg"
                   style={{ backgroundColor: STATUS_COLOR[status] }}
                 />
-                <span className="relative bg-bg pr-2">
+                <span className="relative rounded-md bg-bg px-1.5">
                   {t(`status.${status}`)}
                   <span className="ml-2 font-semibold text-fg-muted tabular">{columnTotal}</span>
                 </span>
@@ -284,8 +284,8 @@ export function ProjectBoardPage() {
                       onDragStart={canEdit ? (e) => handleDragStart(e, issue.id) : undefined}
                       onDragEnd={canEdit ? handleDragEnd : undefined}
                       title={canEdit ? undefined : t('board.notYours')}
-                      className={`group relative rounded-lg border bg-surface p-3 transition-[border-color,box-shadow,opacity] duration-150 ${
-                        isOverdue ? 'border-danger/50' : 'border-border'
+                      className={`group relative rounded-lg border bg-surface p-3 shadow-panel transition-[border-color,box-shadow,opacity] duration-150 ${
+                        isOverdue ? 'border-danger/50' : 'border-edge'
                       } ${canEdit ? 'cursor-grab hover:border-border-strong hover:shadow-float active:cursor-grabbing' : ''} ${
                         draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
                       } ${justLanded ? 'animate-land' : ''}`}
