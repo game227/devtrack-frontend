@@ -1,5 +1,7 @@
 const en: Record<string, string> = {
   'issues.title': 'Issues',
+  'issues.count': '{count} issues',
+  'issues.workspaceLead': 'Every issue in {workspace}, across its projects.',
   'issues.new': 'New issue',
   'issues.create': 'Create issue',
   'issues.allStatuses': 'All statuses',

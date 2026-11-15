@@ -1,7 +1,7 @@
 const uz: Record<string, string> = {
-  'due.overdue': "Muddati o'tgan · {date}",
-  'due.today': 'Muddat: bugun',
-  'due.soon': 'Muddat: {date}',
+  'due.overdue': "Muddati o'tgan {date}",
+  'due.today': 'Muddat bugun',
+  'due.soon': 'Muddat {date}',
   'due.later': '{date}',
   'time.justNow': 'hozirgina',
   'time.minutesAgo': '{count} daqiqa oldin',

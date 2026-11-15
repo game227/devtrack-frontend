@@ -35,7 +35,7 @@ const uz: Record<string, string> = {
   'auth.verifyingEmail': 'Tasdiqlanmoqda…',
   'auth.verifyEmailSuccess': 'Emailingiz tasdiqlandi.',
   'auth.verifyEmailError': "Bu tasdiqlash havolasi noto'g'ri yoki allaqachon ishlatilgan.",
-  'auth.goToDashboard': "Boshqaruv paneliga o'tish",
+  'auth.goToDashboard': "Bosh sahifaga o'tish",
   'auth.otp': 'Tasdiqlash kodi',
   'auth.otpHint': "Autentifikator ilovangizdagi 6 xonali kod yoki tiklash kodlaringizdan biri.",
 }

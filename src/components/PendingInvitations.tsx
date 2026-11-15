@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { acceptInvitation, declineInvitation, listMyInvitations } from '../api/invitations'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useT } from '../i18n'
+import { button } from './ui'
 
 export function PendingInvitations() {
   const t = useT()
@@ -30,12 +31,12 @@ export function PendingInvitations() {
   if (invitations.length === 0 && !respond.isError) return null
 
   return (
-    <section aria-labelledby="pending-invitations" className="mb-6 rounded-2xl border border-border p-4">
-      <h2 id="pending-invitations" className="mb-3 text-sm font-semibold text-fg">
+    <section aria-labelledby="pending-invitations" className="mb-8 rounded-xl border border-brand/40 bg-brand-soft p-4">
+      <h2 id="pending-invitations" className="mb-3 text-base font-bold text-fg">
         {t('invitations.title')}
       </h2>
       {respond.isError && (
-        <p role="alert" className="mb-2 text-xs text-danger">
+        <p role="alert" className="mb-2 text-sm font-semibold text-danger">
           {t('invitations.failed')}
         </p>
       )}
@@ -54,7 +55,7 @@ export function PendingInvitations() {
                 type="button"
                 disabled={respond.isPending}
                 onClick={() => respond.mutate({ id: invitation.id, accept: true, workspaceId: invitation.workspace.id })}
-                className="rounded-md border border-fg bg-fg px-3 py-1 text-xs font-medium text-bg disabled:opacity-50"
+                className={button('primary', 'sm')}
               >
                 {t('invitations.accept')}
               </button>
@@ -62,7 +63,7 @@ export function PendingInvitations() {
                 type="button"
                 disabled={respond.isPending}
                 onClick={() => respond.mutate({ id: invitation.id, accept: false, workspaceId: invitation.workspace.id })}
-                className="rounded-md border border-border px-3 py-1 text-xs text-fg-muted hover:text-fg disabled:opacity-50"
+                className={button('secondary', 'sm')}
               >
                 {t('invitations.decline')}
               </button>

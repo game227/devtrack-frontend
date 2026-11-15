@@ -9,9 +9,9 @@ import {
   resolveTheme,
   setPreference,
   subscribePreference,
-  WAVE_DURATION_MS,
-  waveClipPath,
-  waveKeyframes,
+  SWEEP_DURATION_MS,
+  sweepClipPath,
+  sweepKeyframes,
 } from './theme'
 
 function mockSystem(prefersDark: boolean) {
@@ -40,16 +40,16 @@ describe('theme', () => {
   })
   afterEach(() => vi.unstubAllGlobals())
 
-  it('is dark unless the user chose otherwise', () => {
-    expect(DEFAULT_PREFERENCE).toBe('dark')
-    expect(readPreference()).toBe('dark')
+  it('is light unless the user chose otherwise', () => {
+    expect(DEFAULT_PREFERENCE).toBe('light')
+    expect(readPreference()).toBe('light')
   })
 
   it('reads a saved choice and ignores garbage', () => {
     localStorage.setItem(THEME_STORAGE_KEY, 'light')
     expect(readPreference()).toBe('light')
     localStorage.setItem(THEME_STORAGE_KEY, 'purple')
-    expect(readPreference()).toBe('dark')
+    expect(readPreference()).toBe('light')
   })
 
   it('resolves "system" from the operating system and passes explicit choices through', () => {
@@ -64,7 +64,7 @@ describe('theme', () => {
     expect(document.documentElement.dataset.theme).toBe('light')
     expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#ffffff')
     applyTheme('dark')
-    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#000000')
+    expect(document.querySelector('meta[name="theme-color"]')).toHaveAttribute('content', '#0d1317')
   })
 
   it('saves a new choice, applies it and tells subscribers', () => {
@@ -106,44 +106,17 @@ describe('theme', () => {
 })
 
 describe('theme switch animation', () => {
-  const points = (path: string) =>
-    [...path.matchAll(/([\d.]+)% ([\d.]+)%/g)].map((m) => ({ x: Number(m[1]), y: Number(m[2]) }))
-
   afterEach(() => {
     vi.unstubAllGlobals()
     delete (document as unknown as { startViewTransition?: unknown }).startViewTransition
   })
 
-  it('starts fully clipped, ends fully open, and the front only moves down', () => {
-    const start = points(waveClipPath(0))
-    const end = points(waveClipPath(1))
-    expect(Math.max(...start.map((p) => p.y))).toBeLessThanOrEqual(0.01)
-    expect(Math.min(...end.slice(2).map((p) => p.y))).toBeGreaterThanOrEqual(100) // the two top corners stay at 0
-    const fronts = [0, 0.25, 0.5, 0.75, 1].map((p) => {
-      const ys = points(waveClipPath(p)).slice(2).map((pt) => pt.y)
-      return ys.reduce((a, b) => a + b, 0) / ys.length
-    })
-    expect(fronts).toEqual([...fronts].sort((a, b) => a - b))
-  })
-
-  it('has a rippling (not flat) front in the middle of the sweep', () => {
-    const ys = points(waveClipPath(0.5)).slice(2).map((p) => p.y)
-    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(5)
-  })
-
-  it('is a valid polygon spanning the full width', () => {
-    const path = waveClipPath(0.4)
-    expect(path.startsWith('polygon(0% 0%, 100% 0%')).toBe(true)
-    const xs = points(path).map((p) => p.x)
-    expect(Math.min(...xs)).toBe(0)
-    expect(Math.max(...xs)).toBe(100)
-  })
-
-  it('produces a smooth run of keyframes from closed to open', () => {
-    const frames = waveKeyframes()
-    expect(frames.length).toBeGreaterThan(30)
-    expect(frames[0].clipPath).toBe(waveClipPath(0))
-    expect(frames[frames.length - 1].clipPath).toBe(waveClipPath(1))
+  it('reveals the new theme from the left edge to the right one', () => {
+    expect(sweepClipPath(0)).toBe('inset(0 100.00% 0 0)')
+    expect(sweepClipPath(0.25)).toBe('inset(0 75.00% 0 0)')
+    expect(sweepClipPath(1)).toBe('inset(0 0.00% 0 0)')
+    expect(sweepClipPath(1.5)).toBe('inset(0 0.00% 0 0)') // clamped
+    expect(sweepKeyframes()).toEqual([{ clipPath: sweepClipPath(0) }, { clipPath: sweepClipPath(1) }])
   })
 
   function stubViewTransitions(reducedMotion = false) {
@@ -162,7 +135,7 @@ describe('theme switch animation', () => {
     return { animate, startViewTransition }
   }
 
-  it('flows the new theme in as a view transition when the look really changes', async () => {
+  it('sweeps the new theme in as a view transition when the look really changes', async () => {
     const { animate, startViewTransition } = stubViewTransitions()
     setPreference('dark')
     await Promise.resolve()
@@ -176,8 +149,8 @@ describe('theme switch animation', () => {
     await Promise.resolve()
     expect(animate).toHaveBeenCalledOnce()
     const [keyframes, options] = animate.mock.calls[0]
-    expect(keyframes.length).toBeGreaterThan(30)
-    expect(options).toMatchObject({ pseudoElement: '::view-transition-new(root)', duration: WAVE_DURATION_MS })
+    expect(keyframes).toEqual(sweepKeyframes())
+    expect(options).toMatchObject({ pseudoElement: '::view-transition-new(root)', duration: SWEEP_DURATION_MS })
   })
 
   it('does not animate when nothing visibly changes', () => {

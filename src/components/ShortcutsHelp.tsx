@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useT } from '../i18n'
+import { button, kbd } from './ui'
 
 const ROWS: Array<{ keys: string[]; labelKey: string }> = [
   { keys: ['Ctrl', 'K'], labelKey: 'shortcuts.palette' },
@@ -25,31 +26,26 @@ export function ShortcutsHelp({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]">
-      <button type="button" aria-label={t('cmdk.close')} tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-black/70" />
+      <button type="button" aria-label={t('cmdk.close')} tabIndex={-1} onClick={onClose} className="absolute inset-0 bg-scrim" />
       <div
         role="dialog"
         aria-modal="true"
         aria-label={t('shortcuts.title')}
-        className="relative w-full max-w-sm animate-scale-in rounded-2xl border border-border bg-bg-elevated p-5"
+        className="relative w-full max-w-md animate-scale-in rounded-xl border border-border bg-surface p-5 shadow-float"
       >
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-fg">{t('shortcuts.title')}</h2>
-          <button
-            type="button"
-            autoFocus
-            onClick={onClose}
-            className="rounded-md border border-border px-2 py-0.5 text-xs text-fg-muted transition-colors duration-150 hover:text-fg"
-          >
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+          <h2 className="text-base font-bold text-fg">{t('shortcuts.title')}</h2>
+          <button type="button" autoFocus onClick={onClose} className={button('secondary', 'sm')}>
             {t('common.close')}
           </button>
         </div>
-        <dl className="flex flex-col gap-2">
+        <dl className="flex flex-col divide-y divide-border">
           {ROWS.map((row) => (
-            <div key={row.labelKey} className="flex items-center justify-between gap-4 text-sm">
-              <dt className="text-fg-muted">{t(row.labelKey)}</dt>
+            <div key={row.labelKey} className="flex items-center justify-between gap-4 py-2 text-sm">
+              <dt className="text-fg">{t(row.labelKey)}</dt>
               <dd className="flex gap-1">
                 {row.keys.map((key) => (
-                  <kbd key={key} className="rounded-md border border-border px-1.5 py-0.5 font-mono text-xs text-fg">
+                  <kbd key={key} className={kbd}>
                     {key}
                   </kbd>
                 ))}

@@ -86,6 +86,7 @@ const en: Record<string, string> = {
   'common.status': 'Status',
   'common.priority': 'Priority',
   'common.type': 'Type',
+  'common.notSet': 'Not set',
   'common.title': 'Title',
   'common.assignee': 'Assignee',
   'common.reporter': 'Reporter',

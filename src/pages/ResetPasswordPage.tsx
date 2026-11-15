@@ -51,22 +51,22 @@ export function ResetPasswordPage() {
     <AuthShell title={t('auth.resetTitle')}>
       {isDone ? (
         <div>
-          <p role="status" className="mb-4 text-sm text-success">
+          <p role="status" className="mb-5 rounded-lg border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
             {t('auth.resetDone')}
           </p>
-          <Link to="/login" className="text-sm text-accent hover:underline">
+          <Link to="/login" className="text-sm font-semibold text-accent hover:underline">
             {t('auth.goToSignIn')}
           </Link>
         </div>
       ) : (
         <form onSubmit={handleSubmit}>
           {errors.non_field_errors && errors.non_field_errors.length > 0 && (
-            <p role="alert" className="mb-4 text-sm text-danger">
+            <p role="alert" className="mb-5 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
               {errors.non_field_errors.join(' ')}
             </p>
           )}
 
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('auth.newPassword')} errors={errors.new_password}>
               <input
                 type="password"
@@ -96,8 +96,8 @@ export function ResetPasswordPage() {
             {isSubmitting ? t('auth.resetting') : t('auth.resetPassword')}
           </button>
 
-          <p className="mt-4 text-center text-sm">
-            <Link to="/login" className="text-accent hover:underline">
+          <p className="mt-6 text-center text-sm">
+            <Link to="/login" className="font-semibold text-accent hover:underline">
               {t('auth.backToSignIn')}
             </Link>
           </p>

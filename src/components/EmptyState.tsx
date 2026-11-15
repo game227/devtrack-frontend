@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Icon } from './Icon'
 import type { IconName } from './Icon'
+import { button } from './ui'
 
 interface EmptyStateAction {
   label: string
@@ -16,28 +17,27 @@ interface EmptyStateProps {
   className?: string
 }
 
-const actionClass =
-  'inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]'
-
-// One consistent "nothing here yet" block: what this place is for, plus a single obvious next step.
+// "Nothing here yet": what this place is for, plus a single obvious next step. Drawn as the end of a
+// line with an empty station, waiting for its first stop.
 export function EmptyState({ icon, title, description, action, className = '' }: EmptyStateProps) {
   return (
-    <div
-      className={`flex flex-col items-center rounded-2xl border border-dashed border-border px-6 py-10 text-center ${className}`}
-    >
-      <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-md border border-border text-fg-muted">
-        <Icon name={icon} size={20} />
+    <div className={`flex flex-col items-start gap-1 rounded-xl border border-dashed border-border-strong px-6 py-8 ${className}`}>
+      <span className="mb-3 flex items-center gap-2 text-fg-muted" aria-hidden="true">
+        <span className="h-[3px] w-8 rounded-full bg-border" />
+        <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-dashed border-border-strong">
+          <Icon name={icon} size={16} />
+        </span>
       </span>
-      <h2 className="text-sm font-semibold text-fg">{title}</h2>
-      {description && <p className="mt-1 max-w-sm text-sm text-fg-muted">{description}</p>}
+      <h2 className="text-base font-bold text-fg">{title}</h2>
+      {description && <p className="max-w-md text-sm text-fg-muted">{description}</p>}
       {action &&
         (action.to ? (
-          <Link to={action.to} className={`mt-4 ${actionClass}`}>
+          <Link to={action.to} className={`mt-4 ${button('primary')}`}>
             <Icon name="plus" />
             {action.label}
           </Link>
         ) : (
-          <button type="button" onClick={action.onClick} className={`mt-4 ${actionClass}`}>
+          <button type="button" onClick={action.onClick} className={`mt-4 ${button('primary')}`}>
             <Icon name="plus" />
             {action.label}
           </button>

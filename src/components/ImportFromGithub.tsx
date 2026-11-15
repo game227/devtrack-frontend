@@ -7,6 +7,7 @@ import { describeError } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import { Icon } from './Icon'
 import { formInputClass } from './FormField'
+import { button } from './ui'
 
 // Turn a GitHub repository into a DevTrack project (linking it and optionally importing its issues).
 export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
@@ -49,8 +50,8 @@ export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
   }
 
   return (
-    <div className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
-      <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-fg">
+    <div className="mb-8 max-w-xl rounded-xl border border-border bg-surface p-5">
+      <h2 className="mb-1 flex items-center gap-2 text-base font-bold text-fg">
         <Icon name="github" />
         {t('github.import.title')}
       </h2>
@@ -71,7 +72,7 @@ export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
         <form onSubmit={handleSubmit}>
           {reposQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
           {reposQuery.isError && (
-            <p role="alert" className="mb-2 text-sm text-danger">
+            <p role="alert" className="mb-2 text-sm font-semibold text-danger">
               {describeError(reposQuery.error, lang)}
             </p>
           )}
@@ -96,14 +97,14 @@ export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
                 {t('github.import.issues')}
               </label>
               {importMutation.isError && (
-                <p role="alert" className="mt-3 text-sm text-danger">
+                <p role="alert" className="mt-3 text-sm font-semibold text-danger">
                   {describeError(importMutation.error, lang)}
                 </p>
               )}
               <button
                 type="submit"
                 disabled={!selected || importMutation.isPending}
-                className="mt-3 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                className={`mt-3 ${button('primary')}`}
               >
                 {importMutation.isPending ? t('github.import.submitting') : t('github.import.submit')}
               </button>

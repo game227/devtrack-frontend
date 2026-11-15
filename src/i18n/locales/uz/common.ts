@@ -62,7 +62,7 @@ const uz: Record<string, string> = {
   'role.admin': 'Admin',
   'role.member': "A'zo",
 
-  'nav.dashboard': 'Boshqaruv paneli',
+  'nav.dashboard': 'Bosh sahifa',
   'nav.projects': 'Loyihalar',
   'nav.issues': 'Vazifalar',
   'nav.cycles': 'Sikllar',
@@ -86,6 +86,7 @@ const uz: Record<string, string> = {
   'common.status': 'Holat',
   'common.priority': 'Ustuvorlik',
   'common.type': 'Turi',
+  'common.notSet': 'Belgilanmagan',
   'common.title': 'Sarlavha',
   'common.assignee': 'Ijrochi',
   'common.reporter': 'Muallif',

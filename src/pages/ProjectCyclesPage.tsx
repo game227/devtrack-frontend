@@ -10,6 +10,7 @@ import { FormField, formInputClass } from '../components/FormField'
 import { ProgressBar } from '../components/ProgressBar'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { button } from '../components/ui'
 
 export function ProjectCyclesPage() {
   const { t, lang, formatDate } = useI18n()
@@ -53,30 +54,30 @@ export function ProjectCyclesPage() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">{t('cycles.title')}</h1>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+        <h1 className="text-2xl font-extrabold tracking-[-0.015em] text-fg">{t('cycles.title')}</h1>
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+          className={button(isFormOpen ? 'secondary' : 'primary')}
         >
           {isFormOpen ? t('common.cancel') : t('cycles.new')}
         </button>
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-8 max-w-xl rounded-xl border border-border bg-surface p-5">
           {errors.non_field_errors && (
-            <p role="alert" className="mb-3 text-sm text-danger">
+            <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
               {errors.non_field_errors.join(' ')}
             </p>
           )}
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('common.name')} errors={errors.name}>
               <input className={formInputClass} value={name} onChange={(e) => setName(e.target.value)} required />
             </FormField>
           </div>
-          <div className="mb-3 grid grid-cols-2 gap-2">
+          <div className="mb-5 grid grid-cols-2 gap-3">
             <FormField label={t('common.startDate')} errors={errors.start_date}>
               <input
                 type="date"
@@ -99,7 +100,7 @@ export function ProjectCyclesPage() {
           <button
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className={button('primary')}
           >
             {createMutation.isPending ? t('common.creating') : t('cycles.create')}
           </button>
@@ -117,14 +118,14 @@ export function ProjectCyclesPage() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface empty:hidden">
         {cyclesQuery.data?.map((cycle) => (
-          <div key={cycle.id} className="rounded-2xl border border-border bg-bg-elevated px-4 py-3">
-            <div className="mb-2 flex items-center justify-between gap-3">
+          <div key={cycle.id} className="px-5 py-4">
+            <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <span className="text-sm font-medium text-fg">{cycle.name}</span>
+                <span className="text-[15px] font-bold text-fg">{cycle.name}</span>
                 {cycle.is_active && (
-                  <span className="ml-2 rounded-md border border-border px-2 py-0.5 text-xs font-medium text-success">
+                  <span className="ml-2 inline-flex h-6 items-center rounded-full border border-success/40 bg-success/10 px-2.5 text-xs font-semibold text-success">
                     {t('cycles.active')}
                   </span>
                 )}
@@ -133,12 +134,12 @@ export function ProjectCyclesPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-fg-muted">
+                <span className="text-sm font-semibold text-fg-muted tabular">
                   {t('planning.doneCount', { done: cycle.completed_count, total: cycle.issue_count })}
                 </span>
                 <ConfirmButton
                   onConfirm={() => deleteMutation.mutate(cycle.id)}
-                  className="text-xs text-fg-muted transition-colors duration-150 hover:text-danger"
+                  className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
                 >
                   {t('common.delete')}
                 </ConfirmButton>

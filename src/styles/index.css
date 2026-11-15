@@ -1,44 +1,143 @@
 @import "tailwindcss";
 
+/*
+  DevTrack "Yo'l" (the line). Every issue rides the same five stations — backlog, to do, in progress,
+  review, done — and the interface draws that line: in the logo, across the top of the board, as the
+  status stepper on an issue and as the small track in every issue row. The line is the only ornament;
+  everything around it is plain.
+
+  - Colour means something. Turquoise (firuza, the glaze of Samarkand's domes) marks actions and "you
+    are here"; the five station colours mark status and always sit next to a text label.
+  - Lists, not card grids: rows on a white page, separated by hairlines.
+  - Radii follow hierarchy: controls 6px (rounded-md), cards 8px (rounded-lg), panels and dialogs 12px
+    (rounded-xl), station chips fully round.
+  - Shadows only under things that float above the page: menus, dialogs, a card being dragged.
+
+  Contrast is part of the system (WCAG 2.1 AA, checked with axe in both themes): text tokens meet 4.5:1
+  on bg, surface and well; border-strong and the station colours meet 3:1 (WCAG 1.4.11).
+*/
+
 @theme {
-  --color-bg: #000000;
-  --color-bg-elevated: #000000;
-  --color-border: #292d30;
-  --color-fg: #ffffff;
-  --color-fg-muted: #a1a4a5;
-  --color-accent: #70b8ff;
-  --color-code: #9281f7;
+  /* Light is the default theme; :root[data-theme='dark'] below redefines the same names. */
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-well: #f2f4f7;
+  --color-border: #e1e5ea;
+  --color-border-strong: #7f8995;
+  --color-fg: #121820;
+  --color-fg-muted: #56606c;
+  --color-subtle: #5f6974;
+  --color-accent: #0a6d77;
+  --color-scrim: rgb(18 24 32 / 0.45);
 
-  /* Text on black needs 4.5:1: #767b82 is 4.9:1 (the old #6e727a was 4.35:1). */
-  --color-subtle: #767b82;
-  /* Outline of form controls. WCAG 1.4.11 asks 3:1 for the boundary of a control; the decorative
-     --color-border (1.5:1 on black) stays for cards and dividers, where it is not what identifies a control. */
-  --color-border-strong: #5c6166;
-  --color-success: #3ad389;
-  --color-warning: #ffca16;
-  --color-info: #70b8ff;
-  --color-danger: #ff9592;
-  --color-merged: #baa7ff;
+  --color-brand: #0a7782;
+  --color-brand-strong: #08636c;
+  --color-brand-soft: #ddf1f3;
+  --color-on-brand: #ffffff;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  /* Marketing-only display faces (landing page hero/section headings) — never used in the app shell,
-     where Inter stays "the workhorse" per the Resend-derived reference. */
-  --font-headline: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  /* Text-safe state colours. */
+  --color-success: #1d7a3a;
+  --color-warning: #8f5500;
+  --color-info: #2e52c4;
+  --color-danger: #be2a2a;
+  --color-merged: #7a3dbe;
 
-  --animate-fade-in: fade-in 200ms ease-out;
-  --animate-scale-in: scale-in 150ms ease-out;
-  /* Marketing entrance (hero stagger, scroll-reveal) — more travel and a slower, springier
-     ease than the 150-200ms UI transitions above. `both` keeps the element hidden before
-     the (possibly delayed) animation starts, so a staggered sequence never flashes unstyled. */
-  --animate-fade-up: fade-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* The five stations. */
+  --color-st-backlog: #7e8893;
+  --color-st-todo: #3c5cd6;
+  --color-st-progress: #c76a00;
+  --color-st-review: #8742c6;
+  --color-st-done: #21843d;
+
+  --font-sans: "Atkinson Hyperlegible Next Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --shadow-float: 0 16px 40px -12px rgb(16 24 32 / 0.22), 0 2px 8px rgb(16 24 32 / 0.08);
+
+  --animate-fade-in: fade-in 160ms ease-out;
+  --animate-scale-in: scale-in 140ms ease-out;
+  --animate-arrive: arrive 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #0d1317;
+  --color-surface: #131b21;
+  --color-well: #0a0f13;
+  --color-border: #25303a;
+  --color-border-strong: #5f6c78;
+  --color-fg: #e8edf1;
+  --color-fg-muted: #9ba7b2;
+  --color-subtle: #8d9aa6;
+  --color-accent: #5ec8d2;
+  --color-scrim: rgb(0 0 0 / 0.6);
+
+  --color-brand: #3db8c3;
+  --color-brand-strong: #63cad3;
+  --color-brand-soft: #0f3238;
+  --color-on-brand: #03272b;
+
+  --color-success: #52c47e;
+  --color-warning: #edb04a;
+  --color-info: #86a2ff;
+  --color-danger: #ff8f8b;
+  --color-merged: #c79eff;
+
+  --color-st-backlog: #73818d;
+  --color-st-todo: #7290ff;
+  --color-st-progress: #ee9f3a;
+  --color-st-review: #b888ee;
+  --color-st-done: #4fc27b;
+
+  --shadow-float: 0 18px 44px -10px rgb(0 0 0 / 0.7), 0 2px 8px rgb(0 0 0 / 0.4);
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-brand-soft);
+  color: var(--color-fg);
+}
+
+/* One focus ring everywhere: keyboard users always see where they are. */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-offset: 0;
+}
+
+/* Numbers in tables and counters line up. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Horizontal scrollers (project tabs, the board on small screens) without a heavy scrollbar. */
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(3px);
   }
   to {
     opacity: 1;
@@ -49,7 +148,7 @@
 @keyframes scale-in {
   from {
     opacity: 0;
-    transform: scale(0.97) translateY(-4px);
+    transform: scale(0.98) translateY(-3px);
   }
   to {
     opacity: 1;
@@ -57,221 +156,50 @@
   }
 }
 
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Landing product tour: small building blocks the scenes compose into a script. Each one starts at
-   --d (set inline) and `both` holds the "before" state until then, so a scene reads top to bottom
-   like a timeline. The last frame of every scene is its meaningful end state. */
-.tour-in {
-  animation: tour-in 500ms cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both;
-}
-.tour-show {
-  animation: tour-show 300ms ease-out var(--d, 0ms) both;
-}
-.tour-hide {
-  animation: tour-hide 300ms ease-out var(--d, 0ms) forwards;
-}
-.tour-flash {
-  animation: tour-flash var(--dur, 1500ms) ease-in-out var(--d, 0ms) both;
-}
-.tour-type {
-  animation: tour-type var(--dur, 1s) steps(var(--n, 20), end) var(--d, 0ms) both;
-}
-.tour-press {
-  animation: tour-press 360ms ease-in-out var(--d, 0ms) both;
-}
-.tour-caret {
-  animation: tour-caret 1s steps(1) infinite;
-}
-.tour-progress {
-  animation: tour-progress var(--step-ms, 6500ms) linear both;
-}
-.tour-move {
-  animation: tour-move 6s cubic-bezier(0.65, 0, 0.35, 1) 400ms both;
-}
-.tour-cursor {
-  animation: tour-cursor 6s linear 400ms both;
-}
-.tour-col-a {
-  animation: tour-col-a 6s linear 400ms both;
-}
-.tour-col-b {
-  animation: tour-col-b 6s linear 400ms both;
-}
-
-@keyframes tour-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes tour-show {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes tour-hide {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-@keyframes tour-flash {
+/* A station that just became current: the marker lands with a small overshoot. */
+@keyframes arrive {
   0% {
-    opacity: 0;
+    transform: scale(0.4);
   }
-  10%,
-  90% {
-    opacity: 1;
+  70% {
+    transform: scale(1.15);
   }
-  100% {
-    opacity: 0;
-  }
-}
-@keyframes tour-type {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-@keyframes tour-press {
-  0%,
   100% {
     transform: scale(1);
-    border-color: var(--color-border);
-  }
-  50% {
-    transform: translateY(1px) scale(0.93);
-    border-color: var(--color-fg);
   }
 }
-@keyframes tour-caret {
-  50% {
+
+/* Landing hero: the line is drawn, then each example issue rides from its first station to the one it
+   stops at. --from/--to are set inline in % of the line; --d staggers them. It plays once. */
+.line-draw {
+  transform: scaleX(0);
+  animation: line-draw 900ms cubic-bezier(0.65, 0, 0.35, 1) 150ms forwards;
+}
+.line-ride {
+  left: var(--to);
+  animation: line-ride 1400ms cubic-bezier(0.65, 0, 0.35, 1) var(--d, 0ms) both;
+}
+@keyframes line-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes line-ride {
+  from {
+    left: var(--from);
     opacity: 0;
   }
-}
-@keyframes tour-progress {
-  from {
-    width: 0;
+  15% {
+    opacity: 1;
   }
   to {
-    width: 100%;
-  }
-}
-/* A card picked up in column 1, dropped in column 2, then picked up again and dropped in column 3
-   (translateX % is relative to the card, which is exactly one column wide; 0.5rem is the grid gap). */
-@keyframes tour-move {
-  0%,
-  8% {
-    transform: translateX(0) scale(1);
-    border-color: var(--color-border);
-  }
-  14% {
-    transform: translateX(0) scale(1.04);
-    border-color: var(--color-fg);
-  }
-  32% {
-    transform: translateX(calc(100% + 0.5rem)) scale(1.04);
-    border-color: var(--color-fg);
-  }
-  38%,
-  52% {
-    transform: translateX(calc(100% + 0.5rem)) scale(1);
-    border-color: var(--color-border);
-  }
-  58% {
-    transform: translateX(calc(100% + 0.5rem)) scale(1.04);
-    border-color: var(--color-fg);
-  }
-  78% {
-    transform: translateX(calc(200% + 1rem)) scale(1.04);
-    border-color: var(--color-fg);
-  }
-  84%,
-  100% {
-    transform: translateX(calc(200% + 1rem)) scale(1);
-    border-color: var(--color-success);
-  }
-}
-@keyframes tour-cursor {
-  0%,
-  11% {
-    opacity: 0;
-  }
-  14%,
-  34% {
+    left: var(--to);
     opacity: 1;
-  }
-  37%,
-  55% {
-    opacity: 0;
-  }
-  58%,
-  80% {
-    opacity: 1;
-  }
-  83%,
-  100% {
-    opacity: 0;
-  }
-}
-/* The column the card is currently being dragged over lights up. */
-@keyframes tour-col-a {
-  0%,
-  18%,
-  38%,
-  100% {
-    border-color: var(--color-border);
-  }
-  24%,
-  34% {
-    border-color: var(--color-fg);
-  }
-}
-@keyframes tour-col-b {
-  0%,
-  62%,
-  84%,
-  100% {
-    border-color: var(--color-border);
-  }
-  68%,
-  80% {
-    border-color: var(--color-fg);
   }
 }
 
-html {
-  color-scheme: dark;
-  scroll-behavior: smooth;
-}
-
-/* Light theme: the same tokens, redefined. Everything in the app reads colours through these
-   variables (never raw palette classes), so this one block is the whole theme. Status colours are
-   darkened so they keep their contrast on white. It is chosen with data-theme on <html>, set
-   before first paint by the inline script in index.html and by lib/theme.ts. */
-/* Theme switch (see lib/theme.ts): no cross-fade — the new theme is revealed by an animated clip-path
-   drawn from JavaScript, sitting on top of a still picture of the old one. */
+/* Theme switch (lib/theme.ts): the new theme slides in from the left behind a straight edge, like a
+   train passing — a View Transition, so nothing re-renders. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -282,30 +210,6 @@ html {
 }
 ::view-transition-new(root) {
   z-index: 1;
-}
-
-:root[data-theme='light'] {
-  color-scheme: light;
-  --color-bg: #ffffff;
-  --color-bg-elevated: #fafafa;
-  --color-border: #e4e4e7;
-  --color-fg: #0a0a0b;
-  --color-fg-muted: #5f6368;
-  --color-accent: #0b62c4;
-  --color-code: #6a55d6;
-
-  --color-subtle: #6e727a; /* 4.8:1 on white (was 3.3:1) */
-  --color-border-strong: #8a8f98; /* 3.2:1 on white */
-  --color-success: #0a7d4a; /* 5.0:1 on the elevated #fafafa (was 4.2:1) */
-  --color-warning: #9a6200;
-  --color-info: #0b62c4;
-  --color-danger: #c4302b;
-  --color-merged: #6f4fd6;
-}
-
-body {
-  background-color: var(--color-bg);
-  font-family: var(--font-sans);
 }
 
 @media (prefers-reduced-motion: reduce) {

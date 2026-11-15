@@ -69,12 +69,12 @@ export function RegisterPage() {
     <AuthShell title={t('auth.registerTitle')}>
       <form onSubmit={handleSubmit}>
         {errors.non_field_errors && (
-          <p role="alert" className="mb-4 text-sm text-danger">
+          <p role="alert" className="mb-5 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
             {errors.non_field_errors.join(' ')}
           </p>
         )}
 
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('auth.username')} errors={errors.username}>
             <input
               className={formInputClass}
@@ -86,7 +86,7 @@ export function RegisterPage() {
           </FormField>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('auth.email')} errors={errors.email}>
             <input
               type="email"
@@ -99,7 +99,7 @@ export function RegisterPage() {
           </FormField>
         </div>
 
-        <div className="mb-3 grid grid-cols-2 gap-2">
+        <div className="mb-4 grid grid-cols-2 gap-3">
           <FormField label={t('auth.firstName')} errors={errors.first_name}>
             <input
               className={formInputClass}
@@ -118,7 +118,7 @@ export function RegisterPage() {
           </FormField>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('auth.password')} errors={errors.password}>
             <input
               type="password"
@@ -150,19 +150,19 @@ export function RegisterPage() {
 
         <p className="mt-3 text-center text-xs text-fg-muted">
           {t('legal.agreementPrefix')}{' '}
-          <Link to="/terms" className="text-accent hover:underline">
+          <Link to="/terms" className="font-semibold text-accent hover:underline">
             {t('legal.footerTerms')}
           </Link>{' '}
           {t('legal.agreementAnd')}{' '}
-          <Link to="/privacy" className="text-accent hover:underline">
+          <Link to="/privacy" className="font-semibold text-accent hover:underline">
             {t('legal.footerPrivacy')}
           </Link>
           {t('legal.agreementSuffix')}
         </p>
 
-        <p className="mt-4 text-center text-sm text-fg-muted">
+        <p className="mt-6 text-center text-sm text-fg-muted">
           {t('auth.haveAccount')}{' '}
-          <Link to="/login" className="text-accent hover:underline">
+          <Link to="/login" className="font-semibold text-accent hover:underline">
             {t('auth.signIn')}
           </Link>
         </p>

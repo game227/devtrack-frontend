@@ -127,6 +127,20 @@ const PATHS = {
       <path d="M8 20h8M12 16v4" />
     </>
   ),
+  chevronDown: <path d="m6 9 6 6 6-6" />,
+  keyboard: (
+    <>
+      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+      <path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M7.5 14h9" />
+    </>
+  ),
+  external: (
+    <>
+      <path d="M14 4h6v6" />
+      <path d="M20 4 11 13" />
+      <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+    </>
+  ),
 } as const
 
 export type IconName = keyof typeof PATHS

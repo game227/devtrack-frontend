@@ -23,12 +23,11 @@ import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useI18n } from '../i18n'
 import type { Invitation } from '../types/invitation'
 import type { WorkspaceMember, WorkspaceRole } from '../types/workspace'
+import { button, pageLead, pageTitle } from '../components/ui'
 
 const INVITATION_DAYS = 14 // backend: workspaces.models.INVITATION_TTL
-const buttonClass =
-  'rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg disabled:opacity-50'
-const dangerClass =
-  'rounded-md border border-border px-2.5 py-1 text-xs text-danger transition-colors duration-150 hover:border-danger disabled:opacity-50'
+const buttonClass = button('primary')
+const dangerClass = button('danger', 'sm')
 
 function daysLeft(invitation: Invitation): number {
   const age = (Date.now() - new Date(invitation.created_at).getTime()) / 86_400_000
@@ -116,7 +115,7 @@ export function WorkspaceMembersPage() {
       <li key={member.id} className="flex flex-wrap items-center gap-3 py-3">
         <Avatar name={member.user.username} src={member.user.avatar} size={32} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-fg">
+          <p className="truncate text-sm font-semibold text-fg">
             {member.user.username}
             {isSelf && <span className="ml-1.5 text-xs font-normal text-fg-muted">({t('members.you')})</span>}
           </p>
@@ -134,10 +133,10 @@ export function WorkspaceMembersPage() {
             <option value="admin">{t('members.role.admin')}</option>
           </select>
         ) : (
-          <span className="rounded-md border border-border px-2 py-0.5 text-xs text-fg-muted">{t(`members.role.${member.role}`)}</span>
+          <span className="inline-flex h-6 items-center rounded-full border border-border px-2.5 text-xs font-semibold text-fg-muted">{t(`members.role.${member.role}`)}</span>
         )}
         {me === 'owner' && !currentWorkspace!.is_personal && !isSelf && (
-          <ConfirmButton onConfirm={() => handOver.mutate(member.user.id)} disabled={handOver.isPending} className={dangerClass}>
+          <ConfirmButton onConfirm={() => handOver.mutate(member.user.id)} disabled={handOver.isPending} className={button('secondary', 'sm')}>
             {t('members.handOver')}
           </ConfirmButton>
         )}
@@ -151,24 +150,26 @@ export function WorkspaceMembersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="max-w-4xl space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-fg">{t('members.title')}</h1>
-        <p className="text-sm text-fg-muted">
-          {currentWorkspace.name} · {t('members.count', { count: members.length })}
+        <h1 className={pageTitle}>{t('members.title')}</h1>
+        <p className={pageLead}>
+          {currentWorkspace.name}, {t('members.count', { count: members.length })}
         </p>
       </div>
 
       {notice && (
-        <p role={notice.kind === 'error' ? 'alert' : 'status'} className={`text-sm ${notice.kind === 'error' ? 'text-danger' : 'text-success'}`}>
+        <p role={notice.kind === 'error' ? 'alert' : 'status'} className={`rounded-lg border px-3 py-2 text-sm ${
+            notice.kind === 'error' ? 'border-danger/40 bg-danger/10 text-danger' : 'border-success/40 bg-success/10 text-success'
+          }`}>
           {notice.text}
         </p>
       )}
 
       {canInvite(me) && (
-        <section aria-labelledby="invite-title" className="rounded-2xl border border-border p-4">
-          <h2 id="invite-title" className="mb-1 text-sm font-semibold text-fg">{t('members.inviteTitle')}</h2>
-          <p className="mb-3 text-xs text-fg-muted">{t('members.inviteHint', { days: INVITATION_DAYS })}</p>
+        <section aria-labelledby="invite-title" className="rounded-xl border border-border bg-surface p-5">
+          <h2 id="invite-title" className="mb-1 text-base font-bold text-fg">{t('members.inviteTitle')}</h2>
+          <p className="mb-4 text-sm text-fg-muted">{t('members.inviteHint', { days: INVITATION_DAYS })}</p>
           <form onSubmit={submitInvite} className="flex flex-wrap items-end gap-3">
             <div className="min-w-48 flex-1">
               <FormField label={t('members.username')} errors={inviteErrors.username}>
@@ -190,7 +191,7 @@ export function WorkspaceMembersPage() {
 
           {invitations.length > 0 && (
             <div className="mt-4 border-t border-border pt-3">
-              <h3 className="mb-2 text-xs font-semibold uppercase text-fg-muted">{t('members.pending')}</h3>
+              <h3 className="mb-2 text-sm font-bold text-fg">{t('members.pending')}</h3>
               <ul className="space-y-2">
                 {invitations.map((invitation) => (
                   <li key={invitation.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
@@ -211,20 +212,20 @@ export function WorkspaceMembersPage() {
         </section>
       )}
 
-      <section aria-labelledby="members-title" className="rounded-2xl border border-border px-4">
+      <section aria-labelledby="members-title" className="rounded-xl border border-border bg-surface px-5">
         <h2 id="members-title" className="sr-only">{t('members.title')}</h2>
         <ul className="divide-y divide-border">{members.map(memberRow)}</ul>
       </section>
 
       {canLeave(me) && (
-        <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border p-4">
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-5">
           <p className="text-sm text-fg-muted">{t('members.leaveHint')}</p>
           <ConfirmButton onConfirm={() => leave.mutate()} disabled={leave.isPending} className={dangerClass}>
             {t('members.leave')}
           </ConfirmButton>
         </section>
       )}
-      {me === 'owner' && <p className="text-xs text-fg-muted">{t(currentWorkspace.is_personal ? 'members.personalHint' : 'members.ownerHint')}</p>}
+      {me === 'owner' && <p className="text-sm text-fg-muted">{t(currentWorkspace.is_personal ? 'members.personalHint' : 'members.ownerHint')}</p>}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { githubUrl } from '../lib/safeUrl'
 import { getIssueGithubLinks } from '../api/integrations'
 import { useTimeAgo } from '../hooks/useTimeAgo'
 import { useT } from '../i18n'
+import { Icon } from './Icon'
 import { PullRequestStatusBadge } from './Badge'
 
 export function IssueGithubActivity({ issueId }: { issueId: number }) {
@@ -21,20 +22,23 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
 
   return (
     <div>
-      <div className="mb-2 text-xs text-fg-muted">{t('github.linkedActivity')}</div>
-      <ul className="flex flex-col gap-1.5">
+      <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-fg">
+        <Icon name="github" size={18} />
+        {t('github.linkedActivity')}
+      </h2>
+      <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
         {links.pull_requests.map((pr) => (
           <li
             key={`pr-${pr.id}`}
-            className="flex items-center gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm"
           >
             <PullRequestStatusBadge state={pr.state} merged={pr.merged} />
-            <a href={githubUrl(pr.url)} target="_blank" rel="noreferrer" className="truncate text-fg hover:text-accent">
+            <a href={githubUrl(pr.url)} target="_blank" rel="noreferrer" className="truncate font-semibold text-fg hover:text-accent hover:underline">
               #{pr.number} {pr.title}
             </a>
             {pr.draft && !pr.merged && <span className="shrink-0 text-xs text-fg-muted">{t('github.draftPr')}</span>}
             <span className="ml-auto flex shrink-0 items-center gap-2 text-xs text-fg-muted">
-              {pr.head_ref && <span className="hidden font-mono sm:inline">{pr.head_ref} → {pr.base_ref}</span>}
+              {pr.head_ref && <span className="hidden font-mono sm:inline">{`${pr.head_ref} → ${pr.base_ref}`}</span>}
               <span>{timeAgo(pr.merged_at ?? pr.opened_at ?? pr.created_at)}</span>
             </span>
           </li>
@@ -42,13 +46,13 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
         {links.commits.map((commit) => (
           <li
             key={`commit-${commit.id}`}
-            className="flex items-center gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm"
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm"
           >
             <a
               href={githubUrl(commit.url)}
               target="_blank"
               rel="noreferrer"
-              className="font-mono text-xs text-code hover:underline"
+              className="font-mono text-xs text-accent hover:underline"
             >
               {commit.sha.slice(0, 7)}
             </a>

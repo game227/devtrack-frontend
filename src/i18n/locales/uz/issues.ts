@@ -1,5 +1,7 @@
 const uz: Record<string, string> = {
   'issues.title': 'Vazifalar',
+  'issues.count': '{count} ta vazifa',
+  'issues.workspaceLead': '{workspace} ish maydonidagi barcha loyihalarning vazifalari.',
   'issues.new': 'Yangi vazifa',
   'issues.create': 'Vazifa yaratish',
   'issues.allStatuses': 'Barcha holatlar',

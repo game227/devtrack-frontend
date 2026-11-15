@@ -41,6 +41,7 @@ const uz: Record<string, string> = {
   'health.risk.overdue': '{count} ta vazifaning muddati o\'tib ketgan.',
   'health.risk.urgent_bugs': '{count} ta yuqori/shoshilinch ustuvorlikdagi xato hal qilinmagan.',
   'health.risk.no_recent_activity': '{days} kundan beri hech qanday faollik yo\'q.',
+  'health.noScore': "Baho yo'q",
   'health.title': 'Loyiha salomatligi',
   'health.loading': 'Holat yuklanmoqda…',
 

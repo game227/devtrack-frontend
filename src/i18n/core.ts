@@ -84,6 +84,17 @@ export function formatTime(lang: Lang, iso: string): string {
 // midnight would show the previous day west of UTC, so build them in local time instead.
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
 
+const UZ_MONTHS_SHORT = ['yan', 'fev', 'mar', 'apr', 'may', 'iyn', 'iyl', 'avg', 'sen', 'okt', 'noy', 'dek']
+
+// For chips and narrow columns: "16 noy" / "Nov 16" this year, with the year added otherwise.
+export function formatShortDate(lang: Lang, iso: string, now: Date = new Date()): string {
+  const dateOnly = DATE_ONLY.exec(iso)
+  const date = dateOnly ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : new Date(iso)
+  const sameYear = date.getFullYear() === now.getFullYear()
+  if (lang === 'uz') return `${date.getDate()} ${UZ_MONTHS_SHORT[date.getMonth()]}${sameYear ? '' : ` ${date.getFullYear()}`}`
+  return date.toLocaleDateString(INTL_LOCALES[lang], sameYear ? { month: 'short', day: 'numeric' } : { dateStyle: 'medium' })
+}
+
 export function formatDate(lang: Lang, iso: string): string {
   const dateOnly = DATE_ONLY.exec(iso)
   const date = dateOnly ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : new Date(iso)

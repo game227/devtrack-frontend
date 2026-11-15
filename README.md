@@ -37,13 +37,31 @@ npm run dev
 
 ## Design system
 
-"Black & Violet": black surfaces, `#292d30` borders, white text, muted `#a1a4a5`, links `#70b8ff`,
-violet `#9281f7` only for code/ids, status colors (`success/warning/info/danger/merged`) only next to a
-text label. Use the tokens (`text-danger`, `bg-fg`, …) — not raw Tailwind palette classes. No shadows.
+"Yo'l" (the line). Every issue rides the same five stations, backlog to done, and the interface draws
+that line: the logo, the station line across the top of the board, the status stepper on an issue,
+the small track at the start of every issue row, the home page's count per station, and the project
+timeline. The line is the only ornament; everything else stays plain.
 
-Contrast is part of the system (WCAG 2.1 AA, checked with axe-core in both themes): every text token meets
-4.5:1 on its background, and form controls use `border-border-strong` (3:1, WCAG 1.4.11) — `border-border`
-is for cards and dividers only. `formInputClass` already does this.
+- **Tokens** live in `src/styles/index.css` (light by default, `data-theme="dark"` redefines them).
+  Firuza turquoise (`brand`) marks actions and "you are here"; the station colours (`st-backlog` …
+  `st-done`) mark status and always sit next to a label or a position on the line. Use the tokens
+  (`bg-surface`, `text-fg-muted`, `bg-brand`, …), never raw palette classes.
+- **Recipes** in `src/components/ui.ts` (`button()`, `listPanel`, `pageHeader`, `notice`, …) and the
+  line pieces in `src/components/Track.tsx` (`StatusTrack`, `StatusStepper`, `TrackProgress`, `Logo`).
+  Compose these instead of writing new button or panel classes.
+- **Type**: Atkinson Hyperlegible Next for everything, its Mono sibling only for code-like text (issue
+  keys, commit SHAs, branches, shortcuts). Both are self-hosted through `@fontsource-variable`, so the
+  CSP allows no third-party font host.
+- **Layout**: a top bar (workspace, sections, search, New issue, notifications, account menu) and, inside
+  a project, a second bar with its sections. Lists are rows separated by hairlines, not card grids.
+  Radii follow hierarchy (controls 6px, cards 8px, panels 12px, chips round); shadows only under
+  things that float (menus, dialogs, a dragged card).
+- **One dialog creates issues** (`features/issues/NewIssueDialog.tsx`), opened through
+  `useNewIssue()`: the top bar, the C shortcut, the palette, empty states and `?new=1` links.
+
+Contrast is part of the system (WCAG 2.1 AA, checked with axe-core in both themes and at phone width):
+text tokens meet 4.5:1 on `bg`, `surface` and `well`; `border-strong` and the station colours meet
+3:1 (WCAG 1.4.11), so form controls use `border-border-strong` (`formInputClass` already does).
 
 ## Accessibility conventions
 
@@ -87,9 +105,13 @@ public/screens/ # product screenshots (uz/en) used by the landing page
 
 ## Landing page and screenshots
 
-`/` is the landing page (`src/pages/LandingPage.tsx`); it shows `public/screens/<lang>/*.png`. To
-regenerate them, seed the backend with `python manage.py seed_demo`, sign in as `jane.dev`/`demo1234`
-and capture the dashboard, board, issue, timeline, analytics, project and settings pages at 1440×900.
+`/` is the landing page (`src/pages/LandingPage.tsx`): the hero draws the line and five example issues
+ride to their stations once (the only animation; reduced motion shows the end state), then real
+screenshots from `public/screens/<lang>/` (`board`, `issue`, `analytics`, `timeline`, `dashboard`).
+To regenerate them without touching your own data, seed a scratch database (`createdb
+devtrack_screens`, then `DATABASE_URL=…/devtrack_screens python manage.py migrate && python manage.py
+seed_demo`), run that backend, sign in as `jane.dev`/`demo1234` in the demo workspace, capture each page
+at 1440×900 in the light theme, and drop the database afterwards.
 
 ## CI
 

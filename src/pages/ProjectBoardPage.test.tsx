@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeAuth, renderWithProviders } from '../test/utils'
+import { NewIssueContext } from '../features/issues/newIssueContext'
 import { ProjectBoardPage } from './ProjectBoardPage'
 import type { Issue } from '../types/issue'
 import type { User } from '../types/auth'
@@ -61,11 +62,15 @@ function currentUser(overrides: Partial<User> = {}): User {
   }
 }
 
+const openNewIssue = vi.fn()
+
 function renderBoard(lang: 'uz' | 'en' = 'uz', user: User | null = null) {
   return renderWithProviders(
-    <Routes>
-      <Route path="/projects/:id/board" element={<ProjectBoardPage />} />
-    </Routes>,
+    <NewIssueContext.Provider value={openNewIssue}>
+      <Routes>
+        <Route path="/projects/:id/board" element={<ProjectBoardPage />} />
+      </Routes>
+    </NewIssueContext.Provider>,
     { route: '/projects/7/board', lang, auth: makeAuth({ user }) },
   )
 }
@@ -197,7 +202,11 @@ describe('ProjectBoardPage', () => {
     renderBoard('en', currentUser())
 
     expect(await screen.findByText('The board is empty')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'New issue' })).toHaveAttribute('href', '/projects/7/issues?new=1')
+    // The page header and the empty state both open the new-issue dialog for this project.
+    const buttons = screen.getAllByRole('button', { name: 'New issue' })
+    expect(buttons).toHaveLength(2)
+    await userEvent.click(buttons[1])
+    expect(openNewIssue).toHaveBeenCalledWith(7)
   })
 
   it('flags an overdue card', async () => {

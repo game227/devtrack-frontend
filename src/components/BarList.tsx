@@ -19,7 +19,7 @@ export function BarList({ rows, total }: BarListProps) {
   const t = useT()
   const max = Math.max(...rows.map((row) => row.value), 1)
   return (
-    <ul className="flex flex-col gap-2.5">
+    <ul className="flex flex-col gap-3">
       {rows.map((row) => {
         const percent = total > 0 ? Math.round((row.value / total) * 100) : 0
         return (
@@ -28,18 +28,18 @@ export function BarList({ rows, total }: BarListProps) {
             title={t('analytics.barLabel', { label: row.label, value: row.value, percent })}
             className="grid grid-cols-[minmax(0,9rem)_1fr_auto] items-center gap-3 text-sm"
           >
-            <span className="flex items-center gap-2 truncate text-fg-muted">
-              {row.color && <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />}
+            <span className="flex items-center gap-2 truncate text-fg">
+              {row.color && <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />}
               <span className="truncate">{row.label}</span>
             </span>
-            <span className="h-2 overflow-hidden rounded-r bg-border/40">
+            <span className="h-2 overflow-hidden rounded-full bg-well">
               <span
-                className="block h-full rounded-r"
-                style={{ width: `${(row.value / max) * 100}%`, backgroundColor: row.color ?? 'var(--color-fg)' }}
+                className="block h-full rounded-full"
+                style={{ width: `${(row.value / max) * 100}%`, backgroundColor: row.color ?? 'var(--color-brand)' }}
               />
             </span>
-            <span className="w-16 text-right font-mono text-xs tabular-nums text-fg">
-              {row.value} <span className="text-fg-muted">· {percent}%</span>
+            <span className="w-20 text-right text-xs font-bold text-fg tabular">
+              {row.value} <span className="font-normal text-fg-muted">({percent}%)</span>
             </span>
           </li>
         )

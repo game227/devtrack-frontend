@@ -41,6 +41,7 @@ const en: Record<string, string> = {
   'health.risk.overdue': '{count} issue(s) are past their due date.',
   'health.risk.urgent_bugs': '{count} unresolved high/urgent priority bug(s).',
   'health.risk.no_recent_activity': 'No activity for {days} days.',
+  'health.noScore': "No score",
   'health.title': 'Project health',
   'health.loading': 'Loading health…',
 

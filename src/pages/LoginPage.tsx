@@ -44,12 +44,12 @@ export function LoginPage() {
     <AuthShell title={t('auth.signInTitle')}>
       <form onSubmit={handleSubmit}>
         {errors.non_field_errors && (
-          <p role="alert" className="mb-4 text-sm text-danger">
+          <p role="alert" className="mb-5 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
             {errors.non_field_errors.join(' ')}
           </p>
         )}
 
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('auth.username')} errors={errors.username}>
             <input
               className={formInputClass}
@@ -75,7 +75,7 @@ export function LoginPage() {
         </div>
 
         {needsCode && (
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('auth.otp')} errors={errors.otp}>
               <input
                 className={formInputClass}
@@ -91,8 +91,8 @@ export function LoginPage() {
           </div>
         )}
 
-        <div className="mb-4 text-right text-xs">
-          <Link to="/forgot-password" className="text-accent hover:underline">
+        <div className="mb-5 text-right text-sm">
+          <Link to="/forgot-password" className="font-semibold text-accent hover:underline">
             {t('auth.forgotPassword')}
           </Link>
         </div>
@@ -101,9 +101,9 @@ export function LoginPage() {
           {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
         </button>
 
-        <p className="mt-4 text-center text-sm text-fg-muted">
+        <p className="mt-6 text-center text-sm text-fg-muted">
           {t('auth.noAccount')}{' '}
-          <Link to="/register" className="text-accent hover:underline">
+          <Link to="/register" className="font-semibold text-accent hover:underline">
             {t('auth.register')}
           </Link>
         </p>

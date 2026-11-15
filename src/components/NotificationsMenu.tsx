@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from '../api/notifications'
 import { useI18n } from '../i18n'
 import { Icon } from './Icon'
+import { iconButton } from './ui'
 import type { AppNotification } from '../types/notification'
 
 function notificationLink(notification: AppNotification): string | null {
@@ -76,45 +77,51 @@ export function NotificationsMenu() {
         }
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
-        className="relative flex rounded-md border border-border p-1.5 transition-colors duration-150 hover:text-fg"
+        className={`relative ${iconButton()}`}
       >
-        <Icon name="bell" size={16} />
+        <Icon name="bell" size={18} />
         {unreadCount > 0 && (
-          <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-bg">
+          <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold leading-none text-bg ring-2 ring-bg">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 top-full z-10 mt-1 max-h-96 w-80 max-w-[calc(100vw-2rem)] origin-top-right animate-scale-in overflow-y-auto rounded-md border border-border bg-bg-elevated">
-          <div className="flex items-center justify-between border-b border-border px-3 py-2">
-            <span className="text-xs font-semibold uppercase text-fg-muted">{t('notifications.title')}</span>
+        <div className="absolute right-0 top-full z-40 mt-2 max-h-[28rem] w-96 max-w-[calc(100vw-1.5rem)] origin-top-right animate-scale-in overflow-y-auto rounded-xl border border-border bg-surface shadow-float max-sm:-right-12">
+          <div className="sticky top-0 flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+            <h2 className="text-sm font-bold text-fg">{t('notifications.title')}</h2>
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={() => markAllReadMutation.mutate()}
                 disabled={markAllReadMutation.isPending}
-                className="text-xs text-accent hover:underline disabled:opacity-50"
+                className="text-xs font-semibold text-accent hover:underline disabled:opacity-50"
               >
                 {t('notifications.markAllRead')}
               </button>
             )}
           </div>
-          {notificationsQuery.isLoading && <p className="px-3 py-3 text-sm text-fg-muted">{t('common.loading')}</p>}
+          {notificationsQuery.isLoading && <p className="px-4 py-4 text-sm text-fg-muted">{t('common.loading')}</p>}
           {notificationsQuery.isSuccess && notifications.length === 0 && (
-            <p className="px-3 py-3 text-sm text-fg-muted">{t('notifications.empty')}</p>
+            <p className="px-4 py-6 text-sm text-fg-muted">{t('notifications.empty')}</p>
           )}
           {notifications.map((notification) => (
             <button
               key={notification.id}
               type="button"
               onClick={() => handleClick(notification)}
-              className={`block w-full border-b border-border px-3 py-2 text-left text-sm transition-colors duration-150 last:border-b-0 hover:bg-bg ${
+              className={`flex w-full gap-3 border-b border-border px-4 py-3 text-left text-sm transition-colors duration-150 last:border-b-0 hover:bg-well ${
                 notification.is_read ? 'text-fg-muted' : 'text-fg'
               }`}
             >
-              <div>{notificationText(notification)}</div>
-              <div className="mt-0.5 text-xs text-fg-muted">{formatDateTime(notification.created_at)}</div>
+              <span
+                aria-hidden="true"
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.is_read ? 'bg-transparent' : 'bg-brand'}`}
+              />
+              <span className="min-w-0">
+                <span className={`block ${notification.is_read ? '' : 'font-semibold'}`}>{notificationText(notification)}</span>
+                <span className="mt-0.5 block text-xs text-fg-muted">{formatDateTime(notification.created_at)}</span>
+              </span>
             </button>
           ))}
         </div>

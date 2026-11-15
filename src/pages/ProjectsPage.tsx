@@ -10,6 +10,7 @@ import { FormField, formInputClass } from '../components/FormField'
 import { ImportFromGithub } from '../components/ImportFromGithub'
 import { Icon } from '../components/Icon'
 import { PageSkeleton, SkeletonList } from '../components/Skeleton'
+import { button, formPanel, listPanel, notice, pageHeader, pageLead, pageTitle } from '../components/ui'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { ProjectStatus, Priority } from '../types/project'
@@ -65,23 +66,22 @@ export function ProjectsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">{t('projects.title')}</h1>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsImportOpen((open) => !open)}
-            aria-expanded={isImportOpen}
-            className="flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
-          >
+      <div className={pageHeader}>
+        <div>
+          <h1 className={pageTitle}>{t('projects.title')}</h1>
+          {projectsQuery.data && projectsQuery.data.length > 0 && (
+            <p className={pageLead}>
+              {currentWorkspace.name}, {t('projects.count', { count: projectsQuery.data.length })}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => setIsImportOpen((open) => !open)} aria-expanded={isImportOpen} className={button('secondary')}>
             <Icon name="github" />
             {t('github.import.button')}
           </button>
-          <button
-            type="button"
-            onClick={() => setIsFormOpen((open) => !open)}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
-          >
+          <button type="button" onClick={() => setIsFormOpen((open) => !open)} className={button(isFormOpen ? 'secondary' : 'primary')}>
+            {!isFormOpen && <Icon name="plus" />}
             {isFormOpen ? t('common.cancel') : t('projects.new')}
           </button>
         </div>
@@ -90,14 +90,14 @@ export function ProjectsPage() {
       {isImportOpen && <ImportFromGithub workspaceId={currentWorkspace.id} />}
 
       {isFormOpen && (
-        <form
-          onSubmit={handleSubmit}
-          className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4"
-        >
+        <form onSubmit={handleSubmit} className={formPanel}>
+          <h2 className="mb-4 text-base font-bold text-fg">{t('projects.new')}</h2>
           {errors.non_field_errors && (
-            <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
+            <p role="alert" className={`mb-4 ${notice.error}`}>
+              {errors.non_field_errors.join(' ')}
+            </p>
           )}
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('common.name')} errors={errors.name}>
               <input
                 className={formInputClass}
@@ -107,7 +107,7 @@ export function ProjectsPage() {
               />
             </FormField>
           </div>
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('common.description')} errors={errors.description}>
               <textarea
                 className={formInputClass}
@@ -117,7 +117,7 @@ export function ProjectsPage() {
               />
             </FormField>
           </div>
-          <div className="mb-3 grid grid-cols-2 gap-2">
+          <div className="mb-5 grid grid-cols-2 gap-3">
             <FormField label={t('common.status')} errors={errors.status}>
               <select
                 className={formInputClass}
@@ -147,11 +147,7 @@ export function ProjectsPage() {
               </select>
             </FormField>
           </div>
-          <button
-            type="submit"
-            disabled={createMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-          >
+          <button type="submit" disabled={createMutation.isPending} className={button('primary')}>
             {createMutation.isPending ? t('common.creating') : t('projects.create')}
           </button>
         </form>
@@ -170,26 +166,30 @@ export function ProjectsPage() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
-        {projectsQuery.data?.map((project) => (
-          <Link
-            key={project.id}
-            to={`/projects/${project.id}`}
-            className="flex items-center justify-between rounded-2xl border border-border bg-bg-elevated px-4 py-3 transition-colors duration-150 hover:border-fg"
-          >
-            <div>
-              <div className="text-sm font-medium text-fg">{project.name}</div>
-              {project.description && (
-                <div className="text-xs text-fg-muted">{project.description}</div>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <PriorityBadge priority={project.priority} />
-              <StatusBadge status={project.status} />
-            </div>
-          </Link>
-        ))}
-      </div>
+      {projectsQuery.data && projectsQuery.data.length > 0 && (
+        <ul className={listPanel}>
+          {projectsQuery.data.map((project) => (
+            <li key={project.id}>
+              <Link to={`/projects/${project.id}`} className="flex items-center gap-4 px-4 py-3.5 transition-colors duration-150 hover:bg-well">
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-sm font-extrabold text-brand-strong"
+                >
+                  {project.icon || project.name.slice(0, 1).toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-bold text-fg">{project.name}</span>
+                  {project.description && <span className="block truncate text-sm text-fg-muted">{project.description}</span>}
+                </span>
+                <span className="hidden shrink-0 items-center gap-3 sm:flex">
+                  <PriorityBadge priority={project.priority} />
+                  <StatusBadge status={project.status} />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

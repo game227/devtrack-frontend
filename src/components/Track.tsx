@@ -1,0 +1,166 @@
+import { useT } from '../i18n'
+import { STATUS_COLOR as STATION_COLOR } from '../lib/statusColors'
+import { ISSUE_STATUSES } from '../types/issue'
+import type { IssueStatus } from '../types/issue'
+
+// The line every issue rides: backlog, to do, in progress, review, done. These pieces draw it at
+// different sizes; the station colours live in styles/index.css (--color-st-*).
+
+const STEP = 9
+const START = 5
+
+// The compact track in issue rows: where the issue is on the line, readable at a glance down a list.
+// Position carries the meaning as much as colour does (WCAG 1.4.1), and the name is the status label.
+export function StatusTrack({ status, className = '' }: { status: IssueStatus; className?: string }) {
+  const t = useT()
+  const index = ISSUE_STATUSES.indexOf(status)
+  const color = STATION_COLOR[status]
+  const label = t(`status.${status}`)
+  const end = START + STEP * (ISSUE_STATUSES.length - 1)
+  return (
+    <svg
+      role="img"
+      aria-label={label}
+      width={end + START}
+      height={12}
+      viewBox={`0 0 ${end + START} 12`}
+      className={`shrink-0 ${className}`}
+    >
+      <title>{label}</title>
+      <line x1={START} y1={6} x2={end} y2={6} stroke="var(--color-border-strong)" strokeWidth={1.25} strokeLinecap="round" />
+      {index > 0 && (
+        <line x1={START} y1={6} x2={START + STEP * index} y2={6} stroke={color} strokeWidth={2.5} strokeLinecap="round" />
+      )}
+      {ISSUE_STATUSES.map((station, i) => {
+        const cx = START + STEP * i
+        if (i === index) {
+          return <circle key={station} cx={cx} cy={6} r={4} fill={color} stroke="var(--color-surface)" strokeWidth={1.5} />
+        }
+        if (i < index) return <circle key={station} cx={cx} cy={6} r={2.25} fill={color} />
+        return <circle key={station} cx={cx} cy={6} r={2.25} fill="var(--color-surface)" stroke="var(--color-border-strong)" strokeWidth={1.25} />
+      })}
+    </svg>
+  )
+}
+
+// A single station marker (board column heads, legends). Decorative: the label next to it says the name.
+export function StationDot({ status, size = 10, className = '' }: { status: IssueStatus; size?: number; className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-block shrink-0 rounded-full ring-2 ring-surface ${className}`}
+      style={{ width: size, height: size, backgroundColor: STATION_COLOR[status] }}
+    />
+  )
+}
+
+// The issue page's status control: the whole line, one button per station. Toggle buttons rather than
+// radios, so moving through them with the keyboard never changes anything until a station is chosen.
+export function StatusStepper({
+  status,
+  disabled = false,
+  onChange,
+}: {
+  status: IssueStatus
+  disabled?: boolean
+  onChange: (next: IssueStatus) => void
+}) {
+  const t = useT()
+  const index = ISSUE_STATUSES.indexOf(status)
+  const color = STATION_COLOR[status]
+  const travelled = (index / (ISSUE_STATUSES.length - 1)) * 100
+  return (
+    <fieldset aria-label={t('common.status')} disabled={disabled} className="min-w-0">
+      <div className="relative">
+        {/* The rail runs between the first and the last station centres (each station is 1/5 wide). */}
+        <div aria-hidden="true" className="absolute left-[10%] right-[10%] top-[11px] h-[3px] rounded-full bg-border" />
+        <div
+          aria-hidden="true"
+          className="absolute left-[10%] top-[11px] h-[3px] rounded-full transition-[width] duration-300"
+          style={{ width: `${travelled * 0.8}%`, backgroundColor: color }}
+        />
+        <ol className="relative grid grid-cols-5">
+          {ISSUE_STATUSES.map((station, i) => {
+            const current = i === index
+            const passed = i < index
+            return (
+              <li key={station} className="flex justify-center">
+                <button
+                  type="button"
+                  aria-pressed={current}
+                  onClick={() => !current && onChange(station)}
+                  className="group flex min-h-11 w-full flex-col items-center rounded-md px-0.5 pb-1 text-center disabled:cursor-not-allowed"
+                >
+                  {/* 25px high, so every marker — small or the larger current one — centres on the rail. */}
+                  <span aria-hidden="true" className="flex h-[25px] items-center justify-center">
+                    <span
+                      // A new key when a station becomes current replays its arrival.
+                      key={current ? `${station}-current` : station}
+                      className={`block rounded-full ${
+                        current
+                          ? 'h-[18px] w-[18px] animate-arrive ring-4 ring-surface'
+                          : 'h-[10px] w-[10px] ring-2 ring-surface transition-transform duration-150 group-enabled:group-hover:scale-125'
+                      }`}
+                      style={{
+                        backgroundColor: current || passed ? color : 'var(--color-surface)',
+                        boxShadow: current || passed ? undefined : 'inset 0 0 0 1.5px var(--color-border-strong)',
+                      }}
+                    />
+                  </span>
+                  <span
+                    className={`mt-1 text-[12px] leading-tight ${current ? 'font-bold text-fg' : 'text-fg-muted group-enabled:group-hover:text-fg'}`}
+                  >
+                    {t(`status.${station}`)}
+                  </span>
+                </button>
+              </li>
+            )
+          })}
+        </ol>
+      </div>
+    </fieldset>
+  )
+}
+
+// A progress line: the filled part ends in a station marker, the rest of the rail waits.
+export function TrackProgress({ percent, label, className = '' }: { percent: number; label: string; className?: string }) {
+  const value = Math.max(0, Math.min(100, Math.round(percent)))
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={value}
+      className={`relative h-3 w-full ${className}`}
+    >
+      <div className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-border" />
+      <div className="absolute left-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-brand" style={{ width: `${value}%` }} />
+      <div
+        className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand ring-2 ring-surface"
+        style={{ left: `${value}%` }}
+      />
+    </div>
+  )
+}
+
+// The brand mark: a short line with three stations, the last one reached.
+export function LogoMark({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={(size * 12) / 28} viewBox="0 0 28 12" aria-hidden="true" focusable="false" className="shrink-0">
+      <line x1="3" y1="6" x2="24" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="3.5" cy="6" r="2.5" fill="currentColor" />
+      <circle cx="13.5" cy="6" r="2.5" fill="currentColor" />
+      <circle cx="23" cy="6" r="4.25" fill="var(--color-brand)" stroke="var(--color-bg)" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+export function Logo({ className = '' }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-2 text-[17px] font-extrabold tracking-[-0.02em] text-fg ${className}`}>
+      <LogoMark />
+      DevTrack
+    </span>
+  )
+}

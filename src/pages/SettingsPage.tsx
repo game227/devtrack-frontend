@@ -14,29 +14,28 @@ import { ConfirmButton } from '../components/ConfirmButton'
 import { Icon } from '../components/Icon'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useI18n } from '../i18n'
+import { button, notice, pageTitle } from '../components/ui'
 
-const primaryButton =
-  'shrink-0 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100'
-const dangerButton =
-  'shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-danger hover:text-danger disabled:opacity-50'
+const primaryButton = button('primary')
+const dangerButton = button('danger')
 
 function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings'; children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-bg-elevated p-5">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg">
-        {icon && <Icon name={icon} />}
+    <section className="rounded-xl border border-border bg-surface p-5">
+      <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-fg">
+        {icon && <Icon name={icon} size={18} />}
         {title}
       </h2>
       {children}
-    </div>
+    </section>
   )
 }
 
 export function SettingsPage() {
   const { t } = useI18n()
   return (
-    <div className="max-w-xl space-y-6">
-      <h1 className="text-xl font-semibold text-fg">{t('settings.title')}</h1>
+    <div className="max-w-2xl space-y-6">
+      <h1 className={pageTitle}>{t('settings.title')}</h1>
       <LanguageCard />
       <GithubConnectionCard />
       <TelegramConnectionCard />
@@ -48,7 +47,7 @@ function LanguageCard() {
   const { t } = useI18n()
   return (
     <Card title={t('settings.language')} icon="settings">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">{t('settings.languageHelp')}</p>
         <LanguageSwitcher />
       </div>
@@ -160,12 +159,12 @@ function GithubConnectionCard() {
   return (
     <Card title={t('github.title')} icon="github">
       {banner && (
-        <p role={banner.kind === 'error' ? 'alert' : 'status'} className={`mb-3 text-sm ${banner.kind === 'success' ? 'text-success' : 'text-danger'}`}>
+        <p role={banner.kind === 'error' ? 'alert' : 'status'} className={`mb-4 ${banner.kind === 'success' ? notice.success : notice.error}`}>
           {banner.text}
         </p>
       )}
       {connectMutation.isError && (
-        <p role="alert" className="mb-3 text-sm text-danger">
+        <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
           {t('settings.connectFailed')}
         </p>
       )}
@@ -173,7 +172,7 @@ function GithubConnectionCard() {
       {connectionQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
 
       {connectionQuery.data && !connectionQuery.data.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg-muted">{t('settings.githubHelp')}</p>
           <button type="button" onClick={() => connectMutation.mutate()} disabled={connectMutation.isPending} className={primaryButton}>
             {t('settings.githubConnect')}
@@ -182,9 +181,9 @@ function GithubConnectionCard() {
       )}
 
       {connectionQuery.data?.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg">
-            {t('settings.connectedAs')} <span className="font-medium">{connectionQuery.data.github_username}</span>
+            {t('settings.connectedAs')} <span className="font-semibold">{connectionQuery.data.github_username}</span>
           </p>
           <ConfirmButton
             onConfirm={() => disconnectMutation.mutate()}
@@ -227,7 +226,7 @@ function TelegramConnectionCard() {
   return (
     <Card title="Telegram" icon="send">
       {connectMutation.isError && (
-        <p role="alert" className="mb-3 text-sm text-danger">
+        <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
           {t('settings.connectFailed')}
         </p>
       )}
@@ -235,7 +234,7 @@ function TelegramConnectionCard() {
       {connectionQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
 
       {connectionQuery.data && !connectionQuery.data.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg-muted">{t('settings.telegramHelp')}</p>
           <button type="button" onClick={() => connectMutation.mutate()} disabled={connectMutation.isPending} className={primaryButton}>
             {t('settings.telegramConnect')}
@@ -244,10 +243,10 @@ function TelegramConnectionCard() {
       )}
 
       {connectionQuery.data?.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg">
             {t('settings.connectedAs')}{' '}
-            <span className="font-medium">@{connectionQuery.data.telegram_username || t('settings.telegramUnknown')}</span>
+            <span className="font-semibold">@{connectionQuery.data.telegram_username || t('settings.telegramUnknown')}</span>
           </p>
           <ConfirmButton
             onConfirm={() => disconnectMutation.mutate()}

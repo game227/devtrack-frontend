@@ -9,7 +9,7 @@ import {
 } from '../api/auth'
 import { getUserAnalytics } from '../api/analytics'
 import { FormField, formInputClass } from '../components/FormField'
-import { StatCard } from '../components/StatCard'
+import { StatCard, StatRow } from '../components/StatCard'
 import { DailyActivityChart } from '../components/DailyActivityChart'
 import { useAuth } from '../features/auth/authContext'
 import { useWorkspace } from '../features/workspace/workspaceContext'
@@ -17,6 +17,7 @@ import { TwoFactorCard } from '../components/TwoFactorCard'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { User } from '../types/auth'
+import { button, pageTitle } from '../components/ui'
 
 export function ProfilePage() {
   const { t } = useI18n()
@@ -27,8 +28,8 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="max-w-xl space-y-6">
-      <h1 className="text-xl font-semibold text-fg">{t('profile.title')}</h1>
+    <div className="max-w-3xl space-y-8">
+      <h1 className={pageTitle}>{t('profile.title')}</h1>
       {!user.email_verified && <EmailVerificationBanner />}
       <ProfileForm user={user} onSaved={refreshUser} />
       <PasswordForm />
@@ -54,7 +55,7 @@ function EmailVerificationBanner() {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated p-4 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-4 text-sm">
       <span className="text-fg-muted">{t('profile.emailUnverified')}</span>
       {status === 'sent' ? (
         <span role="status" className="text-fg-muted">{t('profile.verificationSent')}</span>
@@ -63,7 +64,7 @@ function EmailVerificationBanner() {
           type="button"
           onClick={handleResend}
           disabled={status === 'sending'}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg disabled:opacity-50"
+          className={button('primary')}
         >
           {t('profile.resendVerification')}
         </button>
@@ -95,9 +96,9 @@ function DeleteAccountForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-2xl border border-danger/40 bg-bg-elevated p-5"
+      className="space-y-4 rounded-xl border border-danger/40 bg-surface p-5"
     >
-      <h2 className="text-sm font-semibold text-danger">{t('profile.deleteAccount')}</h2>
+      <h2 className="text-base font-bold text-danger">{t('profile.deleteAccount')}</h2>
       <p className="text-sm text-fg-muted">{t('profile.deleteAccountHelp')}</p>
       {errors.non_field_errors && (
         <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
@@ -115,7 +116,7 @@ function DeleteAccountForm() {
       <button
         type="submit"
         disabled={status === 'deleting'}
-        className="rounded-md border border-danger px-3 py-2 text-sm font-medium text-danger transition-colors duration-150 hover:bg-danger/10 active:scale-[0.98] disabled:opacity-50"
+        className={button('danger')}
       >
         {status === 'deleting' ? t('profile.deleting') : t('profile.deleteAccountButton')}
       </button>
@@ -144,17 +145,18 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   const analytics = analyticsQuery.data
 
   return (
-    <div className="rounded-2xl border border-border bg-bg-elevated p-5">
-      <h2 className="mb-3 text-sm font-semibold text-fg">
-        {t('profile.myActivity')} <span className="text-fg-muted">· {currentWorkspace.name}</span>
+    <div className="rounded-xl border border-border bg-surface p-5">
+      <h2 className="mb-4 flex flex-wrap items-center gap-2 text-base font-bold text-fg">
+        {t('profile.myActivity')}
+        <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold text-fg-muted">{currentWorkspace.name}</span>
       </h2>
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <StatRow className="mb-5">
         <StatCard label={t('profile.projects')} value={analytics.projects_count} />
         <StatCard label={t('profile.tasksCompleted')} value={analytics.tasks_completed} />
         <StatCard label={t('profile.issuesResolved')} value={analytics.issues_resolved} />
         <StatCard label={t('profile.openAssigned')} value={analytics.open_assigned} />
-      </div>
-      <div className="mb-1 text-xs text-fg-muted">{t('profile.dailyActivity')}</div>
+      </StatRow>
+      <h3 className="mb-2 text-sm font-bold text-fg">{t('profile.dailyActivity')}</h3>
       <DailyActivityChart data={analytics.daily_activity} />
     </div>
   )
@@ -232,21 +234,21 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5"
+      className="space-y-4 rounded-xl border border-border bg-surface p-5"
     >
       <div className="flex items-center gap-4">
         {avatarPreview ? (
-          <img src={avatarPreview} alt="" className="h-16 w-16 rounded-full border border-border object-cover" />
+          <img src={avatarPreview} alt="" className="h-16 w-16 rounded-full object-cover ring-1 ring-border" />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-bg text-xl text-fg-muted">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-well text-xl font-bold text-fg-muted">
             {user.username.slice(0, 1).toUpperCase()}
           </div>
         )}
-        <label className="cursor-pointer text-sm">
-          <span className="block rounded-md border border-border px-3 py-1.5 text-fg-muted transition-colors duration-150 hover:border-fg hover:text-fg">
+        <label className="cursor-pointer rounded-md text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand">
+          <span className="block rounded-md border border-border-strong bg-surface px-3 py-1.5 font-semibold text-fg transition-colors duration-150 hover:bg-well">
             {t('profile.changeAvatar')}
           </span>
-          <input type="file" accept={AVATAR_TYPES.join(',')} className="hidden" onChange={handleAvatarChange} />
+          <input type="file" accept={AVATAR_TYPES.join(',')} className="sr-only" onChange={handleAvatarChange} />
         </label>
       </div>
       {errors.avatar && (
@@ -294,7 +296,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className={button('primary')}
         >
           {status === 'saving' ? t('common.saving') : t('profile.saveChanges')}
         </button>
@@ -339,9 +341,9 @@ function PasswordForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5"
+      className="space-y-4 rounded-xl border border-border bg-surface p-5"
     >
-      <h2 className="text-sm font-semibold text-fg">{t('profile.changePassword')}</h2>
+      <h2 className="text-base font-bold text-fg">{t('profile.changePassword')}</h2>
       {errors.non_field_errors && (
         <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
       )}
@@ -376,7 +378,7 @@ function PasswordForm() {
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className={button('primary')}
         >
           {status === 'saving' ? t('common.saving') : t('profile.updatePassword')}
         </button>

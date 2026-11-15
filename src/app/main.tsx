@@ -8,6 +8,10 @@ import { I18nProvider } from '../i18n'
 import { App } from './App'
 import { initTheme } from '../lib/theme'
 import { initSentry } from '../lib/sentry'
+// Self-hosted (no third-party font requests): Atkinson Hyperlegible Next for everything, its mono
+// sibling for code-like text (issue keys, commit SHAs, branches, shortcuts).
+import '@fontsource-variable/atkinson-hyperlegible-next'
+import '@fontsource-variable/atkinson-hyperlegible-mono'
 import '../styles/index.css'
 
 initSentry()

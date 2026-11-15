@@ -4,26 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#ffffff" />
     <script>
       // Set the theme before first paint so a light-theme user never sees a dark flash.
       // Keep in step with lib/theme.ts (same storage key, same default).
       try {
         var pref = localStorage.getItem('devtrack_theme')
         var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches
-        var theme = pref === 'light' || pref === 'dark' ? pref : pref === 'system' ? (dark ? 'dark' : 'light') : 'dark'
+        var theme = pref === 'light' || pref === 'dark' ? pref : pref === 'system' ? (dark ? 'dark' : 'light') : 'light'
         document.documentElement.dataset.theme = theme
+        if (theme === 'dark') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d1317')
       } catch (e) {
-        document.documentElement.dataset.theme = 'dark'
+        document.documentElement.dataset.theme = 'light'
       }
     </script>
-    <meta name="description" content="DevTrack — project management for developers: kanban boards, project health, GitHub-aware progress. Uzbek and English." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600&family=Playfair+Display:wght@400&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="description" content="DevTrack is an issue tracker for small development teams: every issue rides one line from backlog to done, and GitHub commits move it along. In Uzbek and English." />
     <title>DevTrack</title>
   </head>
   <body>

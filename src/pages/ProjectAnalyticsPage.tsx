@@ -7,7 +7,8 @@ import { listIssues } from '../api/issues'
 import { BarList } from '../components/BarList'
 import { ProgressBar } from '../components/ProgressBar'
 import { ProjectHealthCard } from '../components/ProjectHealthCard'
-import { StatCard } from '../components/StatCard'
+import { StatCard, StatRow } from '../components/StatCard'
+import { pageTitle } from '../components/ui'
 import { STATUS_COLOR } from '../lib/statusColors'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
@@ -23,10 +24,27 @@ function localToday(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
 
+// The whole project as one line, each station's stretch as long as its share of the issues (the bars
+// underneath carry the labels and numbers).
+function StatusLine({ issues }: { issues: Issue[] }) {
+  const counts = ISSUE_STATUSES.map((status) => ({ status, count: issues.filter((issue) => issue.status === status).length }))
+  return (
+    <div aria-hidden="true" className="mb-5">
+      <div className="flex h-3 w-full gap-[3px] overflow-hidden rounded-full">
+        {counts
+          .filter(({ count }) => count > 0)
+          .map(({ status, count }) => (
+            <span key={status} className="h-full" style={{ flexGrow: count, backgroundColor: STATUS_COLOR[status] }} />
+          ))}
+      </div>
+    </div>
+  )
+}
+
 function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border bg-bg-elevated p-4">
-      <h2 className="mb-3 text-sm font-semibold text-fg">{title}</h2>
+    <section className="rounded-xl border border-border bg-surface p-5">
+      <h2 className="mb-4 text-base font-bold text-fg">{title}</h2>
       {children}
     </section>
   )
@@ -74,23 +92,24 @@ export function ProjectAnalyticsPage() {
   const cycles = [...(cyclesQuery.data ?? [])].sort((a, b) => a.start_date.localeCompare(b.start_date))
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold text-fg">{t('analytics.title')}</h1>
+    <div className="flex flex-col gap-8">
+      <h1 className={pageTitle}>{t('analytics.title')}</h1>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <StatRow>
         <StatCard label={t('analytics.totalIssues')} value={issues.length} />
         <StatCard label={t('analytics.completed')} value={`${completion}%`} />
         <StatCard label={t('analytics.open')} value={open.length} />
-        <StatCard label={t('analytics.overdue')} value={overdue} />
-      </div>
+        <StatCard label={t('analytics.overdue')} value={overdue} tone="danger" />
+      </StatRow>
 
       <ProjectHealthCard projectId={projectId} />
 
       {issues.length === 0 ? (
         <p className="text-sm text-fg-muted">{t('analytics.noIssues')}</p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Panel title={t('analytics.byStatus')}>
+            <StatusLine issues={issues} />
             <BarList
               total={issues.length}
               rows={ISSUE_STATUSES.map((status) => ({
@@ -135,13 +154,13 @@ export function ProjectAnalyticsPage() {
         {cycles.length === 0 ? (
           <p className="text-sm text-fg-muted">{t('analytics.noCycles')}</p>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-4">
             {cycles.map((cycle) => (
               <li key={cycle.id}>
-                <div className="mb-1 flex items-center justify-between text-xs text-fg-muted">
-                  <span className="text-fg">{cycle.name}</span>
-                  <span className="font-mono tabular-nums">
-                    {cycle.completed_count}/{cycle.issue_count} · {Math.round(cycle.completion_percent)}%
+                <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                  <span className="font-semibold text-fg">{cycle.name}</span>
+                  <span className="text-xs font-semibold text-fg-muted tabular">
+                    {cycle.completed_count}/{cycle.issue_count} ({Math.round(cycle.completion_percent)}%)
                   </span>
                 </div>
                 <ProgressBar percent={cycle.completion_percent} label={cycle.name} />

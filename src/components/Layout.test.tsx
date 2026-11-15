@@ -8,7 +8,16 @@ import { makeAuth, renderWithProviders } from '../test/utils'
 import { Layout } from './Layout'
 import type { Workspace } from '../types/workspace'
 
-vi.mock('../api/projects', () => ({ getProject: vi.fn().mockResolvedValue({ id: 7, name: 'Payments API' }) }))
+vi.mock('../api/projects', () => ({
+  getProject: vi.fn().mockResolvedValue({ id: 7, name: 'Payments API', status: 'active', icon: '' }),
+  listProjects: vi.fn().mockResolvedValue([
+    { id: 7, name: 'Payments API', status: 'active' },
+    { id: 8, name: 'Docs Portal', status: 'planned' },
+    { id: 9, name: 'Old Site', status: 'archived' },
+  ]),
+}))
+const createIssue = vi.fn()
+vi.mock('../api/issues', () => ({ createIssue: (...args: unknown[]) => createIssue(...args) }))
 vi.mock('../api/search', () => ({ search: vi.fn() }))
 vi.mock('../api/changes', () => ({ getChanges: vi.fn().mockResolvedValue({ cursor: 'c', changed: [] }) }))
 vi.mock('../api/notifications', () => ({
@@ -21,7 +30,12 @@ const workspace = { id: 3, name: 'Nova Labs' } as Workspace
 
 function Where() {
   const { pathname, search } = useLocation()
-  return <div data-testid="where">{pathname + search}</div>
+  return (
+    <>
+      <div data-testid="where">{pathname + search}</div>
+      <input aria-label="Some field" />
+    </>
+  )
 }
 
 function renderLayout(route: string) {
@@ -55,16 +69,20 @@ describe('Layout keyboard shortcuts', () => {
     expect(screen.getByTestId('where')).toHaveTextContent('/projects')
   })
 
-  it('opens the new-issue form of the current project with C', async () => {
+  it('opens the new-issue dialog for the current project with C, without leaving the page', async () => {
     renderLayout('/projects/7/board')
     await userEvent.keyboard('c')
-    expect(screen.getByTestId('where')).toHaveTextContent('/projects/7/issues?new=1')
+    const dialog = await screen.findByRole('dialog', { name: 'New issue' })
+    expect(dialog).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByLabelText('Project')).toHaveValue('7'))
+    expect(screen.getByTestId('where')).toHaveTextContent('/projects/7/board')
   })
 
-  it('sends C to the projects list when no project is open', async () => {
+  it('opens the new-issue dialog with C when no project is open too', async () => {
     renderLayout('/dashboard')
     await userEvent.keyboard('c')
-    expect(screen.getByTestId('where')).toHaveTextContent('/projects')
+    expect(await screen.findByRole('dialog', { name: 'New issue' })).toBeInTheDocument()
+    expect(screen.getByTestId('where')).toHaveTextContent('/dashboard')
   })
 
   it('shows the shortcuts list on ? and runs a palette command through to navigation', async () => {
@@ -81,8 +99,9 @@ describe('Layout keyboard shortcuts', () => {
 
   it('does not treat typing in a field as a shortcut', async () => {
     renderLayout('/dashboard')
-    await userEvent.type(screen.getByRole('searchbox'), 'c')
+    await userEvent.type(screen.getByLabelText('Some field'), 'cgp')
     expect(screen.getByTestId('where')).toHaveTextContent('/dashboard')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })
 
@@ -99,17 +118,67 @@ describe('Layout accessibility', () => {
     expect(skip).toHaveFocus()
   })
 
-  it('names its landmarks so they can be told apart', () => {
-    renderLayout('/dashboard')
-    expect(screen.getByRole('complementary', { name: 'Sidebar' })).toBeInTheDocument()
+  it('names its landmarks so they can be told apart', async () => {
+    renderLayout('/projects/7/board')
+    expect(screen.getByRole('banner')).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Project sections' })).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Board' })).toHaveAttribute('aria-current', 'page')
   })
 
-  it('gives the command palette button an accessible name that contains its visible shortcut', () => {
+  it('gives the search button an accessible name that contains its visible text and shortcut', async () => {
     renderLayout('/dashboard')
-    const button = screen.getByRole('button', { name: /Command palette/ })
-    expect(button).toHaveAccessibleName('Command palette, Ctrl K')
+    const button = screen.getByRole('button', { name: 'Search, Ctrl K' })
+    expect(button).toHaveTextContent('Search')
     expect(button).toHaveTextContent('Ctrl K')
+    await userEvent.click(button)
+    expect(screen.getByRole('dialog', { name: 'Command palette' })).toBeInTheDocument()
+  })
+
+  it('keeps profile, settings, theme, language and sign-out in the account menu', async () => {
+    renderLayout('/dashboard')
+    const trigger = screen.getByRole('button', { name: /^Account menu/ })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(trigger)
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile')
+    expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/settings')
+    expect(screen.getByRole('group', { name: 'Theme' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Language' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('link', { name: 'Profile' })).not.toBeInTheDocument()
+    expect(trigger).toHaveFocus()
+  })
+
+})
+
+describe('Layout new issue', () => {
+  it('creates an issue from the top bar and opens it when it belongs to another project', async () => {
+    createIssue.mockResolvedValue({ id: 55, project: 8, number: 3 })
+    renderLayout('/dashboard')
+    await userEvent.click(screen.getByRole('button', { name: 'New issue' }))
+    const project = await screen.findByLabelText('Project')
+    // Archived projects take no new work.
+    await waitFor(() => expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual(expect.arrayContaining(['Payments API', 'Docs Portal'])))
+    expect(screen.queryByRole('option', { name: 'Old Site' })).not.toBeInTheDocument()
+    await userEvent.selectOptions(project, '8')
+    await userEvent.type(screen.getByLabelText('Title'), 'Write the API docs')
+    await userEvent.click(screen.getByRole('button', { name: 'Create issue' }))
+    await waitFor(() => expect(screen.getByTestId('where')).toHaveTextContent('/issues/55'))
+    expect(createIssue.mock.calls[0][0]).toEqual(expect.objectContaining({ project: 8, title: 'Write the API docs' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it("stays on the project's page when the new issue belongs to it", async () => {
+    createIssue.mockResolvedValue({ id: 56, project: 7, number: 4 })
+    renderLayout('/projects/7/board')
+    await userEvent.click(screen.getByRole('button', { name: 'New issue' }))
+    await waitFor(() => expect(screen.getByLabelText('Project')).toHaveValue('7'))
+    await userEvent.type(screen.getByLabelText('Title'), 'Rate limit refunds')
+    await userEvent.click(screen.getByRole('button', { name: 'Create issue' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(screen.getByTestId('where')).toHaveTextContent('/projects/7/board')
   })
 })
 

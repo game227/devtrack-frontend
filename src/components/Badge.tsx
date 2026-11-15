@@ -1,38 +1,25 @@
 import { useT } from '../i18n'
+import { STATUS_COLOR } from '../lib/statusColors'
 import type { Priority, ProjectStatus } from '../types/project'
 import type { IssueStatus } from '../types/issue'
 import type { ProjectHealthStatus } from '../types/health'
 import type { PullRequestState } from '../types/integrations'
 
-const NEUTRAL = 'var(--color-subtle)'
-const SUCCESS = 'var(--color-success)'
-const WARNING = 'var(--color-warning)'
-const INFO = 'var(--color-info)'
-const DANGER = 'var(--color-danger)'
-const MERGED_VIOLET = 'var(--color-merged)'
+// Chips: a coloured dot for the state, the label in text colour (so it always reads at 4.5:1).
 
-const STATUS_COLORS: Record<ProjectStatus, string | null> = {
-  planned: NEUTRAL,
+const NEUTRAL = 'var(--color-st-backlog)'
+const SUCCESS = 'var(--color-success)'
+const WARNING = 'var(--color-st-progress)'
+const INFO = 'var(--color-st-todo)'
+const DANGER = 'var(--color-danger)'
+const MERGED = 'var(--color-merged)'
+
+const PROJECT_STATUS_COLORS: Record<ProjectStatus, string | null> = {
+  planned: INFO,
   active: SUCCESS,
   paused: WARNING,
-  completed: INFO,
+  completed: NEUTRAL,
   archived: null,
-}
-
-const ISSUE_STATUS_COLORS: Record<IssueStatus, string | null> = {
-  backlog: null,
-  todo: null,
-  in_progress: WARNING,
-  in_review: INFO,
-  done: SUCCESS,
-}
-
-const PRIORITY_COLORS: Record<Priority, string | null> = {
-  none: null,
-  low: null,
-  medium: WARNING,
-  high: DANGER,
-  urgent: DANGER,
 }
 
 const HEALTH_STATUS_COLORS: Record<ProjectHealthStatus, string> = {
@@ -43,18 +30,14 @@ const HEALTH_STATUS_COLORS: Record<ProjectHealthStatus, string> = {
 
 const PULL_REQUEST_STATE_COLORS: Record<'open' | 'closed' | 'merged', string> = {
   open: SUCCESS,
-  merged: MERGED_VIOLET,
+  merged: MERGED,
   closed: DANGER,
 }
 
-function Badge({ label, color }: { label: string; color: string | null }) {
-  const textColor = color ?? NEUTRAL
+function Chip({ label, color }: { label: string; color: string | null }) {
   return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs font-medium"
-      style={{ color: textColor }}
-    >
-      {color && <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />}
+    <span className="inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-surface px-2.5 text-xs font-semibold text-fg">
+      {color && <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />}
       {label}
     </span>
   )
@@ -62,26 +45,60 @@ function Badge({ label, color }: { label: string; color: string | null }) {
 
 export function StatusBadge({ status }: { status: ProjectStatus }) {
   const t = useT()
-  return <Badge label={t(`projectStatus.${status}`)} color={STATUS_COLORS[status]} />
+  return <Chip label={t(`projectStatus.${status}`)} color={PROJECT_STATUS_COLORS[status]} />
 }
 
 export function IssueStatusBadge({ status }: { status: IssueStatus }) {
   const t = useT()
-  return <Badge label={t(`status.${status}`)} color={ISSUE_STATUS_COLORS[status]} />
+  return <Chip label={t(`status.${status}`)} color={STATUS_COLOR[status]} />
 }
+
+// Priority as signal bars (one to three, urgent is a solid red chip). "No priority" shows nothing:
+// it is the absence of a signal, not one more label in every row.
+const PRIORITY_LEVEL: Record<Priority, number> = { none: 0, low: 1, medium: 2, high: 3, urgent: 3 }
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
   const t = useT()
-  return <Badge label={t(`priority.${priority}`)} color={PRIORITY_COLORS[priority]} />
+  if (priority === 'none') return null
+  const label = t(`priority.${priority}`)
+  if (priority === 'urgent') {
+    return (
+      <span className="inline-flex h-6 shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-danger px-2.5 text-xs font-bold text-bg">
+        <span aria-hidden="true">!</span>
+        {label}
+      </span>
+    )
+  }
+  const level = PRIORITY_LEVEL[priority]
+  const color = priority === 'high' ? 'var(--color-danger)' : priority === 'medium' ? WARNING : 'var(--color-fg-muted)'
+  return (
+    <span className="inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-fg-muted">
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+        {[0, 1, 2].map((bar) => (
+          <rect
+            key={bar}
+            x={1 + bar * 4}
+            y={8 - bar * 3}
+            width="2.5"
+            height={3 + bar * 3}
+            rx="0.75"
+            fill={bar < level ? color : 'var(--color-border-strong)'}
+            opacity={bar < level ? 1 : 0.45}
+          />
+        ))}
+      </svg>
+      {label}
+    </span>
+  )
 }
 
 export function HealthStatusBadge({ status }: { status: ProjectHealthStatus }) {
   const t = useT()
-  return <Badge label={t(`health.${status}`)} color={HEALTH_STATUS_COLORS[status]} />
+  return <Chip label={t(`health.${status}`)} color={HEALTH_STATUS_COLORS[status]} />
 }
 
 export function PullRequestStatusBadge({ state, merged }: { state: PullRequestState; merged: boolean }) {
   const t = useT()
   const effective = merged ? 'merged' : state
-  return <Badge label={t(`pr.${effective}`)} color={PULL_REQUEST_STATE_COLORS[effective]} />
+  return <Chip label={t(`pr.${effective}`)} color={PULL_REQUEST_STATE_COLORS[effective]} />
 }

@@ -14,9 +14,10 @@ import type { ProjectSpecialty } from '../types/project'
 import { Avatar } from './Avatar'
 import { ConfirmButton } from './ConfirmButton'
 import { FormField, formInputClass } from './FormField'
+import { button } from './ui'
 
 const compactSelect =
-  'rounded-md border border-border bg-bg px-2 py-1 text-xs text-fg-muted outline-none focus:border-fg'
+  'rounded-md border border-border-strong bg-surface px-2 py-1 text-xs text-fg transition-colors duration-150 hover:border-fg-muted'
 
 export function ProjectMembers({ projectId }: { projectId: number }) {
   const { t, lang } = useI18n()
@@ -73,19 +74,20 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
   )
 
   return (
-    <div>
-      <h2 className="mb-2 text-sm font-semibold text-fg">{t('common.members')}</h2>
+    <section aria-labelledby="project-members" className="@container">
+      <h2 id="project-members" className="mb-3 text-base font-bold text-fg">
+        {t('common.members')}
+      </h2>
       {membersQuery.isLoading && <p className="text-sm text-fg-muted">{t('project.membersLoading')}</p>}
-      <ul className="mb-3 flex flex-col gap-1">
+      <ul className="mb-4 divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
         {membersQuery.data?.map((member) => (
-          <li
-            key={member.id}
-            className="flex flex-col gap-2 rounded-2xl border border-border bg-bg-elevated px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3"
-          >
-            <span className="flex min-w-0 items-center gap-2 text-fg">
-              <Avatar name={member.user.username} src={member.user.avatar} size={20} />
-              <span className="truncate">{member.user.username}</span>
-              {member.role && <span className="shrink-0 whitespace-nowrap text-fg-muted">· {t(`role.${member.role}`)}</span>}
+          <li key={member.id} className="flex flex-col gap-2 px-4 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <span className="flex min-w-0 items-center gap-2.5 text-fg">
+              <Avatar name={member.user.username} src={member.user.avatar} size={26} />
+              <span className="min-w-0">
+                <span className="block truncate font-semibold">{member.user.username}</span>
+                {member.role && <span className="block text-xs text-fg-muted">{t(`role.${member.role}`)}</span>}
+              </span>
             </span>
             <span className="flex flex-wrap items-center gap-3 sm:shrink-0">
               <select
@@ -100,7 +102,7 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
               </select>
               <ConfirmButton
                 onConfirm={() => removeMutation.mutate(member.user.id)}
-                className="text-xs text-fg-muted transition-colors duration-150 hover:text-danger"
+                className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
               >
                 {t('common.remove')}
               </ConfirmButton>
@@ -110,14 +112,16 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
       </ul>
 
       {errors.non_field_errors && (
-        <p role="alert" className="mb-2 text-sm text-danger">
+        <p role="alert" className="mb-2 text-sm font-semibold text-danger">
           {errors.non_field_errors.join(' ')}
         </p>
       )}
-      <form onSubmit={handleAdd} className="flex max-w-xl flex-wrap items-end gap-2">
+      <form onSubmit={handleAdd} className="grid grid-cols-2 items-end gap-3 @xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+        <div className="col-span-2 @xl:col-span-1">
         <FormField label={t('common.username')} errors={errors.username}>
           <input className={formInputClass} value={username} onChange={(e) => setUsername(e.target.value)} required />
         </FormField>
+        </div>
         <FormField label={t('common.role')} errors={errors.role}>
           <select className={formInputClass} value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="member">{t('role.member')}</option>
@@ -136,11 +140,11 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
         <button
           type="submit"
           disabled={addMutation.isPending}
-          className="mb-0.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className={`col-span-2 @xl:col-span-1 ${button('primary')}`}
         >
           {t('common.add')}
         </button>
       </form>
-    </div>
+    </section>
   )
 }

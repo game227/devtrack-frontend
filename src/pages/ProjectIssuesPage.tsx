@@ -1,38 +1,36 @@
-import { useState } from 'react'
-import { SkeletonList } from '../components/Skeleton'
-import { EmptyState } from '../components/EmptyState'
-import type { FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createIssue, listIssues } from '../api/issues'
-import { FormField, formInputClass } from '../components/FormField'
-import { IssueRow } from '../components/IssueRow'
-import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useQuery } from '@tanstack/react-query'
+import { listIssues } from '../api/issues'
+import { EmptyState } from '../components/EmptyState'
+import { formInputClass } from '../components/FormField'
+import { Icon } from '../components/Icon'
+import { IssueList, IssueRow } from '../components/IssueRow'
+import { SkeletonList } from '../components/Skeleton'
+import { button, pageHeader, pageTitle } from '../components/ui'
+import { useNewIssue } from '../features/issues/newIssueContext'
 import { useI18n } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { IssueStatus, IssueType } from '../types/issue'
-import type { Priority } from '../types/project'
 
 const TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
-const PRIORITIES: Priority[] = ['none', 'low', 'medium', 'high', 'urgent']
 
 export function ProjectIssuesPage() {
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
-  const queryClient = useQueryClient()
+  const openNewIssue = useNewIssue()
 
   const [statusFilter, setStatusFilter] = useState<IssueStatus | ''>('')
   const [typeFilter, setTypeFilter] = useState<IssueType | ''>('')
   const [mineOnly, setMineOnly] = useState(false)
 
-  // `?new=1` (board empty state, the "C" shortcut) lands here with the create form already open.
+  // `?new=1` (the "New issue" links) lands here with the new-issue dialog open for this project.
   const [searchParams] = useSearchParams()
-  const [isFormOpen, setIsFormOpen] = useState(() => searchParams.get('new') === '1')
-  const [title, setTitle] = useState('')
-  const [type, setType] = useState<IssueType>('task')
-  const [priority, setPriority] = useState<Priority>('none')
-  const [errors, setErrors] = useState<FieldErrors>({})
+  const wantsNew = searchParams.get('new') === '1'
+  useEffect(() => {
+    if (wantsNew && Number.isFinite(projectId)) openNewIssue(projectId)
+  }, [wantsNew, projectId, openNewIssue])
 
   const issuesQuery = useQuery({
     queryKey: ['issues', projectId, statusFilter, typeFilter, mineOnly],
@@ -48,41 +46,20 @@ export function ProjectIssuesPage() {
     enabled: Number.isFinite(projectId),
   })
 
-  const createMutation = useMutation({
-    mutationFn: createIssue,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['issues', projectId] })
-      setIsFormOpen(false)
-      setTitle('')
-      setType('task')
-      setPriority('none')
-      setErrors({})
-    },
-    onError: (error) => setErrors(extractFieldErrors(error, lang)),
-  })
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault()
-    createMutation.mutate({ project: projectId, title, type, priority })
-  }
+  const filtered = Boolean(statusFilter || typeFilter || mineOnly)
+  const issues = issuesQuery.data ?? []
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">{t('issues.title')}</h1>
+      <div className={pageHeader}>
+        <h1 className={pageTitle}>{t('issues.title')}</h1>
         <div className="flex items-center gap-2">
-          <Link
-            to={`/projects/${projectId}/board`}
-            className="rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
-          >
+          <Link to={`/projects/${projectId}/board`} className={button('secondary')}>
             {t('nav.board')}
           </Link>
-          <button
-            type="button"
-            onClick={() => setIsFormOpen((open) => !open)}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
-          >
-            {isFormOpen ? t('common.cancel') : t('issues.new')}
+          <button type="button" onClick={() => openNewIssue(projectId)} className={button('primary')}>
+            <Icon name="plus" />
+            {t('issues.new')}
           </button>
         </div>
       </div>
@@ -114,77 +91,35 @@ export function ProjectIssuesPage() {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-1.5 text-fg-muted">
-          <input type="checkbox" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} />
+        <label className="flex h-9 cursor-pointer items-center gap-2 rounded-md px-2 font-semibold text-fg-muted hover:text-fg">
+          <input type="checkbox" className="h-4 w-4 accent-[var(--color-brand)]" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} />
           {t('issues.assignedToMe')}
         </label>
+        {issuesQuery.isSuccess && <span className="ml-auto text-sm text-fg-muted tabular">{t('issues.count', { count: issues.length })}</span>}
       </div>
-
-      {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
-          {errors.non_field_errors && (
-            <p role="alert" className="mb-3 text-sm text-danger">
-              {errors.non_field_errors.join(' ')}
-            </p>
-          )}
-          <div className="mb-3">
-            <FormField label={t('common.title')} errors={errors.title}>
-              <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </FormField>
-          </div>
-          <div className="mb-3 grid grid-cols-2 gap-2">
-            <FormField label={t('common.type')} errors={errors.type}>
-              <select className={formInputClass} value={type} onChange={(e) => setType(e.target.value as IssueType)}>
-                {TYPES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`issueType.${value}`)}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <FormField label={t('common.priority')} errors={errors.priority}>
-              <select
-                className={formInputClass}
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as Priority)}
-              >
-                {PRIORITIES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`priority.${value}`)}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-          </div>
-          <button
-            type="submit"
-            disabled={createMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-          >
-            {createMutation.isPending ? t('common.creating') : t('issues.create')}
-          </button>
-        </form>
-      )}
 
       {issuesQuery.isLoading && <SkeletonList count={4} />}
       {issuesQuery.isError && <p className="text-sm text-danger">{t('issues.loadFailed')}</p>}
-      {issuesQuery.data?.length === 0 &&
-        (statusFilter || typeFilter || mineOnly ? (
-          <p className="text-sm text-fg-muted">{t('issues.empty')}</p>
+      {issuesQuery.isSuccess &&
+        issues.length === 0 &&
+        (filtered ? (
+          <p className="rounded-xl border border-dashed border-border-strong px-4 py-6 text-sm text-fg-muted">{t('issues.empty')}</p>
         ) : (
-          !isFormOpen && (
-            <EmptyState
-              icon="issues"
-              title={t('empty.issues.title')}
-              description={t('empty.issues.desc')}
-              action={{ label: t('empty.issues.action'), onClick: () => setIsFormOpen(true) }}
-            />
-          )
+          <EmptyState
+            icon="issues"
+            title={t('empty.issues.title')}
+            description={t('empty.issues.desc')}
+            action={{ label: t('empty.issues.action'), onClick: () => openNewIssue(projectId) }}
+          />
         ))}
 
-      <div className="flex flex-col gap-2">
-        {issuesQuery.data?.map((issue) => <IssueRow key={issue.id} issue={issue} />)}
-      </div>
+      {issues.length > 0 && (
+        <IssueList label={t('issues.title')}>
+          {issues.map((issue) => (
+            <IssueRow key={issue.id} issue={issue} />
+          ))}
+        </IssueList>
+      )}
     </div>
   )
 }

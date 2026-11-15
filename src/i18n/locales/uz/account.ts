@@ -57,7 +57,7 @@ const uz: Record<string, string> = {
 
   'notFound.title': 'Sahifa topilmadi',
   'notFound.text': "Siz izlayotgan sahifa mavjud emas yoki ko'chirilgan.",
-  'notFound.home': "Boshqaruv paneliga o'tish",
+  'notFound.home': "Bosh sahifaga o'tish",
 }
 
 export default uz

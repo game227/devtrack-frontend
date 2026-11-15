@@ -15,15 +15,16 @@ interface BuildContext {
   toggleLanguage: () => void
   logout: () => void
   showShortcuts: () => void
+  // Opens the "New issue" dialog (for the current project, if one is open).
+  newIssue: () => void
 }
 
-// Where the "new issue" action goes: straight to the create form of the current project, or to the
-// projects list (where you pick one) when no project is open.
+// A link that opens the "New issue" dialog for a project (the project's issue list reads `?new=1`).
 export function newIssuePath(projectId: number | null): string {
-  return projectId === null ? '/projects' : `/projects/${projectId}/issues?new=1`
+  return projectId === null ? '/issues?new=1' : `/projects/${projectId}/issues?new=1`
 }
 
-export function buildCommands({ t, navigate, projectId, toggleLanguage, logout, showShortcuts }: BuildContext): Command[] {
+export function buildCommands({ t, navigate, projectId, toggleLanguage, logout, showShortcuts, newIssue }: BuildContext): Command[] {
   const go = (to: string) => () => navigate(to)
   const commands: Command[] = [
     { id: 'go-dashboard', group: 'navigate', label: t('cmdk.goDashboard'), shortcut: 'G D', run: go('/dashboard') },
@@ -48,7 +49,7 @@ export function buildCommands({ t, navigate, projectId, toggleLanguage, logout, 
   }
 
   commands.push(
-    { id: 'new-issue', group: 'create', label: t('cmdk.newIssue'), shortcut: 'C', run: go(newIssuePath(projectId)) },
+    { id: 'new-issue', group: 'create', label: t('cmdk.newIssue'), shortcut: 'C', run: newIssue },
     { id: 'new-project', group: 'create', label: t('cmdk.newProject'), run: go('/projects?new=1') },
     { id: 'shortcuts', group: 'other', label: t('cmdk.showShortcuts'), shortcut: '?', run: showShortcuts },
     { id: 'language', group: 'other', label: t('cmdk.toggleLanguage'), run: toggleLanguage },

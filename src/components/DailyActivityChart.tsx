@@ -41,7 +41,7 @@ export function DailyActivityChart({ data }: { data: DailyActivity[] }) {
                       {day.count}
                     </span>
                     <div
-                      className={`w-full rounded-t-md ${isToday ? 'bg-fg' : 'bg-fg/60'}`}
+                      className={`w-full rounded-t-[4px] ${isToday ? 'bg-brand' : 'bg-brand/45'}`}
                       style={{ height: `${Math.max(heightPercent, 8)}%` }}
                     />
                   </>

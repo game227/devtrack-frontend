@@ -4,9 +4,8 @@ import { disableTwoFactor, enableTwoFactor, setupTwoFactor } from '../api/auth'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import { FormField, formInputClass } from './FormField'
+import { button } from './ui'
 
-const buttonClass =
-  'rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg disabled:opacity-50'
 
 type Step = 'idle' | 'password' | 'scan' | 'codes' | 'disable'
 
@@ -66,24 +65,24 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
   const general = errors.detail ?? errors.non_field_errors
 
   return (
-    <section aria-labelledby="two-factor-title" className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5">
-      <h2 id="two-factor-title" className="text-sm font-semibold text-fg">
+    <section aria-labelledby="two-factor-title" className="space-y-4 rounded-xl border border-border bg-surface p-5">
+      <h2 id="two-factor-title" className="flex items-center gap-2 text-base font-bold text-fg">
         {t('twoFactor.title')}
       </h2>
       <p className="text-sm text-fg-muted">{t(enabled ? 'twoFactor.on' : 'twoFactor.off')}</p>
       {general && (
-        <p role="alert" className="text-sm text-danger">
+        <p role="alert" className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
           {general.join(' ')}
         </p>
       )}
 
       {step === 'idle' && !enabled && (
-        <button type="button" className={buttonClass} onClick={() => reset('password')}>
+        <button type="button" className={button('primary')} onClick={() => reset('password')}>
           {t('twoFactor.enable')}
         </button>
       )}
       {step === 'idle' && enabled && (
-        <button type="button" className={buttonClass} onClick={() => reset('disable')}>
+        <button type="button" className={button('danger')} onClick={() => reset('disable')}>
           {t('twoFactor.disable')}
         </button>
       )}
@@ -94,8 +93,8 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
             <input type="password" className={formInputClass} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
           </FormField>
           <div className="flex gap-2">
-            <button type="submit" disabled={busy} className={buttonClass}>{t('twoFactor.continue')}</button>
-            <button type="button" className={buttonClass} onClick={() => reset()}>{t('common.cancel')}</button>
+            <button type="submit" disabled={busy} className={button('primary')}>{t('twoFactor.continue')}</button>
+            <button type="button" className={button('secondary')} onClick={() => reset()}>{t('common.cancel')}</button>
           </div>
         </form>
       )}
@@ -103,18 +102,18 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
       {step === 'scan' && secret && (
         <form onSubmit={confirm} className="space-y-3">
           <p className="text-sm text-fg-muted">{t('twoFactor.scanHint')}</p>
-          <p className="break-all rounded-md border border-border-strong px-3 py-2 font-mono text-sm text-fg" aria-label={t('twoFactor.secretLabel')}>
+          <p className="break-all rounded-lg bg-well px-3 py-2 font-mono text-sm text-fg" aria-label={t('twoFactor.secretLabel')}>
             {secret.secret.match(/.{1,4}/g)?.join(' ')}
           </p>
-          <a href={secret.otpauth_uri} className="text-sm text-accent hover:underline">
+          <a href={secret.otpauth_uri} className="text-sm font-semibold text-accent hover:underline">
             {t('twoFactor.openInApp')}
           </a>
           <FormField label={t('auth.otp')} errors={errors.code}>
             <input className={formInputClass} value={code} onChange={(e) => setCode(e.target.value)} autoComplete="one-time-code" inputMode="numeric" required />
           </FormField>
           <div className="flex gap-2">
-            <button type="submit" disabled={busy} className={buttonClass}>{t('twoFactor.confirm')}</button>
-            <button type="button" className={buttonClass} onClick={() => reset()}>{t('common.cancel')}</button>
+            <button type="submit" disabled={busy} className={button('primary')}>{t('twoFactor.confirm')}</button>
+            <button type="button" className={button('secondary')} onClick={() => reset()}>{t('common.cancel')}</button>
           </div>
         </form>
       )}
@@ -122,12 +121,12 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
       {step === 'codes' && (
         <div className="space-y-3">
           <p role="status" className="text-sm text-fg">{t('twoFactor.codesHint')}</p>
-          <ul aria-label={t('twoFactor.codesLabel')} className="grid grid-cols-2 gap-1 font-mono text-sm text-fg">
+          <ul aria-label={t('twoFactor.codesLabel')} className="grid grid-cols-2 gap-x-4 gap-y-1.5 rounded-lg bg-well p-4 font-mono text-sm text-fg">
             {recoveryCodes.map((recovery) => (
               <li key={recovery}>{recovery}</li>
             ))}
           </ul>
-          <button type="button" className={buttonClass} onClick={() => { setRecoveryCodes([]); reset() }}>
+          <button type="button" className={button('primary')} onClick={() => { setRecoveryCodes([]); reset() }}>
             {t('twoFactor.savedThem')}
           </button>
         </div>
@@ -142,8 +141,8 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
             <input className={formInputClass} value={code} onChange={(e) => setCode(e.target.value)} autoComplete="one-time-code" required />
           </FormField>
           <div className="flex gap-2">
-            <button type="submit" disabled={busy} className={buttonClass}>{t('twoFactor.disable')}</button>
-            <button type="button" className={buttonClass} onClick={() => reset()}>{t('common.cancel')}</button>
+            <button type="submit" disabled={busy} className={button('danger')}>{t('twoFactor.disable')}</button>
+            <button type="button" className={button('secondary')} onClick={() => reset()}>{t('common.cancel')}</button>
           </div>
         </form>
       )}

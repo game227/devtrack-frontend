@@ -44,7 +44,7 @@ describe('ProjectHealthCard', () => {
       // Each label is on its factor row and again inside the (collapsed) breakdown.
       expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1)
     }
-    expect(screen.getByText('· 31%')).toBeInTheDocument()
+    expect(screen.getByText('(31%)')).toBeInTheDocument()
   })
 
   it('says why a factor is not applicable instead of showing a fake number', async () => {
@@ -52,7 +52,7 @@ describe('ProjectHealthCard', () => {
     renderCard()
     // Shown on the factor's row and again in the (collapsed) breakdown.
     expect((await screen.findAllByText('No issues have a due date.')).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('No score').length).toBeGreaterThanOrEqual(1)
   })
 
   it('colours a bar by its score, matching the status thresholds', async () => {
@@ -61,8 +61,8 @@ describe('ProjectHealthCard', () => {
     await screen.findByText('72')
     const bars = [...container.querySelectorAll<HTMLElement>('[style*="width"]')]
     const byWidth = Object.fromEntries(bars.map((bar) => [bar.style.width, bar.className]))
-    expect(byWidth['100%']).toContain('bg-success')
-    expect(byWidth['55%']).toContain('bg-warning')
+    expect(byWidth['100%']).toContain('bg-st-done')
+    expect(byWidth['55%']).toContain('bg-st-progress')
     expect(byWidth['40%']).toContain('bg-danger')
   })
 
