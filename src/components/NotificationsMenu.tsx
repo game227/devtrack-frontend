@@ -22,7 +22,7 @@ export function NotificationsMenu() {
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
     queryFn: listNotifications,
-    refetchInterval: 30000,
+    // No polling of its own: the layout's live updates mark it stale when something new arrives.
   })
 
   const markReadMutation = useMutation({

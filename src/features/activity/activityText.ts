@@ -9,6 +9,12 @@ function statusLabel(t: T, value: unknown): string {
   return label === key ? String(value) : label
 }
 
+function roleLabel(t: T, value: unknown): string {
+  const key = `members.role.${String(value)}`
+  const label = t(key)
+  return label === key ? String(value) : label
+}
+
 // One sentence per activity, without the actor ("<actor> " is rendered separately).
 export function describeActivity(activity: Activity, t: T): string {
   const target = activity.target_display ?? ''
@@ -31,6 +37,19 @@ export function describeActivity(activity: Activity, t: T): string {
         pr: String(activity.metadata.pr_number ?? ''),
         to: statusLabel(t, activity.metadata.to),
       })
+    case 'member_joined':
+      return t('activity.member_joined', { role: roleLabel(t, activity.metadata.role) })
+    case 'member_left':
+      return t('activity.member_left')
+    case 'member_removed':
+      return t('activity.member_removed', { user: String(activity.metadata.user ?? '') })
+    case 'role_changed':
+      return t('activity.role_changed', {
+        user: String(activity.metadata.user ?? ''),
+        role: roleLabel(t, activity.metadata.role).toLowerCase(),
+      })
+    case 'ownership_transferred':
+      return t('activity.ownership_transferred', { user: String(activity.metadata.user ?? '') })
     default:
       return activity.verb
   }
@@ -39,5 +58,6 @@ export function describeActivity(activity: Activity, t: T): string {
 export function activityLink(activity: Activity): string | null {
   if (activity.target_type === 'issue') return `/issues/${activity.target_id}`
   if (activity.target_type === 'project') return `/projects/${activity.target_id}`
+  if (activity.target_type === 'workspace') return '/members'
   return null
 }

@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useMatch, useNavigate } from 'react-route
 import { useQuery } from '@tanstack/react-query'
 import { getProject } from '../api/projects'
 import { useAuth } from '../features/auth/authContext'
+import { useLiveUpdates } from '../features/live/useLiveUpdates'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { buildCommands, newIssuePath } from '../features/shortcuts/commands'
 import { handleShortcut } from '../features/shortcuts/shortcuts'
@@ -30,6 +31,7 @@ const MAIN_NAV: NavItem[] = [
   { to: '/projects', labelKey: 'nav.projects', icon: 'projects' },
   { to: '/issues', labelKey: 'nav.issues', icon: 'issues' },
   { to: '/teams', labelKey: 'nav.teams', icon: 'teams' },
+  { to: '/members', labelKey: 'nav.members', icon: 'profile' },
 ]
 
 const PROJECT_NAV: Array<{ path: string; labelKey: string; icon: IconName; end?: boolean }> = [
@@ -122,6 +124,8 @@ export function Layout() {
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [openPalette])
+
+  useLiveUpdates(currentWorkspace?.id)
 
   // Every page is called "DevTrack" otherwise, so tabs, history and screen readers cannot tell them apart
   // (WCAG 2.4.2). The page's own <h1> names it; it is read from the DOM because most headings appear only

@@ -4,6 +4,11 @@ const en: Record<string, string> = {
   'activity.moved_issue': 'moved {target} from {from} to {to}',
   'activity.commented': 'commented: "{target}"',
   'activity.pr_merged': 'merged PR #{pr} — {target} moved to {to}',
+  'activity.member_joined': 'joined as {role}',
+  'activity.member_left': 'left the workspace',
+  'activity.member_removed': 'removed {user} from the workspace',
+  'activity.role_changed': 'made {user} {role}',
+  'activity.ownership_transferred': 'made {user} the owner',
 
   'dashboard.title': 'Dashboard',
   'dashboard.greeting': 'Hi {name} — here is what needs you today.',

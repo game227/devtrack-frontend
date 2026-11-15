@@ -67,6 +67,7 @@ const en: Record<string, string> = {
   'nav.issues': 'Issues',
   'nav.cycles': 'Cycles',
   'nav.teams': 'Teams',
+  'nav.members': 'Members',
   'nav.analytics': 'Analytics',
   'nav.settings': 'Settings',
   'nav.profile': 'Profile',

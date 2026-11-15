@@ -67,6 +67,7 @@ const uz: Record<string, string> = {
   'nav.issues': 'Vazifalar',
   'nav.cycles': 'Sikllar',
   'nav.teams': 'Jamoalar',
+  'nav.members': "A'zolar",
   'nav.analytics': 'Tahlil',
   'nav.settings': 'Sozlamalar',
   'nav.profile': 'Profil',

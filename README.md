@@ -56,6 +56,19 @@ is for cards and dividers only. `formInputClass` already does this.
 - Interactive targets are at least 24×24 px. Anything draggable also has a keyboard/touch alternative
   (the board's per-card status picker).
 
+## Live updates
+
+`Layout` calls `useLiveUpdates(workspaceId)` (`src/features/live`). While the tab is visible it asks
+`GET /changes/?workspace=&since=` every 10 s; the answer names the areas that changed (issues, projects,
+members, notifications, invitations) and only the matching TanStack queries are refetched. A hidden tab
+stops asking and catches up when it comes back. Failed checks are ignored; the next one retries.
+
+## Members
+
+`/members` (`WorkspaceMembersPage`) lists the workspace's people and pending invitations. What each role
+may do is in `src/features/workspace/memberRules.ts`, mirroring the backend's
+`apps/workspaces/membership.py`; the server enforces it either way.
+
 ## Structure
 
 ```

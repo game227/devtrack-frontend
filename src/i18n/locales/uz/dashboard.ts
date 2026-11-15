@@ -4,6 +4,11 @@ const uz: Record<string, string> = {
   'activity.moved_issue': '{target} vazifasini "{from}" holatidan "{to}" holatiga o\'tkazdi',
   'activity.commented': 'izoh qoldirdi: "{target}"',
   'activity.pr_merged': 'PR #{pr} birlashtirildi — {target} "{to}" holatiga o\'tdi',
+  'activity.member_joined': '{role} sifatida qo\'shildi',
+  'activity.member_left': 'ish maydonidan chiqdi',
+  'activity.member_removed': '{user}ni ish maydonidan chiqardi',
+  'activity.role_changed': '{user}ni {role} qildi',
+  'activity.ownership_transferred': '{user}ni ega qildi',
 
   'dashboard.title': 'Boshqaruv paneli',
   'dashboard.greeting': "Salom, {name} — bugun sizdan nimalar kutilmoqda.",

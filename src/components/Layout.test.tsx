@@ -10,6 +10,7 @@ import type { Workspace } from '../types/workspace'
 
 vi.mock('../api/projects', () => ({ getProject: vi.fn().mockResolvedValue({ id: 7, name: 'Payments API' }) }))
 vi.mock('../api/search', () => ({ search: vi.fn() }))
+vi.mock('../api/changes', () => ({ getChanges: vi.fn().mockResolvedValue({ cursor: 'c', changed: [] }) }))
 vi.mock('../api/notifications', () => ({
   listNotifications: vi.fn().mockResolvedValue([]),
   markAllNotificationsRead: vi.fn(),
