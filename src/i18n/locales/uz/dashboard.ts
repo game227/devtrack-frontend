@@ -11,7 +11,10 @@ const uz: Record<string, string> = {
   'activity.ownership_transferred': '{user}ni ega qildi',
 
   'dashboard.title': 'Bosh sahifa',
-  'dashboard.greeting': 'Salom, {name}. Mana sizga tegishli ishlar.',
+  'dashboard.greeting.morning': "Xayrli tong, {name}. Mana sizga tegishli ishlar.",
+  'dashboard.greeting.day': "Xayrli kun, {name}. Mana sizga tegishli ishlar.",
+  'dashboard.greeting.evening': "Xayrli kech, {name}. Mana sizga tegishli ishlar.",
+  'dashboard.greeting.night': "Kech bo'lib qoldi, {name}. Mana sizga tegishli ishlar.",
   'dashboard.doneThisWeek': '7 kunda bajarildi',
   'dashboard.showAllOpen': "Barcha ochiqlarini ko'rsatish",
   'dashboard.overdueCount': "{count} tasining muddati o'tgan",

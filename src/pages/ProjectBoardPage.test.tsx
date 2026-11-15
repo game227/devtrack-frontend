@@ -215,4 +215,29 @@ describe('ProjectBoardPage', () => {
 
     expect(await screen.findByText(/^Overdue/)).toBeInTheDocument()
   })
+
+  it('filters cards by title or #number and clears the filter', async () => {
+    listIssues.mockResolvedValue([
+      issue({ id: 41, number: 3, title: 'Rate limit charges' }),
+      issue({ id: 42, number: 4, title: 'Write docs', status: 'in_progress' }),
+    ])
+    renderBoard('en', currentUser())
+    const search = await screen.findByPlaceholderText('Find a card by title or #number')
+    await userEvent.type(search, 'docs')
+    expect(screen.queryByText('Rate limit charges')).not.toBeInTheDocument()
+    expect(screen.getByText('Write docs')).toBeInTheDocument()
+    await userEvent.clear(search)
+    await userEvent.type(search, '#3')
+    expect(screen.getByText('Rate limit charges')).toBeInTheDocument()
+    expect(screen.queryByText('Write docs')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: /Clear filters/ }))
+    expect(screen.getByText('Write docs')).toBeInTheDocument()
+  })
+
+  it("adds an issue straight into a column's station", async () => {
+    listIssues.mockResolvedValue([issue({ id: 43, title: 'Something' })])
+    renderBoard('en', currentUser())
+    await userEvent.click(await screen.findByRole('button', { name: 'Add an issue to In progress' }))
+    expect(openNewIssue).toHaveBeenCalledWith(7, 'in_progress')
+  })
 })

@@ -6,9 +6,13 @@ const en: Record<string, string> = {
   'shell.workspaceMenu': 'Workspace: {name}',
   'shell.workspaces': 'Your workspaces',
   'shell.manageMembers': 'Manage members',
+  'shell.open': 'Open',
+  'shell.live': 'Updates live',
   'shell.appearance': 'Appearance',
 
   'newIssue.title': 'New issue',
+  'newIssue.startsAt': 'Starts at',
+  'newIssue.created': 'Issue #{number} created',
   'newIssue.project': 'Project',
   'newIssue.noProjects': 'Issues belong to a project. Create one first, then add its issues.',
   'newIssue.createProject': 'Create a project',

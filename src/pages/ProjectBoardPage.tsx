@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { DragEvent } from 'react'
+import type { CSSProperties, DragEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { loadBoard, updateIssue } from '../api/issues'
@@ -14,11 +14,18 @@ import { button, pageHeader, pageTitle } from '../components/ui'
 import { useAuth } from '../features/auth/authContext'
 import { issueEditRights } from '../features/issues/permissions'
 import { useNewIssue } from '../features/issues/newIssueContext'
+import { useToast } from '../features/toast/toastContext'
+import { formInputClass } from '../components/FormField'
 import { STATUS_COLOR } from '../lib/statusColors'
 import { dueState } from '../lib/dueDate'
 import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
+
+const BURST = Array.from({ length: 10 }, (_, i) => {
+  const angle = (i / 10) * Math.PI * 2
+  return { dx: `${Math.round(Math.cos(angle) * 46)}px`, dy: `${Math.round(Math.sin(angle) * 34)}px`, color: Object.values(STATUS_COLOR)[i % 5] }
+})
 
 // A long-running project piles up finished work; only the most recently completed cards are shown
 // until the user asks for the rest, so the board stays about what is still moving.
@@ -34,6 +41,12 @@ export function ProjectBoardPage() {
   const [dragOverColumn, setDragOverColumn] = useState<IssueStatus | null>(null)
   const [draggingIssueId, setDraggingIssueId] = useState<number | null>(null)
   const [showAllDone, setShowAllDone] = useState(false)
+  const [query, setQuery] = useState('')
+  const [mineOnly, setMineOnly] = useState(false)
+  const [assigneeFilter, setAssigneeFilter] = useState<number | null>(null)
+  // The card that just moved lands with a glow (and a burst when it reached Done); keyed so it replays.
+  const [landed, setLanded] = useState<{ id: number; done: boolean; key: number } | null>(null)
+  const toast = useToast()
   const queryKey = ['issues', projectId, 'board', showAllDone ? 'all-done' : 'latest-done']
 
   const issuesQuery = useQuery({
@@ -44,8 +57,17 @@ export function ProjectBoardPage() {
   })
 
   const moveMutation = useMutation({
-    mutationFn: ({ issueId, status }: { issueId: number; status: IssueStatus }) =>
+    mutationFn: ({ issueId, status }: { issueId: number; status: IssueStatus; from?: IssueStatus; undo?: boolean }) =>
       updateIssue(issueId, { status }),
+    onSuccess: (updated, { from, undo }) => {
+      setLanded((previous) => ({ id: updated.id, done: updated.status === 'done', key: (previous?.key ?? 0) + 1 }))
+      if (undo || !from || from === updated.status) return
+      toast({
+        tone: 'info',
+        text: t('board.moved', { number: updated.number, status: t(`status.${updated.status}`) }),
+        action: { label: t('board.undo'), onClick: () => moveMutation.mutate({ issueId: updated.id, status: from, undo: true }) },
+      })
+    },
     onMutate: async ({ issueId, status }) => {
       await queryClient.cancelQueries({ queryKey })
       const previous = queryClient.getQueryData<BoardIssues>(queryKey)
@@ -87,8 +109,9 @@ export function ProjectBoardPage() {
     event.preventDefault()
     setDragOverColumn(null)
     const issueId = Number(event.dataTransfer.getData('text/plain'))
-    if (Number.isFinite(issueId)) {
-      moveMutation.mutate({ issueId, status })
+    const from = issuesQuery.data?.issues.find((issue) => issue.id === issueId)?.status
+    if (Number.isFinite(issueId) && from !== status) {
+      moveMutation.mutate({ issueId, status, from })
     }
   }
 
@@ -108,8 +131,19 @@ export function ProjectBoardPage() {
     return <p className="text-sm text-danger">{t('board.loadFailed')}</p>
   }
 
-  const issues = issuesQuery.data?.issues ?? []
+  const allIssues = issuesQuery.data?.issues ?? []
   const doneTotal = issuesQuery.data?.doneTotal ?? 0
+  const people = [...new Map(allIssues.filter((i) => i.assignee).map((i) => [i.assignee!.id, i.assignee!])).values()].sort((a, b) =>
+    a.username.localeCompare(b.username),
+  )
+  const needle = query.trim().toLowerCase().replace(/^#/, '')
+  const filtering = Boolean(needle || mineOnly || assigneeFilter !== null)
+  const issues = allIssues.filter(
+    (issue) =>
+      (!needle || issue.title.toLowerCase().includes(needle) || String(issue.number) === needle) &&
+      (!mineOnly || issue.assignee?.id === user?.id) &&
+      (assigneeFilter === null || issue.assignee?.id === assigneeFilter),
+  )
 
   return (
     <div>
@@ -126,7 +160,58 @@ export function ProjectBoardPage() {
         </div>
       </div>
 
-      {issues.length === 0 && (
+      {allIssues.length > 0 && (
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <label className="relative min-w-52 flex-1 sm:max-w-xs">
+            <span className="sr-only">{t('board.search')}</span>
+            <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t('board.search')}
+              className={`${formInputClass} mt-0! pl-9`}
+            />
+          </label>
+          <button type="button" aria-pressed={mineOnly} onClick={() => setMineOnly((v) => !v)} className={`${button(mineOnly ? 'primary' : 'secondary', 'md')}`}>
+            {t('board.mine')}
+          </button>
+          {people.length > 1 && (
+            <div role="group" aria-label={t('board.byAssignee')} className="flex items-center -space-x-1.5 pl-1">
+              {people.map((person) => (
+                <button
+                  key={person.id}
+                  type="button"
+                  aria-pressed={assigneeFilter === person.id}
+                  aria-label={person.username}
+                  title={person.username}
+                  onClick={() => setAssigneeFilter((current) => (current === person.id ? null : person.id))}
+                  className={`rounded-full ring-2 transition-transform duration-150 hover:z-10 hover:-translate-y-0.5 ${
+                    assigneeFilter === person.id ? 'z-10 ring-brand' : 'ring-bg'
+                  } ${assigneeFilter !== null && assigneeFilter !== person.id ? 'opacity-45' : ''}`}
+                >
+                  <Avatar name={person.username} src={person.avatar} size={30} />
+                </button>
+              ))}
+            </div>
+          )}
+          {filtering && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery('')
+                setMineOnly(false)
+                setAssigneeFilter(null)
+              }}
+              className="text-sm font-semibold text-accent hover:underline"
+            >
+              {t('board.clearFilters', { count: issues.length })}
+            </button>
+          )}
+        </div>
+      )}
+
+      {allIssues.length === 0 && (
         <EmptyState
           className="mb-6"
           icon="board"
@@ -142,7 +227,7 @@ export function ProjectBoardPage() {
         {ISSUE_STATUSES.map((status, columnIndex) => {
           const columnIssues = issues.filter((issue) => issue.status === status)
           const isDoneColumn = status === 'done'
-          const columnTotal = isDoneColumn ? Math.max(doneTotal, columnIssues.length) : columnIssues.length
+          const columnTotal = isDoneColumn && !filtering ? Math.max(doneTotal, columnIssues.length) : columnIssues.length
           const collapsed = isDoneColumn && !showAllDone && columnTotal > DONE_PREVIEW
           // Done is ordered most recently completed first whether collapsed or not, so expanding it only
           // appends older cards instead of reshuffling the ones already on screen.
@@ -191,9 +276,10 @@ export function ProjectBoardPage() {
                   const canEdit = issueEditRights(issue, user?.id) !== 'none'
                   const isOverdue = dueState(issue.due_date, issue.status) === 'overdue'
                   const isDone = issue.status === 'done'
+                  const justLanded = landed?.id === issue.id
                   return (
                     <div
-                      key={issue.id}
+                      key={justLanded ? `${issue.id}-${landed.key}` : issue.id}
                       draggable={canEdit}
                       onDragStart={canEdit ? (e) => handleDragStart(e, issue.id) : undefined}
                       onDragEnd={canEdit ? handleDragEnd : undefined}
@@ -202,8 +288,19 @@ export function ProjectBoardPage() {
                         isOverdue ? 'border-danger/50' : 'border-border'
                       } ${canEdit ? 'cursor-grab hover:border-border-strong hover:shadow-float active:cursor-grabbing' : ''} ${
                         draggingIssueId === issue.id ? 'opacity-40' : 'opacity-100'
-                      }`}
+                      } ${justLanded ? 'animate-land' : ''}`}
                     >
+                      {justLanded && landed.done && (
+                        <span aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-visible">
+                          {BURST.map((dot, i) => (
+                            <span
+                              key={i}
+                              className="burst-dot"
+                              style={{ backgroundColor: dot.color, '--dx': dot.dx, '--dy': dot.dy } as CSSProperties}
+                            />
+                          ))}
+                        </span>
+                      )}
                       <div className="mb-1.5 flex items-center justify-between gap-2">
                         <span className="font-mono text-xs text-fg-muted">#{issue.number}</span>
                         <PriorityBadge priority={issue.priority} />
@@ -244,7 +341,7 @@ export function ProjectBoardPage() {
                         <select
                           aria-label={t('board.moveTo')}
                           value={issue.status}
-                          onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus })}
+                          onChange={(e) => moveMutation.mutate({ issueId: issue.id, status: e.target.value as IssueStatus, from: issue.status })}
                           className="mt-2.5 w-full rounded-md border border-border-strong bg-surface px-2 py-1 text-xs text-fg md:sr-only md:focus:not-sr-only md:focus:w-full [@media(pointer:coarse)]:not-sr-only [@media(pointer:coarse)]:w-full"
                         >
                           {ISSUE_STATUSES.map((value) => (
@@ -257,7 +354,18 @@ export function ProjectBoardPage() {
                     </div>
                   )
                 })}
-                {isDoneColumn && columnTotal > DONE_PREVIEW && (
+                {!isDoneColumn && (
+                  <button
+                    type="button"
+                    onClick={() => openNewIssue(projectId, status)}
+                    aria-label={t('board.addTo', { status: t(`status.${status}`) })}
+                    className="flex items-center gap-1.5 rounded-lg border border-dashed border-transparent px-2 py-2 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:border-border-strong hover:bg-surface hover:text-fg"
+                  >
+                    <Icon name="plus" size={14} />
+                    {t('board.add')}
+                  </button>
+                )}
+                {isDoneColumn && !filtering && columnTotal > DONE_PREVIEW && (
                   <button
                     type="button"
                     onClick={() => setShowAllDone((current) => !current)}

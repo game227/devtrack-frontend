@@ -103,7 +103,7 @@ describe('DashboardPage focus block', () => {
     ])
     renderDashboard()
 
-    expect(await screen.findByText('Hi jane.dev. Here is your part of the work.')).toBeInTheDocument()
+    expect(await screen.findByText(/jane\.dev\. Here is your part of the work\.|jane\.dev\? Here is your part of the work\./)).toBeInTheDocument()
     // One station per status, each with how many of my issues sit there; Done counts the last 7 days.
     expect(await screen.findByRole('button', { name: 'Todo, 1' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'In progress, 1' })).toBeInTheDocument()

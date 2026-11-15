@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useT } from '../i18n'
 import type { Issue } from '../types/issue'
@@ -9,11 +9,11 @@ import { StatusTrack } from './Track'
 
 // One issue in a list: where it is on the line first, so a column of rows reads like a progress chart.
 // Rendered inside a <ul> (IssueList) whose rows are separated by hairlines.
-export function IssueRow({ issue }: { issue: Issue }) {
+export function IssueRow({ issue, index = 0 }: { issue: Issue; index?: number }) {
   const t = useT()
   const done = issue.status === 'done'
   return (
-    <li>
+    <li style={{ '--i': index } as CSSProperties}>
       <Link
         to={`/issues/${issue.id}`}
         className="group flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2.5 transition-colors duration-150 hover:bg-well sm:flex-nowrap"
@@ -66,7 +66,7 @@ export function IssueRow({ issue }: { issue: Issue }) {
 
 export function IssueList({ children, label }: { children: ReactNode; label?: string }) {
   return (
-    <ul aria-label={label} className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+    <ul aria-label={label} className="stagger divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
       {children}
     </ul>
   )

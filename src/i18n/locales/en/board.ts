@@ -1,4 +1,12 @@
 const en: Record<string, string> = {
+  'board.moved': "#{number} moved to {status}",
+  'board.mine': "Only mine",
+  'board.undo': "Undo",
+  'board.search': "Find a card by title or #number",
+  'board.byAssignee': "Show one person's cards",
+  'board.clearFilters': "Clear filters ({count} shown)",
+  'board.add': "Add issue",
+  'board.addTo': "Add an issue to {status}",
   'board.title': 'Board',
   'board.loading': 'Loading board…',
   'board.loadFailed': "Couldn't load the board. Is the backend running?",

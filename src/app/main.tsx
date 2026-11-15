@@ -6,6 +6,7 @@ import { AuthProvider } from '../features/auth/AuthContext'
 import { WorkspaceProvider } from '../features/workspace/WorkspaceContext'
 import { I18nProvider } from '../i18n'
 import { App } from './App'
+import { ToastProvider } from '../features/toast/ToastViewport'
 import { initTheme } from '../lib/theme'
 import { initSentry } from '../lib/sentry'
 // Self-hosted (no third-party font requests): Atkinson Hyperlegible Next for everything, its mono
@@ -26,7 +27,9 @@ createRoot(document.getElementById('root')!).render(
         <BrowserRouter>
           <AuthProvider>
             <WorkspaceProvider>
-              <App />
+              <ToastProvider>
+                <App />
+              </ToastProvider>
             </WorkspaceProvider>
           </AuthProvider>
         </BrowserRouter>

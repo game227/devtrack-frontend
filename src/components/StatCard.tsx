@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { CountUp } from './CountUp'
 interface StatCardProps {
   label: string
   value: number | string
@@ -14,7 +15,7 @@ export function StatCard({ label, value, tone }: StatCardProps) {
   const toneClass = tone && Number(value) > 0 ? TONE_CLASS[tone] : 'text-fg'
   return (
     <div className="min-w-0 bg-surface px-4 py-3">
-      <div className={`text-2xl font-extrabold tabular ${toneClass}`}>{value}</div>
+      <div className={`text-2xl font-extrabold tabular ${toneClass}`}>{typeof value === 'number' ? <CountUp value={value} /> : value}</div>
       <div className="mt-0.5 text-xs text-fg-muted">{label}</div>
     </div>
   )

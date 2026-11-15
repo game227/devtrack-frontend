@@ -8,7 +8,8 @@ import type { Workspace } from '../../types/workspace'
 
 const listProjects = vi.fn()
 vi.mock('../../api/projects', () => ({ listProjects: (...args: unknown[]) => listProjects(...args) }))
-vi.mock('../../api/issues', () => ({ createIssue: vi.fn() }))
+const createIssue = vi.fn()
+vi.mock('../../api/issues', () => ({ createIssue: (...args: unknown[]) => createIssue(...args) }))
 
 const workspace = { id: 3, name: 'Nova Labs' } as Workspace
 
@@ -40,5 +41,22 @@ describe('NewIssueDialog', () => {
     expect(screen.getByRole('button', { name: 'Create issue' })).toBeEnabled()
     await userEvent.keyboard('{Escape}')
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it('starts the issue at the station it was opened for', async () => {
+    listProjects.mockResolvedValue([{ id: 4, name: 'Payments API', status: 'active' }])
+    createIssue.mockResolvedValue({ id: 9, project: 4, number: 2 })
+    renderWithProviders(
+      <WorkspaceContext.Provider value={{ currentWorkspace: workspace, workspaces: [workspace], isLoading: false, selectWorkspace: () => {} }}>
+        <NewIssueDialog initialProjectId={4} initialStatus="in_review" onClose={vi.fn()} onCreated={vi.fn()} />
+      </WorkspaceContext.Provider>,
+      { lang: 'en' },
+    )
+    expect(await screen.findByRole('button', { name: 'In review' })).toHaveAttribute('aria-pressed', 'true')
+    await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
+    await userEvent.type(screen.getByLabelText('Title'), 'Ship it')
+    await userEvent.click(screen.getByRole('button', { name: 'Create issue' }))
+    await waitFor(() => expect(createIssue).toHaveBeenCalled())
+    expect(createIssue.mock.calls[0][0]).toEqual(expect.objectContaining({ project: 4, status: 'todo', title: 'Ship it' }))
   })
 })

@@ -48,6 +48,14 @@ export function NotificationsMenu() {
 
   const notifications = notificationsQuery.data ?? []
   const unreadCount = notifications.filter((n) => !n.is_read).length
+  // The bell rings once whenever the unread count goes up (not on the first load).
+  const seenUnread = useRef<number | null>(null)
+  const [ringKey, setRingKey] = useState(0)
+  useEffect(() => {
+    if (!notificationsQuery.isSuccess) return
+    if (seenUnread.current !== null && unreadCount > seenUnread.current) setRingKey((k) => k + 1)
+    seenUnread.current = unreadCount
+  }, [unreadCount, notificationsQuery.isSuccess])
 
   function notificationText(notification: AppNotification): string {
     const key = `notifications.${notification.verb}`
@@ -79,7 +87,7 @@ export function NotificationsMenu() {
         onClick={() => setIsOpen((open) => !open)}
         className={`relative ${iconButton()}`}
       >
-        <Icon name="bell" size={18} />
+        <Icon key={ringKey} name="bell" size={18} className={ringKey ? 'origin-top animate-ring' : undefined} />
         {unreadCount > 0 && (
           <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold leading-none text-bg ring-2 ring-bg">
             {unreadCount > 9 ? '9+' : unreadCount}

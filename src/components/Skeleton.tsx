@@ -1,5 +1,5 @@
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-well ${className}`} />
+  return <div className={`shimmer rounded-lg ${className}`} />
 }
 
 // A stack of row-shaped placeholders — what list pages show while their data loads, so the

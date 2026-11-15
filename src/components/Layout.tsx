@@ -11,7 +11,8 @@ import { buildCommands } from '../features/shortcuts/commands'
 import { handleShortcut } from '../features/shortcuts/shortcuts'
 import type { ShortcutState } from '../features/shortcuts/shortcuts'
 import { useI18n } from '../i18n'
-import type { Issue } from '../types/issue'
+import type { Issue, IssueStatus } from '../types/issue'
+import { useToast } from '../features/toast/toastContext'
 import { Avatar } from './Avatar'
 import { StatusBadge } from './Badge'
 import { CommandPalette } from './CommandPalette'
@@ -181,6 +182,8 @@ export function Layout() {
   const [helpOpen, setHelpOpen] = useState(false)
   // undefined: closed; null: open with no project chosen yet; a number: open for that project.
   const [newIssueFor, setNewIssueFor] = useState<number | null | undefined>(undefined)
+  const [newIssueStatus, setNewIssueStatus] = useState<IssueStatus | undefined>(undefined)
+  const toast = useToast()
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
   const projectMatch = useMatch({ path: '/projects/:id', end: false })
@@ -194,9 +197,10 @@ export function Layout() {
 
   const currentProjectId = inProject ? projectId : null
 
-  const openNewIssue = useCallback((project?: number | null) => {
+  const openNewIssue = useCallback((project?: number | null, status?: IssueStatus) => {
     setPaletteOpen(false)
     setHelpOpen(false)
+    setNewIssueStatus(status)
     setNewIssueFor(project ?? null)
   }, [])
 
@@ -204,8 +208,13 @@ export function Layout() {
     setNewIssueFor(undefined)
     void queryClient.invalidateQueries({ queryKey: ['issues'] })
     void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-    // On that project's own pages the new issue appears where you are; anywhere else, open it.
-    if (!pathname.startsWith(`/projects/${issue.project}`)) navigate(`/issues/${issue.id}`)
+    // On that project's own pages the new issue appears where you are (with a link to it); anywhere
+    // else, open it.
+    if (pathname.startsWith(`/projects/${issue.project}`)) {
+      toast({ text: t('newIssue.created', { number: issue.number }), action: { label: t('shell.open'), to: `/issues/${issue.id}` } })
+    } else {
+      navigate(`/issues/${issue.id}`)
+    }
   }
 
   const commands = useMemo(
@@ -370,6 +379,12 @@ export function Layout() {
                 <Icon name="plus" />
                 <span className="max-sm:sr-only">{t('issues.new')}</span>
               </button>
+              {/* What is on screen keeps itself current (useLiveUpdates); this says so. */}
+              <span title={t('shell.live')} className="relative hidden h-9 w-5 items-center justify-center sm:flex">
+                <span className="sr-only">{t('shell.live')}</span>
+                <span aria-hidden="true" className="live-ring absolute h-2 w-2 rounded-full bg-st-done" />
+                <span aria-hidden="true" className="relative h-2 w-2 rounded-full bg-st-done" />
+              </span>
               <NotificationsMenu />
               <UserMenu onShortcuts={() => setHelpOpen(true)} />
             </div>
@@ -379,7 +394,7 @@ export function Layout() {
         {menuOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <button type="button" aria-label={t('nav.closeMenu')} tabIndex={-1} onClick={() => setMenuOpen(false)} className="absolute inset-0 bg-scrim" />
-            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] animate-fade-in flex-col border-r border-border bg-surface shadow-float">
+            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] animate-slide-in-left flex-col border-r border-border bg-surface shadow-float">
               <div className="flex h-14 items-center justify-between border-b border-border px-3">
                 <Logo />
                 <button type="button" autoFocus aria-label={t('nav.closeMenu')} onClick={() => setMenuOpen(false)} className={iconButton()}>
@@ -466,7 +481,12 @@ export function Layout() {
         )}
         {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
         {newIssueFor !== undefined && (
-          <NewIssueDialog initialProjectId={newIssueFor} onClose={() => setNewIssueFor(undefined)} onCreated={issueCreated} />
+          <NewIssueDialog
+            initialProjectId={newIssueFor}
+            initialStatus={newIssueStatus}
+            onClose={() => setNewIssueFor(undefined)}
+            onCreated={issueCreated}
+          />
         )}
       </div>
     </NewIssueContext.Provider>

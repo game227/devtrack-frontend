@@ -11,7 +11,9 @@ import { button, iconButton, notice } from '../../components/ui'
 import { extractFieldErrors, type FieldErrors } from '../auth/errors'
 import { useWorkspace } from '../workspace/workspaceContext'
 import { useI18n } from '../../i18n'
-import type { Issue, IssueType } from '../../types/issue'
+import { ISSUE_STATUSES } from '../../types/issue'
+import type { Issue, IssueStatus, IssueType } from '../../types/issue'
+import { STATUS_COLOR } from '../../lib/statusColors'
 import type { Priority, ProjectStatus } from '../../types/project'
 
 const TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
@@ -22,10 +24,12 @@ const STATUS_ORDER: ProjectStatus[] = ['active', 'planned', 'paused', 'completed
 // after (stay on the project's page, or open the new issue).
 export function NewIssueDialog({
   initialProjectId,
+  initialStatus = 'backlog',
   onClose,
   onCreated,
 }: {
   initialProjectId: number | null
+  initialStatus?: IssueStatus
   onClose: () => void
   onCreated: (issue: Issue) => void
 }) {
@@ -37,6 +41,7 @@ export function NewIssueDialog({
   const [description, setDescription] = useState('')
   const [type, setType] = useState<IssueType>('task')
   const [priority, setPriority] = useState<Priority>('none')
+  const [status, setStatus] = useState<IssueStatus>(initialStatus)
   const [errors, setErrors] = useState<FieldErrors>({})
 
   const projectsQuery = useQuery({
@@ -59,7 +64,7 @@ export function NewIssueDialog({
   function submit(event: FormEvent) {
     event.preventDefault()
     if (projectId === null) return
-    createMutation.mutate({ project: projectId, title: title.trim(), description: description.trim(), type, priority })
+    createMutation.mutate({ project: projectId, title: title.trim(), description: description.trim(), type, priority, status })
   }
 
   const noProjects = projectsQuery.isSuccess && projects.length === 0
@@ -134,6 +139,26 @@ export function NewIssueDialog({
               </select>
             </FormField>
           </div>
+          {/* Where the issue starts on the line. */}
+          <fieldset>
+            <legend className="mb-1.5 text-sm font-semibold text-fg">{t('newIssue.startsAt')}</legend>
+            <div className="flex flex-wrap gap-1.5">
+              {ISSUE_STATUSES.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={status === value}
+                  onClick={() => setStatus(value)}
+                  className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors duration-150 ${
+                    status === value ? 'border-brand bg-brand-soft text-fg' : 'border-border bg-surface text-fg-muted hover:text-fg'
+                  }`}
+                >
+                  <span aria-hidden="true" className="h-2 w-2 rounded-full" style={{ backgroundColor: STATUS_COLOR[value] }} />
+                  {t(`status.${value}`)}
+                </button>
+              ))}
+            </div>
+          </fieldset>
           <div className="mt-1 flex justify-end gap-2">
             <button type="button" onClick={onClose} className={button('secondary')}>
               {t('common.cancel')}

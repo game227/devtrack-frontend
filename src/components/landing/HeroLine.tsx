@@ -20,7 +20,7 @@ const STATION_X = [10, 30, 50, 70, 90]
 
 function ExampleCard({ number, title, who }: { number: number; title: string; who: string }) {
   return (
-    <div className="w-full rounded-lg border border-border bg-surface p-3 text-left shadow-float">
+    <div className="w-full rounded-lg border border-border bg-surface p-3 text-left shadow-float transition-transform duration-200 hover:-translate-y-1">
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-xs text-fg-muted">#{number}</span>
         <Avatar name={who} size={20} />
@@ -42,7 +42,11 @@ export function HeroLine({ animated = true }: { animated?: boolean }) {
         <div className={`absolute left-[2%] right-[2%] top-[177px] h-[6px] origin-left rounded-full bg-brand ${animated ? 'line-draw' : ''}`} />
         {ISSUE_STATUSES.map((status, i) => (
           <div key={status} className="absolute top-[167px] flex -translate-x-1/2 flex-col items-center" style={{ left: `${STATION_X[i]}%` }}>
-            <span className="block h-[26px] w-[26px] rounded-full ring-[5px] ring-bg" style={{ backgroundColor: STATUS_COLOR[status] }} />
+            <span className="relative block h-[26px] w-[26px]">
+              {/* Work in progress is the one station that keeps moving. */}
+              {status === 'in_progress' && <span className="live-ring absolute inset-0 rounded-full" style={{ backgroundColor: STATUS_COLOR[status] }} />}
+              <span className="relative block h-[26px] w-[26px] rounded-full ring-[5px] ring-bg" style={{ backgroundColor: STATUS_COLOR[status] }} />
+            </span>
             <span className="mt-3 whitespace-nowrap text-sm font-bold text-fg">{t(`status.${status}`)}</span>
           </div>
         ))}

@@ -13,6 +13,7 @@ import { IssueList, IssueRow } from '../components/IssueRow'
 import { PendingInvitations } from '../components/PendingInvitations'
 import { Skeleton, SkeletonList } from '../components/Skeleton'
 import { TrackProgress } from '../components/Track'
+import { CountUp } from '../components/CountUp'
 import { pageHeader, pageLead, pageTitle, sectionTitle, textLink } from '../components/ui'
 import { useAuth } from '../features/auth/authContext'
 import { dueState } from '../lib/dueDate'
@@ -22,6 +23,14 @@ import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+function dayPart(at: number): 'morning' | 'day' | 'evening' | 'night' {
+  const hour = new Date(at).getHours()
+  if (hour >= 5 && hour < 12) return 'morning'
+  if (hour >= 12 && hour < 18) return 'day'
+  if (hour >= 18 && hour < 23) return 'evening'
+  return 'night'
+}
 
 // Your issues as the line itself: how many sit at each station, and a station is also a filter for
 // the list underneath. Done counts what you finished in the last seven days.
@@ -38,7 +47,7 @@ function MyLine({
   return (
     <div className="scroll-quiet -mx-1 overflow-x-auto px-1 pb-1">
       <ol className="relative grid min-w-[340px] grid-cols-5">
-        <span aria-hidden="true" className="absolute left-[10%] right-[10%] top-[47px] h-[3px] rounded-full bg-border" />
+        <span aria-hidden="true" className="absolute left-[10%] right-[10%] top-[47px] h-[3px] origin-left animate-grow-x rounded-full bg-border" />
         {ISSUE_STATUSES.map((station) => {
           const pressed = selected === station
           const label = station === 'done' ? t('dashboard.doneThisWeek') : t(`status.${station}`)
@@ -54,7 +63,7 @@ function MyLine({
                 }`}
               >
                 <span className={`h-9 text-[28px] font-extrabold leading-9 tabular ${counts[station] ? 'text-fg' : 'text-subtle'}`}>
-                  {counts[station]}
+                  <CountUp value={counts[station]} />
                 </span>
                 <span aria-hidden="true" className="flex h-6 items-center">
                   <span
@@ -97,7 +106,7 @@ export function DashboardPage() {
     <div className={pageHeader}>
       <div>
         <h1 className={pageTitle}>{t('dashboard.title')}</h1>
-        {user && <p className={pageLead}>{t('dashboard.greeting', { name: user.username })}</p>}
+        {user && <p className={pageLead}>{t(`dashboard.greeting.${dayPart(openedAt)}`, { name: user.username })}</p>}
       </div>
     </div>
   )
@@ -196,8 +205,8 @@ export function DashboardPage() {
             )}
             {shown.length > 0 && (
               <IssueList label={t('dashboard.myOpenIssues')}>
-                {shown.map((issue) => (
-                  <IssueRow key={issue.id} issue={issue} />
+                {shown.map((issue, index) => (
+                  <IssueRow key={issue.id} issue={issue} index={index} />
                 ))}
               </IssueList>
             )}

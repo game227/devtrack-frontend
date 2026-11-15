@@ -34,7 +34,7 @@ export function BarList({ rows, total }: BarListProps) {
             </span>
             <span className="h-2 overflow-hidden rounded-full bg-well">
               <span
-                className="block h-full rounded-full"
+                className="block h-full origin-left animate-grow-x rounded-full"
                 style={{ width: `${(row.value / max) * 100}%`, backgroundColor: row.color ?? 'var(--color-brand)' }}
               />
             </span>

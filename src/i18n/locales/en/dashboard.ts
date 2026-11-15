@@ -11,7 +11,10 @@ const en: Record<string, string> = {
   'activity.ownership_transferred': 'made {user} the owner',
 
   'dashboard.title': 'Dashboard',
-  'dashboard.greeting': 'Hi {name}. Here is your part of the work.',
+  'dashboard.greeting.morning': "Good morning, {name}. Here is your part of the work.",
+  'dashboard.greeting.day': "Good afternoon, {name}. Here is your part of the work.",
+  'dashboard.greeting.evening': "Good evening, {name}. Here is your part of the work.",
+  'dashboard.greeting.night': "Working late, {name}? Here is your part of the work.",
   'dashboard.doneThisWeek': 'Done in 7 days',
   'dashboard.showAllOpen': 'Show all open',
   'dashboard.overdueCount': '{count} overdue',

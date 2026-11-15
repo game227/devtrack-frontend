@@ -3,6 +3,7 @@ import { getProjectHealth } from '../api/health'
 import { useT } from '../i18n'
 import { HealthStatusBadge } from './Badge'
 import { Skeleton } from './Skeleton'
+import { CountUp } from './CountUp'
 import type { ProjectHealth, ProjectHealthBreakdownRow, ProjectHealthFactorKey } from '../types/health'
 
 const FACTORS: ProjectHealthFactorKey[] = ['task_progress', 'deadline', 'bug_rate', 'development_activity', 'flow']
@@ -54,7 +55,7 @@ function FactorRow({ health, factorKey }: { health: ProjectHealth; factorKey: Pr
         <p className="text-xs text-fg-muted">{t(`health.na.${factorKey}`)}</p>
       ) : (
         <div className="h-[6px] w-full overflow-hidden rounded-full bg-well">
-          <div className={`h-full rounded-full ${toneClass(score)}`} style={{ width: `${score}%` }} />
+          <div className={`h-full origin-left animate-grow-x rounded-full ${toneClass(score)}`} style={{ width: `${score}%` }} />
         </div>
       )}
     </div>
@@ -94,7 +95,7 @@ export function ProjectHealthCard({ projectId }: { projectId: number }) {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-4xl font-extrabold leading-none tracking-[-0.02em] text-fg tabular">
-            {health.score}
+            <CountUp value={health.score} />
             <span className="text-base font-bold text-fg-muted">/100</span>
           </span>
           <HealthStatusBadge status={health.status} />

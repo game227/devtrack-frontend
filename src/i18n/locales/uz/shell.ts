@@ -6,9 +6,13 @@ const uz: Record<string, string> = {
   'shell.workspaceMenu': 'Ish maydoni: {name}',
   'shell.workspaces': 'Ish maydonlaringiz',
   'shell.manageMembers': "A'zolarni boshqarish",
+  'shell.open': 'Ochish',
+  'shell.live': 'Jonli yangilanadi',
   'shell.appearance': "Ko'rinish",
 
   'newIssue.title': 'Yangi vazifa',
+  'newIssue.startsAt': 'Qaysi bekatdan boshlanadi',
+  'newIssue.created': '#{number} vazifa yaratildi',
   'newIssue.project': 'Loyiha',
   'newIssue.noProjects': "Vazifalar loyiha ichida bo'ladi. Avval loyiha yarating, keyin unga vazifa qo'shing.",
   'newIssue.createProject': 'Loyiha yaratish',

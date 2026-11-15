@@ -1,3 +1,4 @@
+import { useMounted } from '../hooks/useCountUp'
 import { useT } from '../i18n'
 import { STATUS_COLOR as STATION_COLOR } from '../lib/statusColors'
 import { ISSUE_STATUSES } from '../types/issue'
@@ -69,6 +70,7 @@ export function StatusStepper({
   const index = ISSUE_STATUSES.indexOf(status)
   const color = STATION_COLOR[status]
   const travelled = (index / (ISSUE_STATUSES.length - 1)) * 100
+  const mounted = useMounted()
   return (
     <fieldset aria-label={t('common.status')} disabled={disabled} className="min-w-0">
       <div className="relative">
@@ -76,8 +78,14 @@ export function StatusStepper({
         <div aria-hidden="true" className="absolute left-[10%] right-[10%] top-[11px] h-[3px] rounded-full bg-border" />
         <div
           aria-hidden="true"
-          className="absolute left-[10%] top-[11px] h-[3px] rounded-full transition-[width] duration-300"
-          style={{ width: `${travelled * 0.8}%`, backgroundColor: color }}
+          className="absolute left-[10%] top-[11px] h-[3px] rounded-full transition-[width,background-color] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
+          style={{ width: `${(mounted ? travelled : 0) * 0.8}%`, backgroundColor: color }}
+        />
+        {/* The "train": one marker that rides along the rail to the current station. */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-[3.5px] z-10 block h-[18px] w-[18px] -translate-x-1/2 rounded-full ring-4 ring-surface transition-[left,background-color] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
+          style={{ left: `${10 + (mounted ? index : 0) * 20}%`, backgroundColor: color }}
         />
         <ol className="relative grid grid-cols-5">
           {ISSUE_STATUSES.map((station, i) => {
@@ -94,12 +102,9 @@ export function StatusStepper({
                   {/* 25px high, so every marker — small or the larger current one — centres on the rail. */}
                   <span aria-hidden="true" className="flex h-[25px] items-center justify-center">
                     <span
-                      // A new key when a station becomes current replays its arrival.
-                      key={current ? `${station}-current` : station}
-                      className={`block rounded-full ${
-                        current
-                          ? 'h-[18px] w-[18px] animate-arrive ring-4 ring-surface'
-                          : 'h-[10px] w-[10px] ring-2 ring-surface transition-transform duration-150 group-enabled:group-hover:scale-125'
+                      // The current station's own dot hides under the train.
+                      className={`block h-[10px] w-[10px] rounded-full ring-2 ring-surface transition-transform duration-150 ${
+                        current ? 'opacity-0' : 'group-enabled:group-hover:scale-125'
                       }`}
                       style={{
                         backgroundColor: current || passed ? color : 'var(--color-surface)',
@@ -125,6 +130,7 @@ export function StatusStepper({
 // A progress line: the filled part ends in a station marker, the rest of the rail waits.
 export function TrackProgress({ percent, label, className = '' }: { percent: number; label: string; className?: string }) {
   const value = Math.max(0, Math.min(100, Math.round(percent)))
+  const shown = useMounted() ? value : 0
   return (
     <div
       role="progressbar"
@@ -135,10 +141,10 @@ export function TrackProgress({ percent, label, className = '' }: { percent: num
       className={`relative h-3 w-full ${className}`}
     >
       <div className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-border" />
-      <div className="absolute left-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-brand" style={{ width: `${value}%` }} />
+      <div className="absolute left-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-brand transition-[width] duration-700 ease-out" style={{ width: `${shown}%` }} />
       <div
-        className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand ring-2 ring-surface"
-        style={{ left: `${value}%` }}
+        className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand ring-2 ring-surface transition-[left] duration-700 ease-out"
+        style={{ left: `${shown}%` }}
       />
     </div>
   )
@@ -151,14 +157,14 @@ export function LogoMark({ size = 28 }: { size?: number }) {
       <line x1="3" y1="6" x2="24" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <circle cx="3.5" cy="6" r="2.5" fill="currentColor" />
       <circle cx="13.5" cy="6" r="2.5" fill="currentColor" />
-      <circle cx="23" cy="6" r="4.25" fill="var(--color-brand)" stroke="var(--color-bg)" strokeWidth="1.5" />
+      <circle cx="23" cy="6" r="4.25" fill="var(--color-brand)" stroke="var(--color-bg)" strokeWidth="1.5" className="origin-[23px_6px] transition-transform duration-300 group-hover/logo:scale-125" />
     </svg>
   )
 }
 
 export function Logo({ className = '' }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 text-[17px] font-extrabold tracking-[-0.02em] text-fg ${className}`}>
+    <span className={`group/logo inline-flex items-center gap-2 text-[17px] font-extrabold tracking-[-0.02em] text-fg ${className}`}>
       <LogoMark />
       DevTrack
     </span>

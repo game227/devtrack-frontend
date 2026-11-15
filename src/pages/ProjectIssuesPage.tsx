@@ -115,8 +115,8 @@ export function ProjectIssuesPage() {
 
       {issues.length > 0 && (
         <IssueList label={t('issues.title')}>
-          {issues.map((issue) => (
-            <IssueRow key={issue.id} issue={issue} />
+          {issues.map((issue, index) => (
+            <IssueRow key={issue.id} issue={issue} index={index} />
           ))}
         </IssueList>
       )}

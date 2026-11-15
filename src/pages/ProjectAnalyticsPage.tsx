@@ -34,7 +34,7 @@ function StatusLine({ issues }: { issues: Issue[] }) {
         {counts
           .filter(({ count }) => count > 0)
           .map(({ status, count }) => (
-            <span key={status} className="h-full" style={{ flexGrow: count, backgroundColor: STATUS_COLOR[status] }} />
+            <span key={status} className="h-full origin-left animate-grow-x" style={{ flexGrow: count, backgroundColor: STATUS_COLOR[status] }} />
           ))}
       </div>
     </div>
