@@ -1,5 +1,6 @@
 import { Link, Navigate } from 'react-router-dom'
 import { Avatar } from '../components/Avatar'
+import { ContactCircles, ContactList } from '../components/ContactLinks'
 import { Icon } from '../components/Icon'
 import type { IconName } from '../components/Icon'
 import { HeroDevice } from '../components/landing/HeroDevice'
@@ -106,6 +107,9 @@ export function LandingPage() {
             <a href="#start" className={navLink}>
               {t('landing.nav.start')}
             </a>
+            <a href="#contact" className={navLink}>
+              {t('contact.title')}
+            </a>
           </nav>
           <div className="flex items-center gap-1">
             <Link to="/login" className={`${button('ghost', 'sm')} max-sm:hidden`}>
@@ -172,7 +176,7 @@ export function LandingPage() {
                   className="h-24 w-44 object-cover object-left-top transition-transform duration-300 group-hover:scale-105"
                 />
               </a>
-              <CircleControls />
+              <ContactCircles />
             </div>
           </div>
           <HeroDevice />
@@ -233,6 +237,22 @@ export function LandingPage() {
           </div>
         </section>
 
+        <section id="contact" aria-labelledby="contact-title" className="scroll-mt-24 px-4 py-14 sm:px-6 lg:py-20">
+          <div className="mx-auto grid max-w-6xl items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+            <div>
+              <p className={badge}>
+                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-orange" />
+                {t('contact.title')}
+              </p>
+              <h2 id="contact-title" className="mt-5 text-[clamp(1.9rem,3.4vw,2.7rem)] font-medium leading-[1.08] tracking-[-0.04em]">
+                {t('landing.contactTitle')}
+              </h2>
+              <p className="mt-4 max-w-md text-[15px] leading-relaxed text-fg-muted">{t('contact.lead')}</p>
+            </div>
+            <ContactList />
+          </div>
+        </section>
+
         <section className="px-4 pb-20 pt-6 sm:px-6">
           {/* The closing call to action is the device's colour: ink, with light text. */}
           <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] bg-[linear-gradient(155deg,#2c2c2a_0%,#101010_45%,#050505_100%)] px-6 py-14 text-white shadow-[0_40px_80px_-40px_rgb(0_0_0/0.7)] sm:px-12 lg:py-20">
@@ -270,10 +290,13 @@ export function LandingPage() {
               {t('legal.footerTerms')}
             </Link>
           </div>
-          <span className="flex items-center gap-2 text-xs">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-orange" />
-            {t('landing.madeIn')}
-          </span>
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="flex items-center gap-2 text-xs">
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-orange" />
+              {t('landing.madeIn')}
+            </span>
+            <CircleControls />
+          </div>
         </div>
       </footer>
     </div>

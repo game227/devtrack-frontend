@@ -12,6 +12,7 @@ import {
 import { disconnectTelegram, getTelegramConnectionStatus, getTelegramDeepLink } from '../api/telegram'
 import { ConfirmButton } from '../components/ConfirmButton'
 import { Icon } from '../components/Icon'
+import { ContactList } from '../components/ContactLinks'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useI18n } from '../i18n'
 import { button, notice, pageTitle } from '../components/ui'
@@ -31,6 +32,16 @@ function Card({ title, icon, children }: { title: string; icon?: 'github' | 'sen
   )
 }
 
+function ContactCard() {
+  const { t } = useI18n()
+  return (
+    <Card title={t('contact.title')}>
+      <p className="mb-4 text-sm text-fg-muted">{t('contact.settingsHelp')}</p>
+      <ContactList />
+    </Card>
+  )
+}
+
 export function SettingsPage() {
   const { t } = useI18n()
   return (
@@ -39,6 +50,7 @@ export function SettingsPage() {
       <LanguageCard />
       <GithubConnectionCard />
       <TelegramConnectionCard />
+      <ContactCard />
     </div>
   )
 }

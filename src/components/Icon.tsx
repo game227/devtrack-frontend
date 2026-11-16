@@ -128,6 +128,20 @@ const PATHS = {
     </>
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="m4 7 8 6 8-6" />
+    </>
+  ),
+  phone: <path d="M6.6 3.5h2.6l1.4 4-2 1.3a12.6 12.6 0 0 0 6.6 6.6l1.3-2 4 1.4v2.6a2 2 0 0 1-2.2 2A17.2 17.2 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z" />,
+  instagram: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" />
+    </>
+  ),
   keyboard: (
     <>
       <rect x="2.5" y="6" width="19" height="12" rx="2" />

@@ -61,6 +61,7 @@ const en: Record<string, string> = {
   'landing.step.3.title': 'Work as usual',
   'landing.step.3.text': 'Mention issue numbers in commits and pull requests. DevTrack keeps the board up to date.',
 
+  'landing.contactTitle': "Talk to us",
   'landing.trustTitle': 'Careful with your accounts',
   'landing.trust.2fa': 'Two-factor sign-in with an authenticator app',
   'landing.trust.tokens': 'GitHub tokens encrypted at rest, webhooks checked by signature',

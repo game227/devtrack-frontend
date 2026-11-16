@@ -62,6 +62,7 @@ const uz: Record<string, string> = {
   'landing.step.3.title': 'Odatdagidek ishlang',
   'landing.step.3.text': "Commit va pull request'larda vazifa raqamlarini yozing. DevTrack doskani yangilab boradi.",
 
+  'landing.contactTitle': "Biz bilan bog'laning",
   'landing.trustTitle': 'Hisoblaringiz xavfsizligi',
   'landing.trust.2fa': 'Autentifikator ilovasi bilan ikki bosqichli kirish',
   'landing.trust.tokens': 'GitHub tokenlari shifrlangan, webhooklar imzo bilan tekshiriladi',
