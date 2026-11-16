@@ -1,4 +1,9 @@
 const en: Record<string, string> = {
+  'markdown.write': "Write",
+  'markdown.preview': "Preview",
+  'markdown.empty': "Nothing to preview yet.",
+  'markdown.hint': "Markdown works: **bold**, `code`, - lists, - [ ] tasks, [link](https://…)",
+  'issue.editDescription': "Edit description",
   'issue.loading': 'Loading issue…',
   'issue.loadFailed': "Couldn't load this issue.",
   'issue.backToIssues': '← Back to issues',

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useI18n } from '../i18n'
 import type { Comment } from '../types/comment'
 import { Avatar } from './Avatar'
+import { Markdown } from './Markdown'
 import { formInputClass } from './FormField'
 import { button } from './ui'
 
@@ -55,7 +56,7 @@ export function CommentThread({ queryKey, listComments, createComment }: Comment
                 <span className="font-bold text-fg">{comment.author.username}</span>
                 <span className="text-xs text-fg-muted">{formatDateTime(comment.created_at)}</span>
               </div>
-              <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-fg">{comment.body}</p>
+              <Markdown className="text-[15px] leading-relaxed text-fg">{comment.body}</Markdown>
             </div>
           </li>
         ))}
@@ -75,6 +76,7 @@ export function CommentThread({ queryKey, listComments, createComment }: Comment
           {t('comments.post')}
         </button>
       </form>
+      <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
     </section>
   )
 }

@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createProjectNote, deleteNote, listProjectNotes, updateNote } from '../api/notes'
 import { FormField, formInputClass } from '../components/FormField'
 import { ConfirmButton } from '../components/ConfirmButton'
+import { Markdown } from '../components/Markdown'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { Note } from '../types/note'
@@ -55,6 +56,7 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
           <FormField label={t('notes.body')} errors={errors.body}>
             <textarea className={formInputClass} value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
           </FormField>
+          <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -102,7 +104,7 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
           </ConfirmButton>
         </div>
       </div>
-      <p className="max-w-3xl whitespace-pre-wrap text-[15px] leading-relaxed text-fg">{note.body}</p>
+      <Markdown className="max-w-3xl text-[15px] leading-relaxed text-fg">{note.body}</Markdown>
     </article>
   )
 }
@@ -168,6 +170,7 @@ export function ProjectNotesPage() {
             <FormField label={t('notes.body')} errors={errors.body}>
               <textarea className={formInputClass} value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
             </FormField>
+            <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
           </div>
           <button
             type="submit"

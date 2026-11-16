@@ -1,4 +1,9 @@
 const uz: Record<string, string> = {
+  'markdown.write': "Yozish",
+  'markdown.preview': "Ko'rinishi",
+  'markdown.empty': "Hozircha ko'rsatadigan narsa yo'q.",
+  'markdown.hint': "Markdown ishlaydi: **qalin**, `kod`, - ro'yxat, - [ ] vazifa, [havola](https://…)",
+  'issue.editDescription': "Tavsifni tahrirlash",
   'issue.loading': 'Vazifa yuklanmoqda…',
   'issue.loadFailed': "Vazifani yuklab bo'lmadi.",
   'issue.backToIssues': '← Vazifalarga qaytish',

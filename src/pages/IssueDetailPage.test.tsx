@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import { screen } from '@testing-library/react'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -92,7 +93,8 @@ describe('IssueDetailPage — who can edit', () => {
     expect(screen.getByLabelText('Priority')).toBeEnabled()
     expect(screen.getByLabelText('Assignee')).toBeEnabled()
     expect(screen.getByLabelText('Due date')).toBeEnabled()
-    expect(screen.getByText('Some details')).toHaveClass('cursor-text')
+    expect(screen.getByText('Some details')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit description' })).toBeInTheDocument()
     expect(screen.queryByText('Only the person who created this issue, or the person it is assigned to, can change it.')).not.toBeInTheDocument()
     // The number shown is the issue's number within its project, not the global id in the URL.
     expect(screen.getByText('#12')).toBeInTheDocument()
@@ -113,7 +115,8 @@ describe('IssueDetailPage — who can edit', () => {
     expect(screen.getByLabelText('Assignee')).toBeDisabled()
     expect(screen.getByLabelText('Due date')).toBeDisabled()
     expect(screen.getByText(/It is assigned to you: you can update its status and priority/)).toBeInTheDocument()
-    expect(screen.getByText('Some details')).not.toHaveClass('cursor-text') // the description stays the creator's
+    // The description stays the creator's.
+    expect(screen.queryByRole('button', { name: 'Edit description' })).not.toBeInTheDocument()
   })
 
   it('shows the properties as read-only for anyone other than the creator', async () => {
@@ -125,10 +128,9 @@ describe('IssueDetailPage — who can edit', () => {
     expect(screen.getByLabelText('Assignee')).toBeDisabled()
     expect(screen.getByLabelText('Due date')).toBeDisabled()
     expect(screen.getAllByText('Only the person who created this issue, or the person it is assigned to, can change it.').length).toBeGreaterThan(0)
-    // The description is shown but isn't clickable-to-edit.
-    const description = screen.getByText('Some details')
-    expect(description).not.toHaveClass('cursor-text')
-    expect(description).toHaveAttribute('title', 'Only the person who created this issue, or the person it is assigned to, can change it.')
+    // The description is shown, with no way to edit it.
+    expect(screen.getByText('Some details')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit description' })).not.toBeInTheDocument()
   })
 
   it('offers a neutral empty-description message instead of "click to add" for read-only viewers', async () => {
@@ -144,5 +146,17 @@ describe('IssueDetailPage — who can edit', () => {
     renderIssue(null)
 
     expect(await screen.findByLabelText('Status')).toBeDisabled()
+  })
+
+  it('renders the description as Markdown and edits it with a preview', async () => {
+    getIssue.mockResolvedValue(issue({ description: '**Steps**\n\n1. Open the page' }))
+    renderIssue(currentUser({ id: 1 }))
+
+    expect((await screen.findByText('Steps')).tagName).toBe('STRONG')
+    await userEvent.click(screen.getByRole('button', { name: 'Edit description' }))
+    const box = screen.getByRole('textbox', { name: 'Description' })
+    expect(box).toHaveValue('**Steps**\n\n1. Open the page')
+    await userEvent.click(screen.getByRole('button', { name: 'Preview' }))
+    expect(screen.getAllByText('Open the page').length).toBeGreaterThan(0)
   })
 })

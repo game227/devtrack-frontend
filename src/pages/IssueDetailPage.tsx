@@ -11,6 +11,8 @@ import { Avatar } from '../components/Avatar'
 import { CommentThread } from '../components/CommentThread'
 import { formInputClass } from '../components/FormField'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
+import { Markdown } from '../components/Markdown'
+import { MarkdownField } from '../components/MarkdownField'
 import { StatusStepper } from '../components/Track'
 import { button, notice } from '../components/ui'
 import { useAuth } from '../features/auth/authContext'
@@ -131,19 +133,26 @@ export function IssueDetailPage() {
           </div>
 
           <section aria-labelledby="issue-description">
-            <h2 id="issue-description" className="mb-2 text-base font-bold text-fg">
-              {t('common.description')}
-            </h2>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <h2 id="issue-description" className="text-base font-bold text-fg">
+                {t('common.description')}
+              </h2>
+              {canEdit && !isEditingDescription && issue.description && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDescription(issue.description)
+                    setIsEditingDescription(true)
+                  }}
+                  className={button('ghost', 'sm')}
+                >
+                  {t('issue.editDescription')}
+                </button>
+              )}
+            </div>
             {isEditingDescription && canEdit ? (
-              <form onSubmit={handleSaveDescription} className="flex flex-col gap-3">
-                <textarea
-                  aria-label={t('common.description')}
-                  className={`${formInputClass} mt-0! text-[15px] leading-relaxed`}
-                  rows={6}
-                  defaultValue={issue.description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  autoFocus
-                />
+              <form onSubmit={handleSaveDescription} className="flex max-w-3xl flex-col gap-3">
+                <MarkdownField label={t('common.description')} value={description} onChange={setDescription} autoFocus />
                 <div className="flex gap-2">
                   <button type="submit" className={button('primary')}>
                     {t('common.save')}
@@ -153,23 +162,21 @@ export function IssueDetailPage() {
                   </button>
                 </div>
               </form>
-            ) : (
-              <p
-                onClick={
-                  canEdit
-                    ? () => {
-                        setDescription(issue.description)
-                        setIsEditingDescription(true)
-                      }
-                    : undefined
-                }
-                title={canEdit ? undefined : t('issue.notYours')}
-                className={`max-w-3xl whitespace-pre-wrap rounded-lg text-[15px] leading-relaxed ${issue.description ? 'text-fg' : 'text-fg-muted'} ${
-                  canEdit ? '-mx-2 cursor-text px-2 py-1 transition-colors duration-150 hover:bg-brand-soft/60' : ''
-                }`}
+            ) : issue.description ? (
+              <Markdown className="max-w-3xl text-[15px] leading-relaxed text-fg">{issue.description}</Markdown>
+            ) : canEdit ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setDescription('')
+                  setIsEditingDescription(true)
+                }}
+                className="-mx-2 rounded-lg px-2 py-1 text-left text-[15px] text-fg-muted transition-colors duration-150 hover:bg-brand-soft/60 hover:text-fg"
               >
-                {issue.description || t(canEdit ? 'issue.addDescription' : 'issue.noDescription')}
-              </p>
+                {t('issue.addDescription')}
+              </button>
+            ) : (
+              <p className="text-[15px] text-fg-muted">{t('issue.noDescription')}</p>
             )}
           </section>
 
