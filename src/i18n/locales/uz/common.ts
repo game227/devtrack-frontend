@@ -1,4 +1,8 @@
 const uz: Record<string, string> = {
+  'crash.title': "Bu sahifada nimadir noto'g'ri ketdi",
+  'crash.text': "Xato qayd etildi. Davom etish uchun sahifani qayta yuklang; ishingiz serverda saqlangan.",
+  'crash.reload': "Sahifani qayta yuklash",
+  'crash.retry': "Qayta urinish",
   'common.loading': 'Yuklanmoqda…',
   'common.save': 'Saqlash',
   'common.saving': 'Saqlanmoqda…',

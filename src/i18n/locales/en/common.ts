@@ -1,4 +1,8 @@
 const en: Record<string, string> = {
+  'crash.title': "Something went wrong on this page",
+  'crash.text': "The error has been noted. Reload the page to carry on; your work is saved on the server.",
+  'crash.reload': "Reload the page",
+  'crash.retry': "Try again",
   'common.loading': 'Loading…',
   'common.save': 'Save',
   'common.saving': 'Saving…',
