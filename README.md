@@ -119,7 +119,8 @@ then real screenshots from `public/screens/<lang>/` (`board`, `issue`, `analytic
 To regenerate them without touching your own data, seed a scratch database (`createdb
 devtrack_screens`, then `DATABASE_URL=…/devtrack_screens python manage.py migrate && python manage.py
 seed_demo`), run that backend, sign in as `jane.dev`/`demo1234` in the demo workspace, capture each page
-at 1440×900 in the light theme, and drop the database afterwards.
+at 1440×900 in the light theme, save them as WebP (`Image.open(png).save(webp, 'WEBP', quality=82, method=6)`
+with Pillow; about a third of the PNG size), and drop the database afterwards.
 
 ## CI
 

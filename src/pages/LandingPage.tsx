@@ -18,7 +18,7 @@ function Screenshot({ name, alt }: { name: string; alt: string }) {
     <figure className="relative">
       <span aria-hidden="true" className="corners pointer-events-none absolute -inset-3 [--corner-size:20px]" />
       <img
-        src={`/screens/${lang}/${name}.png`}
+        src={`/screens/${lang}/${name}.webp`}
         alt={alt}
         width={1440}
         height={900}
@@ -169,7 +169,7 @@ export function LandingPage() {
             <div className="mt-10 flex flex-wrap items-end gap-6">
               <a href="#board" aria-label={t('landing.seeBoard')} className="group block overflow-hidden rounded-xl border border-edge shadow-panel">
                 <img
-                  src={`/screens/${lang}/board.png`}
+                  src={`/screens/${lang}/board.webp`}
                   alt=""
                   width={176}
                   height={96}
