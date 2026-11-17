@@ -79,7 +79,7 @@ export function IssueRelations({ issueId, workspaceId, canChange }: { issueId: n
         <ul className="divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel">
           {relations.map((relation) => (
             <li key={relation.id} className="flex items-center gap-3 px-4 py-2.5 text-sm">
-              <span className="w-28 shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-fg-muted">{t(phrase(relation))}</span>
+              <span className="min-w-28 shrink-0 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.1em] text-fg-muted">{t(phrase(relation))}</span>
               <StationDot status={relation.other.status} />
               <Link to={`/issues/${relation.other.id}`} className="flex min-w-0 flex-1 items-baseline gap-2 hover:underline">
                 <span className="shrink-0 font-mono text-xs text-fg-muted">#{relation.other.number}</span>{' '}
