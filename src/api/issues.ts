@@ -1,6 +1,7 @@
 import { apiClient } from './client'
 import { getAllPages } from './pagination'
 import type { PaginatedResponse } from '../types/api'
+import { saveBlob } from './issueParts'
 import type { ListFilters, ListScope } from './savedViews'
 import type { CreateIssuePayload, Issue, IssueFilters, UpdateIssuePayload } from '../types/issue'
 
@@ -62,13 +63,6 @@ export async function exportIssues(scope: ListScope, filters: ListFilters, lang:
   })
   const disposition = String(response.headers['content-disposition'] ?? '')
   const filename = /filename="([^"]+)"/.exec(disposition)?.[1] ?? 'devtrack-issues.csv'
-  const url = URL.createObjectURL(response.data)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.append(link)
-  link.click()
-  link.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  saveBlob(response.data, filename)
   return filename
 }

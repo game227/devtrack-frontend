@@ -1,4 +1,12 @@
 const en: Record<string, string> = {
+  'attachments.title': 'Files',
+  'attachments.add': 'Attach a file',
+  'attachments.hint': 'or drop it here: images, PDF or text, up to 10 MB.',
+  'attachments.uploading': 'Uploading… {percent}%',
+  'attachments.tooBig': 'Files can be at most 10 MB.',
+  'attachments.download': 'Download {name}',
+  'attachments.remove': 'Remove {name}',
+  'attachments.someone': 'someone',
   'issue.estimate': 'Estimate',
   'issue.notEstimated': 'Not estimated',
   'issue.points': '{count} pt',

@@ -89,3 +89,13 @@ export interface IssueRelation {
   other: { id: number; number: number; title: string; status: IssueStatus; project: number }
   created_at: string
 }
+
+export interface IssueAttachment {
+  id: number
+  name: string
+  content_type: string
+  size: number
+  is_image: boolean
+  uploaded_by: UserBrief | null
+  created_at: string
+}

@@ -42,6 +42,9 @@ const uz: Record<string, string> = {
   'error.loadFailed': "Ma'lumotni yuklab bo'lmadi.",
   'error.viewNameTaken': "Bu nomdagi ko'rinish allaqachon bor.",
   'error.tooManyViews': "Har bir ro'yxatda ko'pi bilan {n} ta ko'rinish saqlash mumkin.",
+  'error.attachmentType': 'Faqat rasm (PNG, JPEG, GIF, WebP), PDF va oddiy matn fayllarini biriktirish mumkin.',
+  'error.attachmentSize': 'Fayl hajmi {n} MB dan oshmasligi kerak.',
+  'error.attachmentCount': "Bitta vazifaga ko'pi bilan {n} ta fayl biriktirish mumkin.",
 }
 
 export default uz

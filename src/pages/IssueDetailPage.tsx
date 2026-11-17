@@ -10,6 +10,7 @@ import { getProject, listProjectMembers } from '../api/projects'
 import { Avatar } from '../components/Avatar'
 import { CommentThread } from '../components/CommentThread'
 import { formInputClass } from '../components/FormField'
+import { IssueAttachments } from '../components/IssueAttachments'
 import { IssueChecklist } from '../components/IssueChecklist'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
 import { IssueRelations } from '../components/IssueRelations'
@@ -190,6 +191,16 @@ export function IssueDetailPage() {
           <IssueChecklist issueId={issueId} canChange={canUpdateProgress} />
 
           {currentWorkspace && <IssueRelations issueId={issueId} workspaceId={currentWorkspace.id} canChange={canUpdateProgress} />}
+
+          <IssueAttachments
+            issueId={issueId}
+            canDelete={(attachment) =>
+              attachment.uploaded_by?.id === user?.id ||
+              issue.reporter.id === user?.id ||
+              currentWorkspace?.my_role === 'owner' ||
+              currentWorkspace?.my_role === 'admin'
+            }
+          />
 
           <IssueGithubActivity issueId={issueId} />
 

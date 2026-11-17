@@ -1,4 +1,12 @@
 const uz: Record<string, string> = {
+  'attachments.title': 'Fayllar',
+  'attachments.add': 'Fayl biriktirish',
+  'attachments.hint': 'yoki shu yerga tashlang: rasm, PDF yoki matn, 10 MB gacha.',
+  'attachments.uploading': 'Yuklanmoqda… {percent}%',
+  'attachments.tooBig': 'Fayl hajmi 10 MB dan oshmasligi kerak.',
+  'attachments.download': '{name} faylini yuklab olish',
+  'attachments.remove': "{name} faylini o'chirish",
+  'attachments.someone': 'kimdir',
   'issue.estimate': 'Baho',
   'issue.notEstimated': 'Baholanmagan',
   'issue.points': '{count} ball',
