@@ -1,29 +1,26 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { listIssues } from '../api/issues'
 import { EmptyState } from '../components/EmptyState'
-import { formInputClass } from '../components/FormField'
 import { Icon } from '../components/Icon'
+import { IssueFilterBar } from '../components/IssueFilterBar'
 import { IssueList, IssueRow } from '../components/IssueRow'
 import { SkeletonList } from '../components/Skeleton'
 import { button, pageHeader, pageTitle } from '../components/ui'
 import { useNewIssue } from '../features/issues/newIssueContext'
+import { useIssueFilters } from '../features/issues/useIssueFilters'
+import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useI18n } from '../i18n'
-import { ISSUE_STATUSES } from '../types/issue'
-import type { IssueStatus, IssueType } from '../types/issue'
-
-const TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
+import type { IssueFilters } from '../types/issue'
 
 export function ProjectIssuesPage() {
   const { t } = useI18n()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
   const openNewIssue = useNewIssue()
-
-  const [statusFilter, setStatusFilter] = useState<IssueStatus | ''>('')
-  const [typeFilter, setTypeFilter] = useState<IssueType | ''>('')
-  const [mineOnly, setMineOnly] = useState(false)
+  const { currentWorkspace } = useWorkspace()
+  const { filters, setFilter, applyFilters, isFiltered } = useIssueFilters()
 
   // `?new=1` (the "New issue" links) lands here with the new-issue dialog open for this project.
   const [searchParams] = useSearchParams()
@@ -33,20 +30,11 @@ export function ProjectIssuesPage() {
   }, [wantsNew, projectId, openNewIssue])
 
   const issuesQuery = useQuery({
-    queryKey: ['issues', projectId, statusFilter, typeFilter, mineOnly],
-    queryFn: () =>
-      listIssues(
-        { project: projectId },
-        {
-          status: statusFilter || undefined,
-          type: typeFilter || undefined,
-          assignee: mineOnly ? 'me' : undefined,
-        },
-      ),
+    queryKey: ['issues', projectId, filters],
+    queryFn: () => listIssues({ project: projectId }, filters as IssueFilters),
     enabled: Number.isFinite(projectId),
   })
 
-  const filtered = Boolean(statusFilter || typeFilter || mineOnly)
   const issues = issuesQuery.data ?? []
 
   return (
@@ -64,45 +52,22 @@ export function ProjectIssuesPage() {
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-        <select
-          aria-label={t('issues.filterStatus')}
-          className={`${formInputClass} mt-0! w-auto!`}
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as IssueStatus | '')}
-        >
-          <option value="">{t('issues.allStatuses')}</option>
-          {ISSUE_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {t(`status.${s}`)}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label={t('issues.filterType')}
-          className={`${formInputClass} mt-0! w-auto!`}
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as IssueType | '')}
-        >
-          <option value="">{t('issues.allTypes')}</option>
-          {TYPES.map((value) => (
-            <option key={value} value={value}>
-              {t(`issueType.${value}`)}
-            </option>
-          ))}
-        </select>
-        <label className="flex h-9 cursor-pointer items-center gap-2 rounded-md px-2 font-semibold text-fg-muted hover:text-fg">
-          <input type="checkbox" className="h-4 w-4 accent-[var(--color-brand)]" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} />
-          {t('issues.assignedToMe')}
-        </label>
-        {issuesQuery.isSuccess && <span className="ml-auto text-sm text-fg-muted tabular">{t('issues.count', { count: issues.length })}</span>}
-      </div>
+      {currentWorkspace && Number.isFinite(projectId) && (
+        <IssueFilterBar
+          scope={{ project: projectId }}
+          workspaceId={currentWorkspace.id}
+          filters={filters}
+          onFilter={setFilter}
+          onApply={applyFilters}
+          count={issuesQuery.isSuccess ? issues.length : undefined}
+        />
+      )}
 
       {issuesQuery.isLoading && <SkeletonList count={4} />}
       {issuesQuery.isError && <p className="text-sm text-danger">{t('issues.loadFailed')}</p>}
       {issuesQuery.isSuccess &&
         issues.length === 0 &&
-        (filtered ? (
+        (isFiltered ? (
           <p className="rounded-xl border border-dashed border-border-strong px-4 py-6 text-sm text-fg-muted">{t('issues.empty')}</p>
         ) : (
           <EmptyState

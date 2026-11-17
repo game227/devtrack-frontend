@@ -40,6 +40,8 @@ const uz: Record<string, string> = {
   'error.ownerCannotBeRemoved': "Ish maydoni egasini olib tashlab bo'lmaydi.",
   'error.network': "Serverga ulanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.",
   'error.loadFailed': "Ma'lumotni yuklab bo'lmadi.",
+  'error.viewNameTaken': "Bu nomdagi ko'rinish allaqachon bor.",
+  'error.tooManyViews': "Har bir ro'yxatda ko'pi bilan {n} ta ko'rinish saqlash mumkin.",
 }
 
 export default uz

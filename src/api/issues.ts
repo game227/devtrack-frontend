@@ -1,6 +1,7 @@
 import { apiClient } from './client'
 import { getAllPages } from './pagination'
 import type { PaginatedResponse } from '../types/api'
+import type { ListFilters, ListScope } from './savedViews'
 import type { CreateIssuePayload, Issue, IssueFilters, UpdateIssuePayload } from '../types/issue'
 
 interface ListIssuesScope {
@@ -50,4 +51,24 @@ export async function getIssue(id: number): Promise<Issue> {
 export async function updateIssue(id: number, payload: UpdateIssuePayload): Promise<Issue> {
   const { data } = await apiClient.patch<Issue>(`/issues/${id}/`, payload)
   return data
+}
+
+// The list's issues (same scope and filters) as a CSV file, saved through a temporary link: the API
+// needs the bearer token, so a plain <a href> to the endpoint would not be authorised.
+export async function exportIssues(scope: ListScope, filters: ListFilters, lang: string): Promise<string> {
+  const response = await apiClient.get<Blob>('/issues/export/', {
+    params: { ...scope, ...filters, lang },
+    responseType: 'blob',
+  })
+  const disposition = String(response.headers['content-disposition'] ?? '')
+  const filename = /filename="([^"]+)"/.exec(disposition)?.[1] ?? 'devtrack-issues.csv'
+  const url = URL.createObjectURL(response.data)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.append(link)
+  link.click()
+  link.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+  return filename
 }

@@ -5,6 +5,8 @@ export type IssueType = 'task' | 'bug' | 'feature' | 'improvement' | 'chore'
 export type IssueStatus = 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'done'
 
 export const ISSUE_STATUSES: IssueStatus[] = ['backlog', 'todo', 'in_progress', 'in_review', 'done']
+export const ISSUE_TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
+export const ISSUE_PRIORITIES: Priority[] = ['none', 'low', 'medium', 'high', 'urgent']
 
 // The backend nests only id/name/color on an Issue (LabelBriefSerializer) —
 // not the full Label shape from types/label.ts (which includes workspace/project).
