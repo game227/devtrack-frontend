@@ -47,6 +47,7 @@ const RULES: Rule[] = [
   [/^This repository is already linked to another project\.?$/, 'error.repoAlreadyLinked'],
   [/^The workspace owner cannot be removed\.?$/, 'error.ownerCannotBeRemoved'],
   [/^You already have a view with this name\.?$/, 'error.viewNameTaken'],
+  [/^This is not available in the demo\.?$/, 'error.demoBlocked'],
   [/^Only images \(PNG, JPEG, GIF, WebP\), PDF and plain text files can be attached\.?$/, 'error.attachmentType'],
   [/^Files can be at most (\d+) MB\.?$/, 'error.attachmentSize', (m) => ({ n: m[1] })],
   [/^An issue can hold up to (\d+) files\.?$/, 'error.attachmentCount', (m) => ({ n: m[1] })],

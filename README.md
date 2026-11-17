@@ -33,6 +33,8 @@ npm run dev
 - Server error messages (DRF has no Uzbek catalog) are mapped to keys in `src/i18n/apiErrors.ts`;
   unknown messages are shown as sent. Uzbek dates are formatted by hand because browsers ship poor
   Uzbek date data.
+- `VITE_DEMO_ENABLED=true` (with `DEMO_ENABLED` on the API) adds "Try the demo" to the landing page and a
+  banner inside the app for demo accounts.
 - The language is stored in `localStorage` (`devtrack_lang`); the default is Uzbek. A test checks that
   every English key exists in Uzbek and Russian with the same `{placeholders}`. Russian dates use the
   browser's `ru-RU` data; the landing page shows the English screenshots to Russian visitors.

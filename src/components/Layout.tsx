@@ -24,6 +24,7 @@ import { ShortcutsHelp } from './ShortcutsHelp'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { Logo } from './Track'
 import { button, iconButton, kbd } from './ui'
+import { DemoBanner } from './DemoButton'
 
 const MAIN_NAV: Array<{ to: string; labelKey: string }> = [
   { to: '/dashboard', labelKey: 'nav.dashboard' },
@@ -472,6 +473,7 @@ export function Layout() {
         )}
 
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] px-4 py-7 outline-none lg:px-7 lg:py-9">
+          <DemoBanner />
           {/* Keyed by search too, so "?new=1" links remount the page and open its create form. */}
           <div key={pathname + search} className="animate-fade-in">
             <Outlet />

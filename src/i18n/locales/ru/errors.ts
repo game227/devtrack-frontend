@@ -45,6 +45,7 @@ const ru: Record<string, string> = {
   'error.attachmentType': 'Прикреплять можно только изображения (PNG, JPEG, GIF, WebP), PDF и текстовые файлы.',
   'error.attachmentSize': 'Размер файла — не больше {n} МБ.',
   'error.attachmentCount': 'К задаче можно прикрепить не больше {n} файлов.',
+  'error.demoBlocked': 'В демо это недоступно.',
 }
 
 export default ru

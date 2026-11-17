@@ -11,6 +11,8 @@ import { useTheme } from '../hooks/useTheme'
 import { LANGS, useI18n } from '../i18n'
 import type { Lang } from '../i18n'
 import { resolveTheme } from '../lib/theme'
+import { DEMO_ENABLED } from '../api/demo'
+import { DemoButton } from '../components/DemoButton'
 
 // A real product screenshot (regenerated with the design; see README), in a frosted frame.
 function Screenshot({ name, alt }: { name: string; alt: string }) {
@@ -173,6 +175,7 @@ export function LandingPage() {
               <a href="#board" className={`${button('secondary', 'lg')} rounded-xl`}>
                 {t('landing.ctaSecondary')}
               </a>
+              {DEMO_ENABLED && <DemoButton />}
             </div>
             <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-fg/15 bg-surface/40 py-1.5 pl-1.5 pr-5">
               <span className="flex -space-x-2">

@@ -1,4 +1,10 @@
 const en: Record<string, string> = {
+  'demo.try': 'Try the demo',
+  'demo.starting': 'Preparing the demo…',
+  'demo.busy': 'The demo is busy right now. Try again in a little while.',
+  'demo.failed': "Couldn't start the demo. Please try again.",
+  'demo.banner': 'You are in a demo: everything here is sample data and is deleted within a day. Inviting people, GitHub, Telegram and uploads are off.',
+  'demo.signUp': 'Create your own account',
   'landing.nav.board': 'Board',
   'landing.nav.github': 'GitHub',
   'landing.nav.start': 'Getting started',

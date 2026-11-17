@@ -1,4 +1,10 @@
 const ru: Record<string, string> = {
+  'demo.try': 'Попробовать демо',
+  'demo.starting': 'Готовим демо…',
+  'demo.busy': 'Демо сейчас занято. Попробуйте чуть позже.',
+  'demo.failed': 'Не удалось запустить демо. Попробуйте ещё раз.',
+  'demo.banner': 'Вы в демо: здесь только пример данных, они удаляются в течение суток. Приглашения, GitHub, Telegram и загрузка файлов отключены.',
+  'demo.signUp': 'Создать свой аккаунт',
   'landing.nav.board': 'Доска',
   'landing.nav.github': 'GitHub',
   'landing.nav.start': 'Как начать',

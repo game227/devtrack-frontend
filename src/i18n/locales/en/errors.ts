@@ -45,6 +45,7 @@ const en: Record<string, string> = {
   'error.attachmentType': 'Only images (PNG, JPEG, GIF, WebP), PDF and plain text files can be attached.',
   'error.attachmentSize': 'Files can be at most {n} MB.',
   'error.attachmentCount': 'An issue can hold up to {n} files.',
+  'error.demoBlocked': 'This is not available in the demo.',
 }
 
 export default en

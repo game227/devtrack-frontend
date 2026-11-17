@@ -1,4 +1,10 @@
 const uz: Record<string, string> = {
+  'demo.try': "Demoni sinab ko'rish",
+  'demo.starting': 'Demo tayyorlanmoqda…',
+  'demo.busy': "Hozir demo band. Birozdan keyin urinib ko'ring.",
+  'demo.failed': "Demoni ishga tushirib bo'lmadi. Qayta urinib ko'ring.",
+  'demo.banner': "Siz demodasiz: bu yerdagi hamma narsa namuna ma'lumot va bir kun ichida o'chiriladi. Odamlarni taklif qilish, GitHub, Telegram va fayl yuklash o'chiq.",
+  'demo.signUp': "O'z akkauntingizni yarating",
   'landing.nav.board': 'Doska',
   'landing.nav.github': 'GitHub',
   'landing.nav.start': 'Qanday boshlash',

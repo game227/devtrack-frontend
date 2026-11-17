@@ -45,6 +45,7 @@ const uz: Record<string, string> = {
   'error.attachmentType': 'Faqat rasm (PNG, JPEG, GIF, WebP), PDF va oddiy matn fayllarini biriktirish mumkin.',
   'error.attachmentSize': 'Fayl hajmi {n} MB dan oshmasligi kerak.',
   'error.attachmentCount': "Bitta vazifaga ko'pi bilan {n} ta fayl biriktirish mumkin.",
+  'error.demoBlocked': 'Bu demoda mavjud emas.',
 }
 
 export default uz

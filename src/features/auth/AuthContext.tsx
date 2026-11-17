@@ -11,6 +11,7 @@ import {
 import { AuthContext } from './authContext'
 import type { AuthContextValue } from './authContext'
 import type { LoginPayload, RegisterPayload, User } from '../../types/auth'
+import * as demoApi from '../../api/demo'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -83,6 +84,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(me)
   }, [])
 
+  const startDemo = useCallback(async () => {
+    const session = await demoApi.startDemo()
+    setAccessToken(session.access)
+    setStoredRefreshToken(session.refresh)
+    try {
+      // Open the demo's sample workspace rather than the account's empty personal one.
+      localStorage.setItem('devtrack_workspace', String(session.workspace))
+    } catch {
+      // Not stored: the workspace switcher still lists it.
+    }
+    setUser(await authApi.getMe())
+  }, [])
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -92,8 +106,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       refreshUser,
+      startDemo,
     }),
-    [user, isLoading, login, register, logout, refreshUser],
+    [user, isLoading, login, register, logout, refreshUser, startDemo],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
