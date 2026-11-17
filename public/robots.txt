@@ -1,0 +1,8 @@
+# The public pages are the landing page and the legal pages; everything else needs an account.
+User-agent: *
+Allow: /$
+Allow: /privacy
+Allow: /terms
+Disallow: /
+
+Sitemap: https://devtrack-frontend.onrender.com/sitemap.xml
