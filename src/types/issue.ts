@@ -36,6 +36,8 @@ export interface Issue {
   // Set on issues imported from GitHub (for those, `number` is GitHub's number too).
   github_number: number | null
   github_url: string
+  // Checklist progress; null while the issue has no checklist.
+  checklist: { done: number; total: number } | null
   // When the issue last reached Done (null while it is open).
   completed_at: string | null
   created_at: string
@@ -64,4 +66,23 @@ export interface IssueFilters {
   label?: number
   cycle?: number
   milestone?: number
+}
+
+export interface ChecklistItem {
+  id: number
+  text: string
+  done: boolean
+  position: number
+  created_at: string
+}
+
+export type RelationKind = 'blocks' | 'duplicates' | 'relates'
+
+export interface IssueRelation {
+  id: number
+  kind: RelationKind
+  // "out": this issue made the link (it blocks / duplicates the other); "in": the other issue did.
+  direction: 'out' | 'in'
+  other: { id: number; number: number; title: string; status: IssueStatus; project: number }
+  created_at: string
 }

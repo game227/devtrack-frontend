@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { PageSkeleton } from '../components/Skeleton'
 import type { FormEvent, ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
@@ -10,12 +10,15 @@ import { getProject, listProjectMembers } from '../api/projects'
 import { Avatar } from '../components/Avatar'
 import { CommentThread } from '../components/CommentThread'
 import { formInputClass } from '../components/FormField'
+import { IssueChecklist } from '../components/IssueChecklist'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
+import { IssueRelations } from '../components/IssueRelations'
 import { Markdown } from '../components/Markdown'
 import { MarkdownField } from '../components/MarkdownField'
 import { StatusStepper } from '../components/Track'
 import { button, notice } from '../components/ui'
 import { useAuth } from '../features/auth/authContext'
+import { WorkspaceContext } from '../features/workspace/workspaceContext'
 import { issueEditRights } from '../features/issues/permissions'
 import { githubUrl } from '../lib/safeUrl'
 import { useI18n } from '../i18n'
@@ -36,6 +39,8 @@ function Property({ label, children }: { label: string; children: ReactNode }) {
 export function IssueDetailPage() {
   const { t, formatDateTime } = useI18n()
   const { user } = useAuth()
+  // Read without useWorkspace(): the page also renders where no workspace provider exists (tests, deep links).
+  const currentWorkspace = useContext(WorkspaceContext)?.currentWorkspace ?? null
   const { id } = useParams<{ id: string }>()
   const issueId = Number(id)
   const queryClient = useQueryClient()
@@ -179,6 +184,10 @@ export function IssueDetailPage() {
               <p className="text-[15px] text-fg-muted">{t('issue.noDescription')}</p>
             )}
           </section>
+
+          <IssueChecklist issueId={issueId} canChange={canUpdateProgress} />
+
+          {currentWorkspace && <IssueRelations issueId={issueId} workspaceId={currentWorkspace.id} canChange={canUpdateProgress} />}
 
           <IssueGithubActivity issueId={issueId} />
 

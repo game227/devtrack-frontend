@@ -5,6 +5,7 @@ import type { Issue } from '../types/issue'
 import { Avatar } from './Avatar'
 import { PriorityBadge } from './Badge'
 import { DueChip } from './DueChip'
+import { Icon } from './Icon'
 import { StatusTrack } from './Track'
 
 // One issue in a list: where it is on the line first, so a column of rows reads like a progress chart.
@@ -39,6 +40,13 @@ export function IssueRow({ issue, index = 0 }: { issue: Issue; index?: number })
               </span>
             ))}
           </span>
+          {issue.checklist && (
+            <span title={t('checklist.short', issue.checklist)} className="hidden items-center gap-1 font-mono text-xs text-fg-muted tabular sm:inline-flex">
+              <Icon name="check" className="h-3.5 w-3.5" />
+              <span className="sr-only">{t('checklist.title')}</span>
+              {issue.checklist.done}/{issue.checklist.total}
+            </span>
+          )}
           <span className="flex justify-end md:w-40">
             <DueChip dueDate={issue.due_date} status={issue.status} />
           </span>
