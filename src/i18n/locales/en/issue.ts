@@ -1,4 +1,5 @@
 const en: Record<string, string> = {
+  'presence.viewing': '{names} also viewing',
   'attachments.title': 'Files',
   'attachments.add': 'Attach a file',
   'attachments.hint': 'or drop it here: images, PDF or text, up to 10 MB.',

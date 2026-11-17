@@ -1,4 +1,5 @@
 const ru: Record<string, string> = {
+  'presence.viewing': 'Также смотрят: {names}',
   'attachments.title': 'Файлы',
   'attachments.add': 'Прикрепить файл',
   'attachments.hint': 'или перетащите сюда: изображения, PDF или текст, до 10 МБ.',

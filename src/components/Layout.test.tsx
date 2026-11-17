@@ -19,7 +19,7 @@ vi.mock('../api/projects', () => ({
 const createIssue = vi.fn()
 vi.mock('../api/issues', () => ({ createIssue: (...args: unknown[]) => createIssue(...args) }))
 vi.mock('../api/search', () => ({ search: vi.fn() }))
-vi.mock('../api/changes', () => ({ getChanges: vi.fn().mockResolvedValue({ cursor: 'c', changed: [] }) }))
+vi.mock('../api/changes', () => ({ LIVE_STREAM: false, getChanges: vi.fn().mockResolvedValue({ cursor: 'c', changed: [] }) }))
 vi.mock('../api/notifications', () => ({
   listNotifications: vi.fn().mockResolvedValue([]),
   markAllNotificationsRead: vi.fn(),

@@ -14,6 +14,7 @@ import { IssueAttachments } from '../components/IssueAttachments'
 import { IssueChecklist } from '../components/IssueChecklist'
 import { IssueGithubActivity } from '../components/IssueGithubActivity'
 import { IssueRelations } from '../components/IssueRelations'
+import { IssueViewers } from '../components/IssueViewers'
 import { Markdown } from '../components/Markdown'
 import { MarkdownField } from '../components/MarkdownField'
 import { StatusStepper } from '../components/Track'
@@ -128,6 +129,9 @@ export function IssueDetailPage() {
           )}
         </div>
         <h1 className="mt-1.5 max-w-4xl text-[32px] font-medium leading-tight tracking-[-0.035em] text-fg">{issue.title}</h1>
+        <div className="mt-3">
+          <IssueViewers issueId={issue.id} />
+        </div>
       </header>
 
       <div className="grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_20rem]">

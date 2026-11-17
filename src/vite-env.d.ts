@@ -5,6 +5,7 @@ interface ImportMetaEnv {
   readonly VITE_SENTRY_DSN?: string
   readonly VITE_SENTRY_ENVIRONMENT?: string
   readonly VITE_DEMO_ENABLED?: string
+  readonly VITE_LIVE_STREAM?: string
 }
 
 interface ImportMeta {

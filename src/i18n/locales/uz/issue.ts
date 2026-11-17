@@ -1,4 +1,5 @@
 const uz: Record<string, string> = {
+  'presence.viewing': "{names} ham ko'ryapti",
   'attachments.title': 'Fayllar',
   'attachments.add': 'Fayl biriktirish',
   'attachments.hint': 'yoki shu yerga tashlang: rasm, PDF yoki matn, 10 MB gacha.',
