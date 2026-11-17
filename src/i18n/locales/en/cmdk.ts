@@ -25,7 +25,7 @@ const en: Record<string, string> = {
   'cmdk.newIssue': 'New issue',
   'cmdk.newProject': 'New project',
   'cmdk.showShortcuts': 'Keyboard shortcuts',
-  'cmdk.toggleLanguage': 'Switch language (UZ / EN)',
+  'cmdk.toggleLanguage': 'Switch language (UZ / RU / EN)',
   'cmdk.logout': 'Log out',
 
   'shortcuts.title': 'Keyboard shortcuts',

@@ -9,6 +9,7 @@ import { badge, button } from '../components/ui'
 import { useAuth } from '../features/auth/authContext'
 import { useTheme } from '../hooks/useTheme'
 import { LANGS, useI18n } from '../i18n'
+import type { Lang } from '../i18n'
 import { resolveTheme } from '../lib/theme'
 
 // A real product screenshot (regenerated with the design; see README), in a frosted frame.
@@ -18,7 +19,7 @@ function Screenshot({ name, alt }: { name: string; alt: string }) {
     <figure className="relative">
       <span aria-hidden="true" className="corners pointer-events-none absolute -inset-3 [--corner-size:20px]" />
       <img
-        src={`/screens/${lang}/${name}.webp`}
+        src={`/screens/${screenLang(lang)}/${name}.webp`}
         alt={alt}
         width={1440}
         height={900}
@@ -79,9 +80,17 @@ const TRUST: Array<{ key: string; icon: IconName }> = [
 // One letter each, so the overlapping circles stay legible.
 const TEAM = ['D', 'S', 'J', 'M']
 
+// Product screenshots exist in Uzbek and English; Russian visitors see the English ones.
+function screenLang(lang: Lang) {
+  return lang === 'ru' ? 'en' : lang
+}
+
 export function LandingPage() {
   const { t, lang } = useI18n()
   const { isAuthenticated, isLoading } = useAuth()
+  const heroWords = t('landing.hero.l1').split(' ')
+  const heroLast = heroWords.pop() ?? ''
+  const heroLead = heroWords.join(' ')
 
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/dashboard" replace />
@@ -135,11 +144,20 @@ export function LandingPage() {
               <span aria-hidden="true" className="h-2 w-2 rounded-full bg-orange" />
               {t('landing.badge')}
             </p>
-            <h1 className="mt-6 text-[clamp(2.6rem,6vw,4.6rem)] font-medium leading-[1.02] tracking-[-0.05em]">
+            <h1
+              className={`mt-6 font-medium leading-[1.02] tracking-[-0.05em] ${
+                lang === 'ru' ? 'text-[clamp(2.3rem,5.2vw,4rem)]' : 'text-[clamp(2.6rem,6vw,4.6rem)]'
+              }`}
+            >
               <span className="block">
-                {t('landing.hero.l1')}{' '}
-                <span aria-hidden="true" className="ml-1 inline-flex translate-y-[-0.08em] align-middle text-fg">
-                  <LogoMark size={56} />
+                {heroLead}
+                {heroLead && ' '}
+                {/* The mark stays on the line of the last word instead of wrapping onto a line of its own. */}
+                <span className="whitespace-nowrap">
+                  {heroLast}{' '}
+                  <span aria-hidden="true" className="ml-1 inline-flex translate-y-[-0.08em] align-middle text-fg">
+                    <LogoMark size={56} />
+                  </span>
                 </span>
               </span>
               {/* Spaces between the lines, so the heading reads as a sentence to assistive technology. */}{' '}
@@ -169,7 +187,7 @@ export function LandingPage() {
             <div className="mt-10 flex flex-wrap items-end gap-6">
               <a href="#board" aria-label={t('landing.seeBoard')} className="group block overflow-hidden rounded-xl border border-edge shadow-panel">
                 <img
-                  src={`/screens/${lang}/board.webp`}
+                  src={`/screens/${screenLang(lang)}/board.webp`}
                   alt=""
                   width={176}
                   height={96}

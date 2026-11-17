@@ -10,7 +10,7 @@ import { useWorkspace } from '../features/workspace/workspaceContext'
 import { buildCommands } from '../features/shortcuts/commands'
 import { handleShortcut } from '../features/shortcuts/shortcuts'
 import type { ShortcutState } from '../features/shortcuts/shortcuts'
-import { useI18n } from '../i18n'
+import { LANGS, useI18n } from '../i18n'
 import type { Issue, IssueStatus } from '../types/issue'
 import { useToast } from '../features/toast/toastContext'
 import { Avatar } from './Avatar'
@@ -224,7 +224,7 @@ export function Layout() {
         t,
         navigate,
         projectId: currentProjectId,
-        toggleLanguage: () => setLang(lang === 'uz' ? 'en' : 'uz'),
+        toggleLanguage: () => setLang(LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length]),
         logout: () => void logout(),
         showShortcuts: () => setHelpOpen(true),
         newIssue: () => openNewIssue(currentProjectId),

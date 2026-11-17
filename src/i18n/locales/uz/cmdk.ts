@@ -25,7 +25,7 @@ const uz: Record<string, string> = {
   'cmdk.newIssue': 'Yangi vazifa',
   'cmdk.newProject': 'Yangi loyiha',
   'cmdk.showShortcuts': 'Klaviatura yorliqlari',
-  'cmdk.toggleLanguage': "Tilni almashtirish (UZ / EN)",
+  'cmdk.toggleLanguage': "Tilni almashtirish (UZ / RU / EN)",
   'cmdk.logout': 'Chiqish',
 
   'shortcuts.title': 'Klaviatura yorliqlari',

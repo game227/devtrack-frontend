@@ -1,3 +1,4 @@
+import type { Lang } from '../i18n/core'
 import { setAccessToken, setStoredRefreshToken } from '../features/auth/tokenStore'
 import { apiClient } from './client'
 import type {
@@ -91,7 +92,7 @@ export async function confirmEmailVerification(
   return data
 }
 
-export async function resendEmailVerification(lang?: 'uz' | 'en'): Promise<{ detail: string }> {
+export async function resendEmailVerification(lang?: Lang): Promise<{ detail: string }> {
   const { data } = await apiClient.post<{ detail: string }>('/auth/email/verify/resend/', { lang })
   return data
 }

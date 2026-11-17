@@ -1,6 +1,6 @@
-export type Lang = 'uz' | 'en'
+export type Lang = 'uz' | 'en' | 'ru'
 
-export const LANGS: Lang[] = ['uz', 'en']
+export const LANGS: Lang[] = ['uz', 'ru', 'en']
 export const DEFAULT_LANG: Lang = 'uz'
 export const STORAGE_KEY = 'devtrack_lang'
 
@@ -20,6 +20,7 @@ function collect(modules: Record<string, unknown>): Dict {
 export const dictionaries: Record<Lang, Dict> = {
   en: collect(import.meta.glob('./locales/en/*.ts', { eager: true, import: 'default' })),
   uz: collect(import.meta.glob('./locales/uz/*.ts', { eager: true, import: 'default' })),
+  ru: collect(import.meta.glob('./locales/ru/*.ts', { eager: true, import: 'default' })),
 }
 
 export type TranslateParams = Record<string, string | number>
@@ -33,7 +34,7 @@ export function translate(lang: Lang, key: string, params?: TranslateParams): st
 export function readStoredLang(): Lang {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'uz' || stored === 'en') return stored
+    if (stored === 'uz' || stored === 'en' || stored === 'ru') return stored
   } catch {
     // localStorage unavailable (private mode, etc.) — fall through to the default.
   }
@@ -48,7 +49,7 @@ export function storeLang(lang: Lang): void {
   }
 }
 
-const INTL_LOCALES: Record<Lang, string> = { uz: 'uz-UZ', en: 'en-US' }
+const INTL_LOCALES: Record<Lang, string> = { uz: 'uz-UZ', en: 'en-US', ru: 'ru-RU' }
 
 // Browsers ship poor Uzbek date data (Chromium prints "2026 M09 21"), so Uzbek dates are built here.
 const UZ_MONTHS = [

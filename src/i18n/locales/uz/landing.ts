@@ -17,11 +17,11 @@ const uz: Record<string, string> = {
   'landing.github.kicker': "GitHub",
   'landing.health.kicker': "Salomatlik",
   'landing.timeline.kicker': "Xronologiya",
-  'landing.local.kicker': "O'zbek va ingliz tilida",
+  'landing.local.kicker': "O'zbek, rus va ingliz tilida",
   'landing.madeIn': "O'zbekistonda yaratilgan",
   'landing.heroTitle': "Har bir vazifa qayerda turganini ko'ring.",
   'landing.heroText':
-    "DevTrack kichik dasturchilar jamoalari uchun vazifalar trekeri. Har bir vazifa zaxiradan bajarilgunga qadar bitta chiziq bo'ylab yuradi, GitHub'dagi commitlar uni oldinga siljitadi va butun jamoa bir xil manzarani ko'radi: o'zbek yoki ingliz tilida.",
+    "DevTrack kichik dasturchilar jamoalari uchun vazifalar trekeri. Har bir vazifa zaxiradan bajarilgunga qadar bitta chiziq bo'ylab yuradi, GitHub'dagi commitlar uni oldinga siljitadi va butun jamoa bir xil manzarani ko'radi: o'zbek, rus yoki ingliz tilida.",
   'landing.ctaPrimary': 'Ish maydoni yaratish',
   'landing.ctaSecondary': "Qanday ishlashini ko'rish",
 
@@ -44,7 +44,7 @@ const uz: Record<string, string> = {
   'landing.timeline.title': 'Har bir harakat yozib boriladi',
   'landing.timeline.text':
     "Holat o'zgarishlari, izohlar, birlashtirilgan pull request'lar va yangi a'zolar kunlar bo'yicha guruhlangan bitta xronologiyaga tushadi.",
-  'landing.local.title': "Avval o'zbekcha, inglizchasi bir bosishda",
+  'landing.local.title': "Avval o'zbekcha, rus va inglizchasi bir bosishda",
   'landing.local.text':
     "Har bir sahifa, sana va xato xabari tarjima qilingan. Telegram bot har kuni qisqa hisobot yuboradi va parolni chatning o'zidan tiklashga yordam beradi.",
 

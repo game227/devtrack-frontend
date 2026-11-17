@@ -18,9 +18,24 @@ describe('translation keys used in source', () => {
       for (const match of code.matchAll(KEY_LITERAL)) {
         const key = match[1]
         if (!namespaces.has(key.split('.')[0])) continue
-        if (!(key in dictionaries.en) || !(key in dictionaries.uz)) unknown.push(`${file}: ${key}`)
+        if (!(key in dictionaries.en) || !(key in dictionaries.uz) || !(key in dictionaries.ru)) unknown.push(`${file}: ${key}`)
       }
     }
     expect(unknown).toEqual([])
+  })
+})
+
+describe('dictionaries', () => {
+  it('every language has every English key, with the same placeholders', () => {
+    const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',')
+    const problems: string[] = []
+    for (const lang of ['uz', 'ru'] as const) {
+      for (const [key, text] of Object.entries(dictionaries.en)) {
+        const translated = dictionaries[lang][key]
+        if (translated === undefined) problems.push(`${lang}: missing ${key}`)
+        else if (placeholders(translated) !== placeholders(text)) problems.push(`${lang}: placeholders differ in ${key}`)
+      }
+    }
+    expect(problems).toEqual([])
   })
 })

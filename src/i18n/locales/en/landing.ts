@@ -17,11 +17,11 @@ const en: Record<string, string> = {
   'landing.github.kicker': "GitHub",
   'landing.health.kicker': "Health",
   'landing.timeline.kicker': "Timeline",
-  'landing.local.kicker': "Uzbek and English",
+  'landing.local.kicker': "Uzbek, Russian, English",
   'landing.madeIn': "Made in Uzbekistan",
   'landing.heroTitle': 'See where every task stands.',
   'landing.heroText':
-    'DevTrack is an issue tracker for small development teams. Every issue rides one line from backlog to done, commits on GitHub move it along, and the whole team sees the same picture, in Uzbek or in English.',
+    'DevTrack is an issue tracker for small development teams. Every issue rides one line from backlog to done, commits on GitHub move it along, and the whole team sees the same picture, in Uzbek, Russian or English.',
   'landing.ctaPrimary': 'Create a workspace',
   'landing.ctaSecondary': "See how it works",
 
@@ -43,7 +43,7 @@ const en: Record<string, string> = {
     'Each project gets a health score from its progress, deadlines, open bugs and recent activity, with the reasons listed underneath.',
   'landing.timeline.title': 'Every move is written down',
   'landing.timeline.text': 'Status changes, comments, merged pull requests and new members land in one timeline, grouped by day.',
-  'landing.local.title': 'Uzbek first, English one click away',
+  'landing.local.title': 'Uzbek first, Russian and English one click away',
   'landing.local.text':
     'Every screen, date and error message is translated. The Telegram bot sends a daily summary and can reset your password from the chat.',
 

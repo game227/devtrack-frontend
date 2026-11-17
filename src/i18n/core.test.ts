@@ -78,8 +78,13 @@ describe('language storage', () => {
   })
 
   it('ignores unsupported stored values', () => {
-    localStorage.setItem(STORAGE_KEY, 'ru')
+    localStorage.setItem(STORAGE_KEY, 'de')
     expect(readStoredLang()).toBe('uz')
+  })
+
+  it('remembers Russian', () => {
+    localStorage.setItem(STORAGE_KEY, 'ru')
+    expect(readStoredLang()).toBe('ru')
   })
 })
 

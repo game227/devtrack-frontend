@@ -1,3 +1,4 @@
+import type { Lang } from '../i18n/core'
 export interface UserBrief {
   id: number
   username: string
@@ -35,7 +36,7 @@ export interface RegisterPayload {
   password_confirm: string
   first_name?: string
   last_name?: string
-  lang?: 'uz' | 'en'
+  lang?: Lang
 }
 
 export interface LoginPayload {
@@ -62,7 +63,7 @@ export interface ChangePasswordPayload {
 export interface RequestPasswordResetPayload {
   email: string
   // Language of the message that carries the reset link.
-  lang?: 'uz' | 'en'
+  lang?: Lang
 }
 
 export interface ConfirmPasswordResetPayload {

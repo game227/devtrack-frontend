@@ -29,7 +29,7 @@ export function BurndownChart({ cycleId, name }: { cycleId: number; name: string
   const [box, W] = useWidth()
   const shortDate = (iso: string) => {
     const [, month, day] = iso.split('-').map(Number)
-    return lang === 'uz' ? `${day} ${UZ_MONTHS[month - 1]}` : new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`))
+    return lang === 'uz' ? `${day} ${UZ_MONTHS[month - 1]}` : new Intl.DateTimeFormat(lang === 'ru' ? 'ru-RU' : 'en', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`))
   }
   const query = useQuery({ queryKey: ['burndown', cycleId], queryFn: () => getBurndown(cycleId) })
   return (

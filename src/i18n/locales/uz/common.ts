@@ -81,6 +81,7 @@ const uz: Record<string, string> = {
 
   'lang.uz': "O'zbekcha",
   'lang.en': 'English',
+  'lang.ru': 'Русский',
   'lang.switch': 'Til',
 
   'common.loadingWorkspace': 'Ish maydoni yuklanmoqda…',

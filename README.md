@@ -1,6 +1,6 @@
 # DevTrack Frontend
 
-React + Vite + TypeScript single-page app for DevTrack, in **Uzbek (default) and English**, plus the public
+React + Vite + TypeScript single-page app for DevTrack, in **Uzbek (default), Russian and English**, plus the public
 landing page. It talks to [devtrack-backend](https://github.com/game227/devtrack-backend) over REST
 (`/api/v1/`) and shares no code with it.
 
@@ -28,12 +28,14 @@ npm run dev
   automatically — add a file, no registration needed.
 - Use `const { t } = useI18n()` (or `useT()`); `t('key', { param })` interpolates `{param}`.
   Fallback order is selected language → English → the key itself.
-- `npm test` fails if the two languages have different keys, or if a literal `'area.key'` used in the
+- `npm test` fails if a language is missing a key, or if a literal `'area.key'` used in the
   source does not exist, so a forgotten translation cannot ship.
 - Server error messages (DRF has no Uzbek catalog) are mapped to keys in `src/i18n/apiErrors.ts`;
   unknown messages are shown as sent. Uzbek dates are formatted by hand because browsers ship poor
   Uzbek date data.
-- The language is stored in `localStorage` (`devtrack_lang`); the default is Uzbek.
+- The language is stored in `localStorage` (`devtrack_lang`); the default is Uzbek. A test checks that
+  every English key exists in Uzbek and Russian with the same `{placeholders}`. Russian dates use the
+  browser's `ru-RU` data; the landing page shows the English screenshots to Russian visitors.
 
 ## Design system
 
@@ -108,7 +110,7 @@ src/
   types/        # types mirroring backend serializers
   lib/          # small shared helpers
   test/         # Vitest setup and render helpers
-public/screens/ # product screenshots (uz/en) used by the landing page
+public/screens/ # product screenshots (uz/en; ru uses en) used by the landing page
 ```
 
 ## Landing page and screenshots

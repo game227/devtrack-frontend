@@ -81,6 +81,7 @@ const en: Record<string, string> = {
 
   'lang.uz': "O'zbekcha",
   'lang.en': 'English',
+  'lang.ru': 'Русский',
   'lang.switch': 'Language',
 
   'common.loadingWorkspace': 'Loading workspace…',
