@@ -1,0 +1,15 @@
+{
+  "name": "DevTrack",
+  "short_name": "DevTrack",
+  "description": "Issue tracking for small development teams.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#cececc",
+  "theme_color": "#cececc",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

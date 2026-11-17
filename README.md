@@ -33,6 +33,9 @@ npm run dev
 - Server error messages (DRF has no Uzbek catalog) are mapped to keys in `src/i18n/apiErrors.ts`;
   unknown messages are shown as sent. Uzbek dates are formatted by hand because browsers ship poor
   Uzbek date data.
+- PWA: `public/manifest.webmanifest`, icons and `public/sw.js` make the app installable. The service worker
+  (production builds only) caches only `/assets/*` and the shell for offline navigation; API calls are
+  never cached. It also shows Web Push notifications; Settings has the switch when the API has VAPID keys.
 - `VITE_DEMO_ENABLED=true` (with `DEMO_ENABLED` on the API) adds "Try the demo" to the landing page and a
   banner inside the app for demo accounts.
 - The language is stored in `localStorage` (`devtrack_lang`); the default is Uzbek. A test checks that

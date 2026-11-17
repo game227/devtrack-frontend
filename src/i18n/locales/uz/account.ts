@@ -1,4 +1,12 @@
 const uz: Record<string, string> = {
+  'push.title': 'Shu qurilmadagi bildirishnomalar',
+  'push.on': "Yoqilgan: tayinlashlar, izohlar va eslatmalar DevTrack yopiq bo'lsa ham shu qurilmaga keladi.",
+  'push.off': "Tayinlashlar, izohlar va eslatmalarni DevTrack yopiq bo'lsa ham shu qurilmada oling.",
+  'push.unsupported': "Bu brauzer push bildirishnomalarni qabul qila olmaydi. iPhone'da avval DevTrack'ni bosh ekranga qo'shing.",
+  'push.enable': 'Yoqish',
+  'push.disable': "O'chirish",
+  'push.denied': "Bu sayt uchun bildirishnomalar bloklangan. Brauzerning sayt sozlamalarida ruxsat bering va qayta urinib ko'ring.",
+  'push.failed': "Sozlamani o'zgartirib bo'lmadi. Qayta urinib ko'ring.",
   'profile.title': 'Profil',
   'profile.changeAvatar': "Rasmni o'zgartirish",
   'profile.firstName': 'Ism',

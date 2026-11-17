@@ -16,6 +16,7 @@ import { ContactList } from '../components/ContactLinks'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useI18n } from '../i18n'
 import { button, notice, pageTitle } from '../components/ui'
+import { PushCard } from '../components/PushCard'
 
 const primaryButton = button('primary')
 const dangerButton = button('danger')
@@ -50,6 +51,7 @@ export function SettingsPage() {
       <LanguageCard />
       <GithubConnectionCard />
       <TelegramConnectionCard />
+      <PushCard />
       <ContactCard />
     </div>
   )

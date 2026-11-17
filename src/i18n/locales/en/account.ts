@@ -1,4 +1,12 @@
 const en: Record<string, string> = {
+  'push.title': 'Notifications on this device',
+  'push.on': 'On: assignments, comments and mentions reach this device even when DevTrack is closed.',
+  'push.off': 'Get assignments, comments and mentions on this device even when DevTrack is closed.',
+  'push.unsupported': 'This browser cannot receive push notifications. On iPhone, add DevTrack to the home screen first.',
+  'push.enable': 'Turn on',
+  'push.disable': 'Turn off',
+  'push.denied': "Notifications are blocked for this site. Allow them in the browser's site settings, then try again.",
+  'push.failed': "Couldn't change the setting. Please try again.",
   'profile.title': 'Profile',
   'profile.changeAvatar': 'Change avatar',
   'profile.firstName': 'First name',

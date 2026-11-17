@@ -9,6 +9,7 @@ import { App } from './App'
 import { ToastProvider } from '../features/toast/ToastViewport'
 import { initTheme } from '../lib/theme'
 import { initSentry } from '../lib/sentry'
+import { registerServiceWorker } from '../lib/push'
 // Self-hosted (no third-party font requests): Geist for everything, Geist Mono for code-like text
 // (issue keys, commit SHAs, branches, shortcuts).
 import '@fontsource-variable/geist'
@@ -17,6 +18,7 @@ import '../styles/index.css'
 
 initSentry()
 initTheme()
+registerServiceWorker()
 
 const queryClient = new QueryClient()
 
