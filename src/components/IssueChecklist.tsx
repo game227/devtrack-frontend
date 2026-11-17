@@ -39,8 +39,11 @@ export function IssueChecklist({ issueId, canChange }: { issueId: number; canCha
 
   const toggle = useMutation({
     mutationFn: (item: ChecklistItem) => updateChecklistItem(item.id, { done: !item.done }),
-    onMutate: async (item) => {
-      await queryClient.cancelQueries({ queryKey: key })
+    // The tick shows at once: the cache is updated before anything is awaited, so the checkbox never
+    // flips back for a moment while the request starts. A refetch already running is dropped without
+    // reverting (its answer would predate this change).
+    onMutate: (item) => {
+      void queryClient.cancelQueries({ queryKey: key }, { revert: false })
       const previous = queryClient.getQueryData<ChecklistItem[]>(key)
       queryClient.setQueryData<ChecklistItem[]>(key, (old) => old?.map((i) => (i.id === item.id ? { ...i, done: !i.done } : i)))
       return { previous }
