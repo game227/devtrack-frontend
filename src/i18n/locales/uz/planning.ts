@@ -1,4 +1,15 @@
 const uz: Record<string, string> = {
+  'burndown.toggle': 'Burndown grafigi',
+  'burndown.title': '{name}: burndown',
+  'burndown.left': '{count} {unit} qoldi',
+  'burndown.points': 'ball',
+  'burndown.issues': 'vazifa',
+  'burndown.notStarted': 'Hali boshlanmagan',
+  'burndown.actual': 'Qolgan',
+  'burndown.ideal': 'Ideal',
+  'burndown.day': 'Kun',
+  'burndown.empty': "Burndown ko'rinishi uchun bu siklga vazifa qo'shing.",
+  'burndown.failed': "Burndown grafigini yuklab bo'lmadi.",
   'confirm.ask': 'Ishonchingiz komilmi?',
   'planning.doneCount': '{done}/{total} bajarildi',
 

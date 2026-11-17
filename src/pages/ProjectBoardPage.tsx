@@ -330,6 +330,11 @@ export function ProjectBoardPage() {
                         ) : (
                           <span className="min-w-0 truncate">{t('common.unassigned')}</span>
                         )}
+                        {issue.estimate !== null && (
+                          <span className="shrink-0 rounded-full border border-border px-1.5 font-mono text-[10px] tabular" title={t('issue.points', { count: issue.estimate })}>
+                            {issue.estimate}
+                          </span>
+                        )}
                         {issue.checklist && (
                           <span className="inline-flex shrink-0 items-center gap-0.5 font-mono tabular" title={t('checklist.short', issue.checklist)}>
                             <Icon name="check" className="h-3 w-3" />

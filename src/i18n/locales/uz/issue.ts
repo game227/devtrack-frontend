@@ -1,4 +1,7 @@
 const uz: Record<string, string> = {
+  'issue.estimate': 'Baho',
+  'issue.notEstimated': 'Baholanmagan',
+  'issue.points': '{count} ball',
   'checklist.title': 'Bosqichlar',
   'checklist.progress': '{total} tadan {done} tasi bajarildi',
   'checklist.add': "Bosqich qo'shish",

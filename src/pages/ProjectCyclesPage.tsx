@@ -5,7 +5,9 @@ import type { FormEvent } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createCycle, deleteCycle, listCycles } from '../api/cycles'
+import { BurndownChart } from '../components/BurndownChart'
 import { ConfirmButton } from '../components/ConfirmButton'
+import { Icon } from '../components/Icon'
 import { FormField, formInputClass } from '../components/FormField'
 import { ProgressBar } from '../components/ProgressBar'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
@@ -13,6 +15,9 @@ import { useI18n } from '../i18n'
 import { button } from '../components/ui'
 
 export function ProjectCyclesPage() {
+  // The active cycle's burndown is open by default; the others open on request.
+  const [open, setOpen] = useState<Record<number, boolean>>({})
+  const isOpen = (cycle: { id: number; is_active: boolean }) => open[cycle.id] ?? cycle.is_active
   const { t, lang, formatDate } = useI18n()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
@@ -146,6 +151,21 @@ export function ProjectCyclesPage() {
               </div>
             </div>
             <ProgressBar percent={cycle.completion_percent} label={cycle.name} />
+            <button
+              type="button"
+              aria-expanded={isOpen(cycle)}
+              aria-controls={`burndown-${cycle.id}`}
+              onClick={() => setOpen((current) => ({ ...current, [cycle.id]: !isOpen(cycle) }))}
+              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-fg-muted hover:text-fg"
+            >
+              <Icon name="chevronDown" className={`h-3.5 w-3.5 transition-transform ${isOpen(cycle) ? 'rotate-180' : ''}`} />
+              {t('burndown.toggle')}
+            </button>
+            {isOpen(cycle) && (
+              <div id={`burndown-${cycle.id}`} className="mt-3">
+                <BurndownChart cycleId={cycle.id} name={cycle.name} />
+              </div>
+            )}
           </div>
         ))}
       </div>

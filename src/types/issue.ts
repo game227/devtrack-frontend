@@ -27,6 +27,8 @@ export interface Issue {
   type: IssueType
   status: IssueStatus
   priority: Priority
+  // Story points; null when not estimated.
+  estimate: number | null
   assignee: UserBrief | null
   reporter: UserBrief
   labels: IssueLabel[]
@@ -51,6 +53,7 @@ export interface CreateIssuePayload {
   type?: IssueType
   status?: IssueStatus
   priority?: Priority
+  estimate?: number | null
   assignee_id?: number | null
   label_ids?: number[]
   due_date?: string | null

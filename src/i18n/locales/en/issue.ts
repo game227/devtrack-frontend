@@ -1,4 +1,7 @@
 const en: Record<string, string> = {
+  'issue.estimate': 'Estimate',
+  'issue.notEstimated': 'Not estimated',
+  'issue.points': '{count} pt',
   'checklist.title': 'Checklist',
   'checklist.progress': '{done} of {total} done',
   'checklist.add': 'Add step',

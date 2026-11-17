@@ -1,4 +1,15 @@
 const en: Record<string, string> = {
+  'burndown.toggle': 'Burndown',
+  'burndown.title': 'Burndown of {name}',
+  'burndown.left': '{count} {unit} left',
+  'burndown.points': 'points',
+  'burndown.issues': 'issues',
+  'burndown.notStarted': 'Starts soon',
+  'burndown.actual': 'Left',
+  'burndown.ideal': 'Ideal',
+  'burndown.day': 'Day',
+  'burndown.empty': 'Add issues to this cycle to see its burndown.',
+  'burndown.failed': "Couldn't load the burndown.",
   'confirm.ask': 'Are you sure?',
   'planning.doneCount': '{done}/{total} done',
 

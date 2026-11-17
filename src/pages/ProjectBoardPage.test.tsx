@@ -38,6 +38,7 @@ function issue(overrides: Partial<Issue>): Issue {
     due_date: null,
     github_number: null,
     github_url: '',
+    estimate: null,
     checklist: null,
     completed_at: null,
     created_at: '2026-09-01T10:00:00Z',

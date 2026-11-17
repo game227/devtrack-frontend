@@ -14,3 +14,14 @@ export async function createCycle(payload: CreateCyclePayload): Promise<Cycle> {
 export async function deleteCycle(id: number): Promise<void> {
   await apiClient.delete(`/cycles/${id}/`)
 }
+
+export interface Burndown {
+  unit: 'points' | 'issues'
+  total: number
+  days: Array<{ date: string; remaining: number | null; ideal: number }>
+}
+
+export async function getBurndown(cycleId: number): Promise<Burndown> {
+  const { data } = await apiClient.get<Burndown>(`/cycles/${cycleId}/burndown/`)
+  return data
+}

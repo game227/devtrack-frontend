@@ -26,6 +26,8 @@ import type { IssueStatus } from '../types/issue'
 import type { Priority } from '../types/project'
 
 const PRIORITIES: Priority[] = ['none', 'low', 'medium', 'high', 'urgent']
+// The usual planning-poker scale.
+const ESTIMATES = [1, 2, 3, 5, 8, 13, 21]
 
 function Property({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -237,6 +239,24 @@ export function IssueDetailPage() {
                     {member.specialty ? `${member.user.username} (${t(`specialty.${member.specialty}`)})` : member.user.username}
                   </option>
                 ))}
+              </select>
+            </Property>
+            <Property label={t('issue.estimate')}>
+              <select
+                aria-label={t('issue.estimate')}
+                className={`${formInputClass} mt-0!`}
+                value={issue.estimate ?? ''}
+                disabled={!canEdit}
+                onChange={(e) => updateMutation.mutate({ estimate: e.target.value ? Number(e.target.value) : null })}
+              >
+                <option value="">{t('issue.notEstimated')}</option>
+                {[...new Set([...ESTIMATES, ...(issue.estimate ? [issue.estimate] : [])])]
+                  .sort((a, b) => a - b)
+                  .map((points) => (
+                    <option key={points} value={points}>
+                      {t('issue.points', { count: points })}
+                    </option>
+                  ))}
               </select>
             </Property>
             <Property label={t('common.dueDate')}>
