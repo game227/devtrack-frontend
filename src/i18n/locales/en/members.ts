@@ -1,4 +1,6 @@
 const en: Record<string, string> = {
+  'members.roleHint.member': 'Works on projects and issues; cannot invite people or change roles.',
+  'members.roleHint.admin': 'Also invites and removes members and manages every project in the workspace.',
   'members.title': 'Members',
   'members.count': '{count} members',
   'members.you': 'you',

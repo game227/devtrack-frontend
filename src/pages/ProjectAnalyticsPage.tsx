@@ -14,6 +14,7 @@ import { useT } from '../i18n'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueType } from '../types/issue'
 import type { Priority } from '../types/project'
+import { Reveal } from '../components/Reveal'
 
 const PRIORITIES: Priority[] = ['urgent', 'high', 'medium', 'low', 'none']
 const TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
@@ -41,12 +42,13 @@ function StatusLine({ issues }: { issues: Issue[] }) {
   )
 }
 
-function Panel({ title, children }: { title: string; children: ReactNode }) {
+// Each chart eases in as it scrolls into view, and its bars grow then (not while still off screen).
+function Panel({ title, children, delay = 0 }: { title: string; children: ReactNode; delay?: number }) {
   return (
-    <section className="rounded-xl border border-edge bg-surface shadow-panel p-5">
-      <h2 className="mb-4 text-base font-bold text-fg">{title}</h2>
+    <Reveal as="section" delay={delay} className="rounded-xl border border-edge bg-surface shadow-panel p-5">
+      <h2 className="mb-4 text-base font-semibold tracking-[-0.01em] text-fg">{title}</h2>
       {children}
-    </section>
+    </Reveal>
   )
 }
 
@@ -120,7 +122,7 @@ export function ProjectAnalyticsPage() {
               }))}
             />
           </Panel>
-          <Panel title={t('analytics.byPriority')}>
+          <Panel title={t('analytics.byPriority')} delay={90}>
             <BarList
               total={open.length}
               rows={PRIORITIES.map((priority) => ({
@@ -140,7 +142,7 @@ export function ProjectAnalyticsPage() {
               }))}
             />
           </Panel>
-          <Panel title={t('analytics.workload')}>
+          <Panel title={t('analytics.workload')} delay={90}>
             {workloadRows.length > 0 ? (
               <BarList rows={workloadRows} total={open.length} />
             ) : (

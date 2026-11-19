@@ -12,7 +12,7 @@ import { button } from './ui'
 
 // The issue's steps. Ticking is instant (optimistic); anyone in the workspace sees the list, the
 // creator and the assignee change it.
-export function IssueChecklist({ issueId, canChange }: { issueId: number; canChange: boolean }) {
+export function IssueChecklist({ issueId, canChange, autoFocus = false }: { issueId: number; canChange: boolean; autoFocus?: boolean }) {
   const { t, lang } = useI18n()
   const queryClient = useQueryClient()
   const key = ['issue-checklist', issueId]
@@ -70,7 +70,7 @@ export function IssueChecklist({ issueId, canChange }: { issueId: number; canCha
   return (
     <section aria-labelledby="issue-checklist">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 id="issue-checklist" className="text-base font-bold text-fg">
+        <h2 id="issue-checklist" className="text-base font-semibold tracking-[-0.01em] text-fg">
           {t('checklist.title')}
         </h2>
         {items.length > 0 && <span className="font-mono text-xs text-fg-muted tabular">{t('checklist.progress', { done, total: items.length })}</span>}
@@ -108,6 +108,7 @@ export function IssueChecklist({ issueId, canChange }: { issueId: number; canCha
           <input
             aria-label={t('checklist.add')}
             placeholder={t('checklist.placeholder')}
+            autoFocus={autoFocus}
             className={`${formInputClass} mt-0! flex-1`}
             value={text}
             maxLength={200}

@@ -3,7 +3,7 @@ import type { ErrorInfo, ReactNode } from 'react'
 import { useT } from '../i18n'
 import { reportError } from '../lib/sentry'
 import { Logo } from './Track'
-import { button } from './ui'
+import { button, pageTitle } from './ui'
 
 function Fallback({ onRetry }: { onRetry: () => void }) {
   const t = useT()
@@ -11,7 +11,7 @@ function Fallback({ onRetry }: { onRetry: () => void }) {
     <div className="flex min-h-screen items-center justify-center px-4 text-fg">
       <div role="alert" className="glass w-full max-w-md rounded-[24px] p-8">
         <Logo />
-        <h1 className="mt-6 text-[28px] font-medium leading-tight tracking-[-0.035em]">{t('crash.title')}</h1>
+        <h1 className={`mt-6 ${pageTitle}`}>{t('crash.title')}</h1>
         <p className="mt-2 text-[15px] text-fg-muted">{t('crash.text')}</p>
         <div className="mt-6 flex flex-wrap gap-2">
           <button type="button" onClick={() => window.location.reload()} className={`${button('primary')} rounded-xl`}>

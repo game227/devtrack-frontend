@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { I18nContext } from './context'
 import type { I18nValue } from './context'
-import { formatDate, formatDateTime, formatShortDate, formatTime, readStoredLang, storeLang, translate } from './core'
+import { formatDate, formatDateTime, formatLongDay, formatShortDate, formatTime, readStoredLang, storeLang, translate } from './core'
 import type { Lang, TranslateParams } from './core'
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -27,6 +27,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       formatDateTime: (iso: string) => formatDateTime(lang, iso),
       formatDate: (iso: string) => formatDate(lang, iso),
       formatShortDate: (iso: string) => formatShortDate(lang, iso),
+      formatLongDay: (date: Date) => formatLongDay(lang, date),
       formatTime: (iso: string) => formatTime(lang, iso),
     }),
     [lang, setLang, t],

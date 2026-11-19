@@ -13,6 +13,9 @@ export interface AppNotification {
   target_type: NotificationTargetType
   target_id: number
   target_display: string
+  // Who did it (the comment's author) and the issue it is about, when there is one.
+  actor?: string | null
+  issue?: { id: number; number: number; title: string } | null
   is_read: boolean
   created_at: string
 }

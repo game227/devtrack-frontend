@@ -76,4 +76,19 @@ describe('refreshAccessToken racing a password change', () => {
     expect(await refreshAccessToken()).toBe('a2')
     expect(tokenStore.getStoredRefreshToken()).toBe('r2')
   })
+
+  it('ends a session whose stored token was cleared elsewhere (signed out in another tab)', async () => {
+    tokenStore.setStoredRefreshToken(null)
+    expect(await refreshAccessToken()).toBeNull()
+    expect(tokenStore.getAccessToken()).toBeNull()
+    expect(expired).toHaveBeenCalledOnce()
+    expect(refreshPost).not.toHaveBeenCalled()
+  })
+
+  it('stays quiet when there was no session at all', async () => {
+    tokenStore.setStoredRefreshToken(null)
+    tokenStore.setAccessToken(null)
+    expect(await refreshAccessToken()).toBeNull()
+    expect(expired).not.toHaveBeenCalled()
+  })
 })

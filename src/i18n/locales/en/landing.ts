@@ -1,4 +1,8 @@
 const en: Record<string, string> = {
+  'landing.getStartedShort': 'Get started',
+  'landing.askUs': 'Questions?',
+  'landing.trust.kicker': 'Security',
+  'landing.trust.lead': 'Your accounts and code connections are protected by default; nothing to set up first.',
   'demo.try': 'Try the demo',
   'demo.starting': 'Preparing the demo…',
   'demo.busy': 'The demo is busy right now. Try again in a little while.',
@@ -76,6 +80,23 @@ const en: Record<string, string> = {
   'landing.finalTitle': 'Start with one project',
   'landing.finalText': 'A workspace and a first board take about a minute.',
   'landing.footer': '© {year} DevTrack',
+  'landing.try.kicker': 'Try it',
+  'landing.try.title': 'Drag a card, or let a commit move it',
+  'landing.try.lead': 'A small copy of the real board. Drag a card to another station (or press it to send it on), or write a commit message with its number: "fixes #2" finishes it.',
+  'landing.try.board': 'Practice board',
+  'landing.try.cardLabel': '#{number} {title}, {status}. Press to send it to the next station',
+  'landing.try.moved': '#{number} {title}: {status}',
+  'landing.try.commitLabel': 'Commit message',
+  'landing.try.commit': 'Commit',
+  'landing.try.reset': 'Start over',
+  'landing.try.log': 'Commits',
+  'landing.try.noMatch': 'No #number in the message. Try: fixes #2',
+  'landing.try.unknown': 'There is no #{number} on this board',
+  'landing.try.allDone': "Everything is done. That's the whole line.",
+  'landing.try.card1': 'Sign-in page',
+  'landing.try.card2': 'Password reset email',
+  'landing.try.card3': 'Rounding error in payments',
+  'landing.try.card4': 'Dark mode',
 }
 
 export default en

@@ -17,19 +17,61 @@ import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useI18n } from '../i18n'
 import { button, notice, pageTitle } from '../components/ui'
 import { PushCard } from '../components/PushCard'
+import { updateMe } from '../api/auth'
+import { useAuth } from '../features/auth/authContext'
 
 const primaryButton = button('primary')
 const dangerButton = button('danger')
 
-function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings'; children: ReactNode }) {
+function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings' | 'mail'; children: ReactNode }) {
   return (
     <section className="rounded-xl border border-edge bg-surface shadow-panel p-5">
-      <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-fg">
+      <h2 className="mb-3 flex items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
         {icon && <Icon name={icon} size={18} />}
         {title}
       </h2>
       {children}
     </section>
+  )
+}
+
+// The Monday email: projects' health, late issues and what got done, for owners and admins.
+function DigestCard() {
+  const { t } = useI18n()
+  const { user, refreshUser } = useAuth()
+  const [error, setError] = useState(false)
+  const save = useMutation({
+    mutationFn: (on: boolean) => updateMe({ weekly_digest: on }),
+    onSuccess: () => {
+      setError(false)
+      void refreshUser()
+    },
+    onError: () => setError(true),
+  })
+  if (!user || user.weekly_digest === undefined) return null
+  const on = save.isPending ? Boolean(save.variables) : user.weekly_digest
+  return (
+    <Card title={t('digest.title')} icon="mail">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="max-w-md text-sm text-fg-muted">{t('digest.help')}</p>
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-fg">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-[var(--color-fg)]"
+            checked={on}
+            disabled={save.isPending}
+            onChange={(e) => save.mutate(e.target.checked)}
+          />
+          {t(on ? 'digest.on' : 'digest.off')}
+        </label>
+      </div>
+      {!user.email_verified && <p className="mt-2 text-xs text-fg-muted">{t('digest.verify')}</p>}
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-danger">
+          {t('digest.failed')}
+        </p>
+      )}
+    </Card>
   )
 }
 
@@ -52,6 +94,7 @@ export function SettingsPage() {
       <GithubConnectionCard />
       <TelegramConnectionCard />
       <PushCard />
+      <DigestCard />
       <ContactCard />
     </div>
   )

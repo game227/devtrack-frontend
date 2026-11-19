@@ -6,6 +6,7 @@ import { FormField, formInputClass } from '../components/FormField'
 import { useAuth } from '../features/auth/authContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { Spinner } from '../components/Spinner'
 
 export function LoginPage() {
   const { t, lang } = useI18n()
@@ -97,8 +98,9 @@ export function LoginPage() {
           </Link>
         </div>
 
-        <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-          {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
+        <button aria-busy={isSubmitting} type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+          {isSubmitting && <Spinner />}
+{t('auth.signIn')}
         </button>
 
         <p className="mt-6 text-center text-sm text-fg-muted">

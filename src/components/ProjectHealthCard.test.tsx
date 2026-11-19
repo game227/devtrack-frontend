@@ -94,14 +94,15 @@ describe('ProjectHealthCard', () => {
     expect(screen.getByText('No activity for 16 days.')).toBeInTheDocument()
   })
 
-  it('opens a breakdown with the numbers behind each factor', async () => {
+  it('says under each factor why it scored what it did, and breaks down the points on request', async () => {
     getProjectHealth.mockResolvedValue(health())
     renderCard()
-    await userEvent.click(await screen.findByText('How is this calculated?'))
-    const list = screen.getByText(/2 of 10 issues done · 50% of the schedule has passed/).closest('ul') as HTMLElement
-    expect(within(list).getByText('12.4 pts')).toBeInTheDocument()
-    expect(within(list).getByText('Last activity 1 day(s) ago (GitHub)')).toBeInTheDocument()
-    expect(within(list).getByText('1 of 3 items in flight have stalled')).toBeInTheDocument()
+    expect(await screen.findByText(/2 of 10 issues done · 50% of the schedule has passed/)).toBeInTheDocument()
+    expect(screen.getByText('Last activity 1 day(s) ago (GitHub)')).toBeInTheDocument()
+    expect(screen.getByText('1 of 3 items in flight have stalled')).toBeInTheDocument()
+    await userEvent.click(screen.getByText('How is this calculated?'))
+    const list = screen.getByText('12.4 pts').closest('ul') as HTMLElement
+    expect(within(list).getByText('Are we as far along as the plan says we should be?')).toBeInTheDocument()
   })
 
   it('still renders against an older backend that has no breakdown or new factors', async () => {

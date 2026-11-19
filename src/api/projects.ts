@@ -36,6 +36,14 @@ export async function updateProject(id: number, payload: UpdateProjectPayload): 
   return data
 }
 
+// Keeps a project in (or takes it out of) the signed-in user's sidebar.
+export async function setProjectFavorite(id: number, favorite: boolean): Promise<boolean> {
+  const { data } = favorite
+    ? await apiClient.put<{ is_favorite: boolean }>(`/projects/${id}/favorite/`)
+    : await apiClient.delete<{ is_favorite: boolean }>(`/projects/${id}/favorite/`)
+  return data.is_favorite
+}
+
 export async function listProjectMembers(projectId: number): Promise<ProjectMember[]> {
   return getAllPages<ProjectMember>(`/projects/${projectId}/members/`)
 }

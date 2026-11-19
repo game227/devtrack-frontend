@@ -19,6 +19,7 @@ vi.mock('../api/issues', () => ({
   listIssues: (...args: unknown[]) => listIssues(...args),
   exportIssues: (...args: unknown[]) => exportIssues(...args),
 }))
+vi.mock('../api/projects', () => ({ listProjects: () => Promise.resolve([{ id: 1, name: 'Payments' }]) }))
 vi.mock('../api/labels', () => ({ listLabels: () => Promise.resolve([{ id: 4, name: 'ui', color: '#111111', workspace: 3, project: null }]) }))
 vi.mock('../api/savedViews', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../api/savedViews')>()),
@@ -110,5 +111,18 @@ describe('IssuesPage filters', () => {
     renderPage('/issues?status=in_review')
     await userEvent.click(screen.getByRole('button', { name: 'Export CSV' }))
     expect(exportIssues).toHaveBeenCalledWith({ workspace: 3 }, { status: 'in_review' }, 'en')
+  })
+
+  it('names the project of each issue and lists finished work last', async () => {
+    const base = { project: 1, type: 'task', priority: 'none', labels: [], assignee: null, due_date: null, github_number: null, checklist: null, estimate: null }
+    listIssues.mockResolvedValue([
+      { ...base, id: 1, number: 1, title: 'Old one', status: 'done' },
+      { ...base, id: 2, number: 2, title: 'Open one', status: 'todo' },
+    ])
+    renderPage()
+    const rows = await screen.findAllByRole('listitem')
+    expect(rows[0]).toHaveTextContent('Open one')
+    expect(rows[0]).toHaveTextContent('Payments')
+    expect(rows[1]).toHaveTextContent('Old one')
   })
 })

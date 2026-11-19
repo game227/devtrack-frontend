@@ -7,9 +7,10 @@ type Size = 'sm' | 'md' | 'lg'
 const BUTTON_BASE =
   'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-[background-color,border-color,box-shadow,transform] duration-150 active:translate-y-px disabled:pointer-events-none disabled:opacity-50'
 
+// On touch screens (coarse pointers) the small sizes grow to a comfortable 40-44px target.
 const BUTTON_SIZE: Record<Size, string> = {
-  sm: 'h-8 px-3 text-[13px]',
-  md: 'h-10 px-4 text-sm',
+  sm: 'h-8 px-3 text-[13px] pointer-coarse:h-10',
+  md: 'h-10 px-4 text-sm pointer-coarse:h-11',
   lg: 'h-12 px-6 text-[15px]',
 }
 
@@ -28,7 +29,7 @@ export function button(tone: Tone = 'secondary', size: Size = 'md'): string {
 // A square icon-only button (its accessible name comes from aria-label).
 export function iconButton(size: 'sm' | 'md' = 'md'): string {
   return `inline-flex shrink-0 items-center justify-center rounded-full text-fg-muted transition-colors duration-150 hover:bg-surface/80 hover:text-fg ${
-    size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'
+    size === 'sm' ? 'h-8 w-8 pointer-coarse:h-10 pointer-coarse:w-10' : 'h-10 w-10 pointer-coarse:h-11 pointer-coarse:w-11'
   }`
 }
 

@@ -19,14 +19,24 @@ function phrase(relation: IssueRelation) {
   return relation.direction === 'out' ? `relations.${relation.kind}` : `relations.${relation.kind}.in`
 }
 
-export function IssueRelations({ issueId, workspaceId, canChange }: { issueId: number; workspaceId: number; canChange: boolean }) {
+export function IssueRelations({
+  issueId,
+  workspaceId,
+  canChange,
+  startAdding = false,
+}: {
+  issueId: number
+  workspaceId: number
+  canChange: boolean
+  startAdding?: boolean
+}) {
   const { t, lang } = useI18n()
   const queryClient = useQueryClient()
   const key = ['issue-relations', issueId]
   const query = useQuery({ queryKey: key, queryFn: () => listRelations(issueId) })
   const relations = query.data ?? []
 
-  const [adding, setAdding] = useState(false)
+  const [adding, setAdding] = useState(startAdding)
   const [kind, setKind] = useState<RelationKind>('relates')
   const [term, setTerm] = useState('')
   const [debounced, setDebounced] = useState('')
@@ -64,7 +74,7 @@ export function IssueRelations({ issueId, workspaceId, canChange }: { issueId: n
   return (
     <section aria-labelledby="issue-relations">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 id="issue-relations" className="text-base font-bold text-fg">
+        <h2 id="issue-relations" className="text-base font-semibold tracking-[-0.01em] text-fg">
           {t('relations.title')}
         </h2>
         {canChange && !adding && (

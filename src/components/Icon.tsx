@@ -137,6 +137,21 @@ const PATHS = {
     </>
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
+  chevronRight: <path d="m9 6 6 6-6 6" />,
+  collapse: <path d="M4 12h6m0 0-3-3m3 3-3 3m13-3h-6m0 0 3-3m-3 3 3 3" />,
+  star: <path d="m12 3.6 2.55 5.17 5.7.83-4.12 4.02.97 5.68L12 16.62 6.9 19.3l.97-5.68L3.75 9.6l5.7-.83z" />,
+  sidebar: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <path d="M9.5 4v16" />
+    </>
+  ),
+  members: (
+    <>
+      <circle cx="9.5" cy="8" r="3.5" />
+      <path d="M3.5 19.5a6 6 0 0 1 12 0M18.5 8v6m-3-3h6" />
+    </>
+  ),
   mail: (
     <>
       <rect x="3" y="5" width="18" height="14" rx="2.5" />

@@ -84,22 +84,25 @@ test('saved views, CSV export and the issue tools', async ({ page, request }) =>
   await page.getByRole('button', { name: 'Saqlash' }).click()
   await expect(page.locator('section[aria-labelledby="issue-description"] strong')).toHaveText('Steps')
 
-  await page.getByRole('textbox', { name: "Bosqich qo'shish" }).fill('Reproduce it')
-  await page.getByRole('button', { name: "Bosqich qo'shish" }).click()
+  // Empty parts wait in the "Add" row; each opens ready to type into.
+  await page.getByRole('group', { name: "Vazifaga qo'shish:" }).getByRole('button', { name: 'Qadamlar' }).click()
+  await page.getByRole('textbox', { name: "Qadam qo'shish" }).fill('Reproduce it')
+  await page.getByRole('button', { name: "Qadam qo'shish" }).click()
   // The field clears once the step is saved and the list reloaded.
-  await expect(page.getByRole('textbox', { name: "Bosqich qo'shish" })).toHaveValue('')
+  await expect(page.getByRole('textbox', { name: "Qadam qo'shish" })).toHaveValue('')
   const step = page.getByRole('checkbox', { name: 'Reproduce it' })
   // A click and a waiting assertion: check() reads the box at the very moment React re-renders it.
   await step.click()
   await expect(step).toBeChecked()
   await expect(page.getByText('1 tadan 1 tasi bajarildi')).toBeVisible()
 
-  await page.getByRole('button', { name: "Vazifani bog'lash" }).click()
+  await page.getByRole('group', { name: "Vazifaga qo'shish:" }).getByRole('button', { name: "Bog'liq vazifa" }).click()
   await page.getByLabel("Bog'lanish turi").selectOption('blocks')
   await page.getByLabel("Vazifani nomi yoki raqami bo'yicha toping").fill(`Blocker ${stamp}`)
   await page.getByRole('button', { name: new RegExp(`Blocker ${stamp}`) }).click()
   await expect(page.getByRole('link', { name: new RegExp(`#${other.number} Blocker`) })).toBeVisible()
 
+  await page.getByRole('group', { name: "Vazifaga qo'shish:" }).getByRole('button', { name: 'Fayl' }).click()
   await page.locator('input[type=file]').setInputFiles({ name: 'screen.png', mimeType: 'image/png', buffer: PNG })
   await expect(page.getByText('screen.png')).toBeVisible()
   await expect(page.locator('section[aria-labelledby="issue-attachments"] img')).toBeVisible()

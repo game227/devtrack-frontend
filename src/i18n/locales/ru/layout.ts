@@ -1,4 +1,8 @@
 const ru: Record<string, string> = {
+  'nav.mobile': 'Основные разделы',
+  'notifications.rich.commented': '{actor} прокомментировал(а) #{number} «{title}»',
+  'notifications.rich.mentioned': '{actor} упомянул(а) вас в #{number} «{title}»',
+  'notifications.rich.issue_assigned': 'Вам назначена задача #{number} «{title}»',
   'nav.overview': 'Обзор',
   'nav.board': 'Доска',
   'nav.milestones': 'Этапы',
@@ -18,6 +22,12 @@ const ru: Record<string, string> = {
   'notifications.mentioned': 'Вас упомянули: «{target}»',
   'notifications.workspace_invited': 'Вас пригласили в «{target}»',
   'notifications.project_member_added': 'Вас добавили в «{target}»',
+  'nav.sidebar': 'Боковая панель',
+  'nav.collapseSidebar': 'Свернуть панель',
+  'nav.expandSidebar': 'Развернуть панель',
+  'nav.breadcrumb': 'Вы здесь',
+  'nav.favorites': 'Избранное',
+  'nav.favoritesEmpty': 'Отметьте проект звёздочкой (☆ рядом с названием) — он будет здесь, в один клик.',
 }
 
 export default ru

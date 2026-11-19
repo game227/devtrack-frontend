@@ -1,9 +1,9 @@
 import { useT } from '../i18n'
-import { STATUS_COLOR } from '../lib/statusColors'
 import type { Priority, ProjectStatus } from '../types/project'
 import type { IssueStatus } from '../types/issue'
 import type { ProjectHealthStatus } from '../types/health'
 import type { PullRequestState } from '../types/integrations'
+import { StationGlyph } from './Track'
 
 // Chips: a coloured dot for the state, the label in text colour (so it always reads at 4.5:1).
 
@@ -50,7 +50,12 @@ export function StatusBadge({ status }: { status: ProjectStatus }) {
 
 export function IssueStatusBadge({ status }: { status: IssueStatus }) {
   const t = useT()
-  return <Chip label={t(`status.${status}`)} color={STATUS_COLOR[status]} />
+  return (
+    <span className="inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-surface/70 px-2.5 text-xs font-medium text-fg">
+      <StationGlyph status={status} size={11} />
+      {t(`status.${status}`)}
+    </span>
+  )
 }
 
 // Priority as signal bars (one to three, urgent is a solid red chip). "No priority" shows nothing:

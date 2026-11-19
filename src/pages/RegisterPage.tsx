@@ -6,6 +6,8 @@ import { FormField, formInputClass } from '../components/FormField'
 import { useAuth } from '../features/auth/authContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { PasswordRules } from '../components/PasswordRules'
+import { Spinner } from '../components/Spinner'
 
 interface FormState {
   username: string
@@ -129,6 +131,7 @@ export function RegisterPage() {
               required
             />
           </FormField>
+          <PasswordRules value={form.password} />
         </div>
 
         <div className="mb-4">
@@ -144,8 +147,9 @@ export function RegisterPage() {
           </FormField>
         </div>
 
-        <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-          {isSubmitting ? t('auth.creatingAccount') : t('auth.createAccount')}
+        <button aria-busy={isSubmitting} type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+          {isSubmitting && <Spinner />}
+{t('auth.createAccount')}
         </button>
 
         <p className="mt-3 text-center text-xs text-fg-muted">

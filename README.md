@@ -36,11 +36,17 @@ npm run dev
 - PWA: `public/manifest.webmanifest`, icons and `public/sw.js` make the app installable. The service worker
   (production builds only) caches only `/assets/*` and the shell for offline navigation; API calls are
   never cached. It also shows Web Push notifications; Settings has the switch when the API has VAPID keys.
+- Issue tools: share links (`/share/:token`, a public read-only page) and printing, templates in the
+  new-issue dialog, bulk changes on issue lists (tick rows, then one change; the server skips what you
+  may not change), WIP limits per board column, issue history and time logging on the issue page,
+  recurring issues on the project overview, and the phone bottom navigation.
+- Issue-page keys (registered through `setPageShortcuts`, tried after the global ones): S status,
+  A assignee, P priority, E edit description, M comment, T log time.
 - `VITE_DEMO_ENABLED=true` (with `DEMO_ENABLED` on the API) adds "Try the demo" to the landing page and a
   banner inside the app for demo accounts.
 - The language is stored in `localStorage` (`devtrack_lang`); the default is Uzbek. A test checks that
   every English key exists in Uzbek and Russian with the same `{placeholders}`. Russian dates use the
-  browser's `ru-RU` data; the landing page shows the English screenshots to Russian visitors.
+  browser's `ru-RU` data. The landing page has screenshots in all three languages.
 
 ## Design system
 
@@ -77,6 +83,28 @@ The Django admin wears the same tokens (`devtrack-backend/apps/adminui`).
 Contrast is part of the system (WCAG 2.1 AA, checked with axe-core in both themes and at phone width):
 text tokens meet 4.5:1 on `bg`, `surface` and `well`; `border-strong` and the station colours meet
 3:1 (WCAG 1.4.11), so form controls use `border-border-strong` (`formInputClass` already does).
+
+### Layout and patterns
+
+- **App shell**: from `lg` a floating sidebar (`components/AppSidebar.tsx`) holds the workspace switcher,
+  the main sections, starred projects (`PUT /projects/<id>/favorite/`, the star next to a project's name)
+  and settings; it narrows to icons (remembered in `devtrack_sidebar`). The top bar shows where you are
+  (`components/Breadcrumbs.tsx`). Below `lg` a drawer has the same sections; phones also get the bottom bar.
+- **Station glyphs** (`StationGlyph` in `components/Track.tsx`): each station also has a shape (dashed
+  ring, ring, half, three-quarters, full with a tick), so status never depends on colour alone.
+- **Home**: getting-started steps for a new workspace (ticked from real data, hideable), "My day" (overdue,
+  today and the coming week of my issues), the station line, compact recent activity.
+- **Board**: compact or comfortable cards, columns that fold to a strip, a row per assignee, and a dashed
+  "lands here" placeholder while dragging; preferences per project in `devtrack_board:<id>`.
+- **Issue page**: empty parts (steps, links, files) wait in one "Add" row; properties are sticky on
+  desktops and open as a bottom sheet on phones; "Saved" confirms each change; titles glide from a card
+  or row into the heading (view transitions, off with reduced motion).
+- **Phones**: swipe a list row left to send the issue to its next station (with undo); small buttons grow
+  to 40-44px on coarse pointers.
+- **Charts**: the burndown has a crosshair readout (pointer, or arrow keys when focused), project rows a
+  weekly "finished" column chart, health a ring meter. Dark theme: three depth levels, soft white text.
+- **Landing**: an interactive practice board (`components/landing/TryBoard.tsx`): drag or press cards,
+  or write a commit like `fixes #2`.
 
 ## Accessibility conventions
 
@@ -115,7 +143,7 @@ src/
   types/        # types mirroring backend serializers
   lib/          # small shared helpers
   test/         # Vitest setup and render helpers
-public/screens/ # product screenshots (uz/en; ru uses en) used by the landing page
+public/screens/ # product screenshots (uz/en/ru) used by the landing page
 ```
 
 ## Landing page and screenshots

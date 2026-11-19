@@ -1,4 +1,8 @@
 const ru: Record<string, string> = {
+  'landing.getStartedShort': 'Начать',
+  'landing.askUs': 'Есть вопросы?',
+  'landing.trust.kicker': 'Безопасность',
+  'landing.trust.lead': 'Аккаунты и подключения к коду защищены по умолчанию — ничего не нужно настраивать заранее.',
   'demo.try': 'Попробовать демо',
   'demo.starting': 'Готовим демо…',
   'demo.busy': 'Демо сейчас занято. Попробуйте чуть позже.',
@@ -64,6 +68,23 @@ const ru: Record<string, string> = {
   'landing.finalTitle': 'Начните с одного проекта',
   'landing.finalText': 'Пространство и первая доска — примерно минута.',
   'landing.footer': '© {year} DevTrack',
+  'landing.try.kicker': 'Попробуйте',
+  'landing.try.title': 'Перетащите карточку или дайте коммиту сдвинуть её',
+  'landing.try.lead': 'Маленькая копия настоящей доски. Перетащите карточку на другую станцию (или нажмите — она перейдёт дальше) либо напишите коммит с её номером: «fixes #2» завершит задачу.',
+  'landing.try.board': 'Пробная доска',
+  'landing.try.cardLabel': '#{number} {title}, {status}. Нажмите, чтобы перевести на следующую станцию',
+  'landing.try.moved': '#{number} {title}: {status}',
+  'landing.try.commitLabel': 'Сообщение коммита',
+  'landing.try.commit': 'Закоммитить',
+  'landing.try.reset': 'Сначала',
+  'landing.try.log': 'Коммиты',
+  'landing.try.noMatch': 'В сообщении нет #номера. Например: fixes #2',
+  'landing.try.unknown': 'На этой доске нет #{number}',
+  'landing.try.allDone': 'Всё готово. Вот и вся линия.',
+  'landing.try.card1': 'Страница входа',
+  'landing.try.card2': 'Письмо для сброса пароля',
+  'landing.try.card3': 'Ошибка округления в платежах',
+  'landing.try.card4': 'Тёмная тема',
 }
 
 export default ru

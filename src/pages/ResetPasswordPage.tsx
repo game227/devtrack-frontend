@@ -6,6 +6,8 @@ import { AuthShell, primaryButtonClass } from '../components/AuthShell'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { PasswordRules } from '../components/PasswordRules'
+import { Spinner } from '../components/Spinner'
 
 export function ResetPasswordPage() {
   const { t, lang } = useI18n()
@@ -77,6 +79,7 @@ export function ResetPasswordPage() {
                 required
               />
             </FormField>
+            <PasswordRules value={password} />
           </div>
 
           <div className="mb-4">
@@ -92,8 +95,9 @@ export function ResetPasswordPage() {
             </FormField>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-            {isSubmitting ? t('auth.resetting') : t('auth.resetPassword')}
+          <button aria-busy={isSubmitting} type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+            {isSubmitting && <Spinner />}
+{t('auth.resetPassword')}
           </button>
 
           <p className="mt-6 text-center text-sm">

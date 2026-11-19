@@ -1,4 +1,6 @@
 const uz: Record<string, string> = {
+  'members.roleHint.member': "Loyiha va vazifalar bilan ishlaydi; odam taklif qila olmaydi va rollarni o'zgartira olmaydi.",
+  'members.roleHint.admin': "Bundan tashqari a'zolarni taklif qiladi va chiqaradi, ish maydonidagi barcha loyihalarni boshqaradi.",
   'members.title': "A'zolar",
   'members.count': "{count} a'zo",
   'members.you': 'siz',

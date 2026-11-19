@@ -7,7 +7,10 @@ import { NewIssueDialog } from './NewIssueDialog'
 import type { Workspace } from '../../types/workspace'
 
 const listProjects = vi.fn()
-vi.mock('../../api/projects', () => ({ listProjects: (...args: unknown[]) => listProjects(...args) }))
+vi.mock('../../api/projects', () => ({
+  listProjects: (...args: unknown[]) => listProjects(...args),
+  listProjectMembers: () => Promise.resolve([{ id: 1, user: { id: 9, username: 'timur', avatar: null }, role: '', specialty: '', added_at: '' }]),
+}))
 const createIssue = vi.fn()
 vi.mock('../../api/issues', () => ({ createIssue: (...args: unknown[]) => createIssue(...args) }))
 
@@ -58,5 +61,29 @@ describe('NewIssueDialog', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Create issue' }))
     await waitFor(() => expect(createIssue).toHaveBeenCalled())
     expect(createIssue.mock.calls[0][0]).toEqual(expect.objectContaining({ project: 4, status: 'todo', title: 'Ship it' }))
+  })
+
+  it('fills the description from a template without overwriting typed text, and sends assignee and due date', async () => {
+    listProjects.mockResolvedValue([{ id: 4, name: 'Payments API', status: 'active' }])
+    createIssue.mockResolvedValue({ id: 1, project: 4, number: 1 })
+    renderDialog()
+    await waitFor(() => expect(screen.getByLabelText('Project')).toHaveValue('4'))
+    await userEvent.click(screen.getByRole('button', { name: 'Bug report' }))
+    expect(screen.getByLabelText('Type')).toHaveValue('bug')
+    expect((screen.getByLabelText('Description') as HTMLTextAreaElement).value).toContain('## Steps to reproduce')
+    // Switching template replaces an untouched template...
+    await userEvent.click(screen.getByRole('button', { name: 'New feature' }))
+    expect((screen.getByLabelText('Description') as HTMLTextAreaElement).value).toContain('## Problem')
+    // ...but never text someone typed.
+    await userEvent.clear(screen.getByLabelText('Description'))
+    await userEvent.type(screen.getByLabelText('Description'), 'My own words')
+    await userEvent.click(screen.getByRole('button', { name: 'Task' }))
+    expect(screen.getByLabelText('Description')).toHaveValue('My own words')
+
+    await userEvent.type(screen.getByLabelText('Title'), 'Crash on save')
+    await userEvent.selectOptions(screen.getByLabelText('Assignee'), await screen.findByRole('option', { name: 'timur' }))
+    await userEvent.type(screen.getByLabelText('Due date (optional)'), '2026-12-01')
+    await userEvent.click(screen.getByRole('button', { name: 'Create issue' }))
+    expect(createIssue.mock.calls[0][0]).toMatchObject({ title: 'Crash on save', type: 'task', assignee_id: 9, due_date: '2026-12-01' })
   })
 })

@@ -1,4 +1,14 @@
 const ru: Record<string, string> = {
+  'plan.passed': 'Дата прошла {days} дн. назад',
+  'plan.complete': 'Все задачи выполнены',
+  'plan.running': 'День {day} из {total} · осталось дней: {left}',
+  'plan.left': 'Осталось дней: {days}',
+  'plan.dueToday': 'Срок — сегодня',
+  'plan.upcoming': 'Начнётся через {days} дн.',
+  'plan.overdue': 'Дата прошла {days} дн. назад · открытых задач: {left}',
+  'plan.noIssues': 'Задач пока нет',
+  'plan.howToAddCycle': 'Чтобы добавить задачу, откройте её и выберите этот цикл в поле «Цикл» справа.',
+  'plan.howToAddMilestone': 'Чтобы добавить задачу, откройте её и выберите этот этап в поле «Этап» справа.',
   'burndown.toggle': 'Диаграмма сгорания',
   'burndown.title': 'Сгорание: {name}',
   'burndown.left': 'Осталось: {count} {unit}',
@@ -54,6 +64,7 @@ const ru: Record<string, string> = {
   'analytics.noIssues': 'Задач пока нет — аналитика появится, когда они будут.',
   'analytics.noCycles': 'Циклов пока нет.',
   'analytics.barLabel': '{label}: {value} ({percent}%)',
+  'burndown.explore': '{name}: стрелки ← → показывают значения по дням',
 }
 
 export default ru

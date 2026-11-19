@@ -8,6 +8,8 @@ import { iconButton } from './ui'
 import type { AppNotification } from '../types/notification'
 
 function notificationLink(notification: AppNotification): string | null {
+  // A comment or mention opens the issue it was written on.
+  if (notification.issue) return `/issues/${notification.issue.id}`
   if (notification.target_type === 'issue') return `/issues/${notification.target_id}`
   if (notification.target_type === 'project') return `/projects/${notification.target_id}`
   return null
@@ -58,6 +60,13 @@ export function NotificationsMenu() {
   }, [unreadCount, notificationsQuery.isSuccess])
 
   function notificationText(notification: AppNotification): string {
+    const issue = notification.issue
+    if (issue && notification.actor && (notification.verb === 'commented' || notification.verb === 'mentioned')) {
+      return t(`notifications.rich.${notification.verb}`, { actor: notification.actor, number: issue.number, title: issue.title })
+    }
+    if (issue && notification.verb === 'issue_assigned') {
+      return t('notifications.rich.issue_assigned', { number: issue.number, title: issue.title })
+    }
     const key = `notifications.${notification.verb}`
     const text = t(key, { target: notification.target_display })
     // Unknown verbs from a newer backend fall back to the raw verb instead of a translation key.
@@ -95,7 +104,7 @@ export function NotificationsMenu() {
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 top-full z-40 mt-2 max-h-[28rem] w-96 max-w-[calc(100vw-1.5rem)] origin-top-right animate-scale-in overflow-y-auto glass rounded-xl shadow-float max-sm:-right-12">
+        <div className="absolute right-0 top-full z-40 mt-2 max-h-[28rem] w-96 max-w-[calc(100vw-1.5rem)] origin-top-right animate-scale-in overflow-y-auto glass-menu rounded-xl shadow-float max-sm:-right-12">
           <div className="sticky top-0 flex items-center justify-between border-b border-border bg-surface/90 px-4 py-3">
             <h2 className="text-sm font-bold text-fg">{t('notifications.title')}</h2>
             {unreadCount > 0 && (
@@ -128,6 +137,10 @@ export function NotificationsMenu() {
               />
               <span className="min-w-0">
                 <span className={`block ${notification.is_read ? '' : 'font-semibold'}`}>{notificationText(notification)}</span>
+                {/* The comment itself, quoted under the line that says who wrote it where. */}
+                {notification.issue && notification.actor && notification.target_display && (
+                  <span className="mt-0.5 line-clamp-2 block text-xs text-fg-muted">“{notification.target_display}”</span>
+                )}
                 <span className="mt-0.5 block text-xs text-fg-muted">{formatDateTime(notification.created_at)}</span>
               </span>
             </button>

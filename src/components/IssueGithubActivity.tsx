@@ -22,7 +22,7 @@ export function IssueGithubActivity({ issueId }: { issueId: number }) {
 
   return (
     <div>
-      <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-fg">
+      <h2 className="mb-3 flex items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
         <Icon name="github" size={18} />
         {t('github.linkedActivity')}
       </h2>

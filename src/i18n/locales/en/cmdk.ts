@@ -1,4 +1,11 @@
 const en: Record<string, string> = {
+  'shortcuts.issue.section': "On an issue's page",
+  'shortcuts.issue.status': 'Change the status',
+  'shortcuts.issue.assignee': 'Choose the assignee',
+  'shortcuts.issue.priority': 'Choose the priority',
+  'shortcuts.issue.edit': 'Edit the description',
+  'shortcuts.issue.comment': 'Write a comment',
+  'shortcuts.issue.time': 'Log time',
   'cmdk.title': 'Command palette',
   'cmdk.placeholder': 'Type a command or search…',
   'cmdk.close': 'Close',

@@ -66,7 +66,7 @@ export function TwoFactorCard({ enabled, onChanged }: { enabled: boolean; onChan
 
   return (
     <section aria-labelledby="two-factor-title" className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5">
-      <h2 id="two-factor-title" className="flex items-center gap-2 text-base font-bold text-fg">
+      <h2 id="two-factor-title" className="flex items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
         {t('twoFactor.title')}
       </h2>
       <p className="text-sm text-fg-muted">{t(enabled ? 'twoFactor.on' : 'twoFactor.off')}</p>

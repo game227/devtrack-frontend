@@ -1,4 +1,11 @@
 const ru: Record<string, string> = {
+  'shortcuts.issue.section': 'На странице задачи',
+  'shortcuts.issue.status': 'Изменить статус',
+  'shortcuts.issue.assignee': 'Выбрать исполнителя',
+  'shortcuts.issue.priority': 'Выбрать приоритет',
+  'shortcuts.issue.edit': 'Изменить описание',
+  'shortcuts.issue.comment': 'Написать комментарий',
+  'shortcuts.issue.time': 'Записать время',
   'cmdk.title': 'Палитра команд',
   'cmdk.placeholder': 'Введите команду или запрос…',
   'cmdk.close': 'Закрыть',

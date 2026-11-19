@@ -10,6 +10,8 @@ import type { User } from '../types/auth'
 
 const listIssues = vi.fn()
 const updateIssue = vi.fn()
+const getProject = vi.fn()
+vi.mock('../api/projects', () => ({ getProject: (...args: unknown[]) => getProject(...args) }))
 vi.mock('../api/issues', () => ({
   listIssues: (...args: unknown[]) => listIssues(...args),
   updateIssue: (...args: unknown[]) => updateIssue(...args),
@@ -81,6 +83,7 @@ describe('ProjectBoardPage', () => {
   beforeEach(() => {
     listIssues.mockReset()
     updateIssue.mockReset()
+    getProject.mockReset().mockResolvedValue({ id: 7, workspace: 3, owner: { id: 99, username: 'o' }, wip_limits: {} })
   })
 
   it('shows all five columns, including the backlog, with Uzbek titles', async () => {
@@ -241,5 +244,64 @@ describe('ProjectBoardPage', () => {
     renderBoard('en', currentUser())
     await userEvent.click(await screen.findByRole('button', { name: 'Add an issue to In progress' }))
     expect(openNewIssue).toHaveBeenCalledWith(7, 'in_progress')
+  })
+
+  it('shows a column against its WIP limit and warns past it', async () => {
+    getProject.mockResolvedValue({ id: 7, workspace: 3, owner: { id: 99, username: 'o' }, wip_limits: { in_progress: 1, todo: 5 } })
+    listIssues.mockResolvedValue([
+      issue({ id: 1, number: 1, title: 'One', status: 'in_progress' }),
+      issue({ id: 2, number: 2, title: 'Two', status: 'in_progress' }),
+      issue({ id: 3, number: 3, title: 'Three', status: 'todo' }),
+    ])
+    renderBoard('en')
+    expect(await screen.findByText('2 of 1: finish something before starting more')).toBeInTheDocument()
+    expect(screen.getByTitle('Limit: 5')).toHaveTextContent('1/5')
+  })
+})
+
+describe('ProjectBoardPage — views', () => {
+  beforeEach(() => {
+    listIssues.mockReset()
+    getProject.mockReset().mockResolvedValue({ id: 7, workspace: 3, owner: { id: 99, username: 'o' }, wip_limits: {} })
+  })
+
+  const fixture = () => [
+    issue({ id: 1, number: 1, title: 'Alex backlog', status: 'backlog', labels: [{ id: 5, name: 'api', color: '#888888' }] as Issue['labels'] }),
+    issue({ id: 2, number: 2, title: 'Jane doing', status: 'in_progress', assignee: { id: 1, username: 'jane.dev', avatar: null } }),
+    issue({ id: 3, number: 3, title: 'Nobody todo', status: 'todo', assignee: null }),
+  ]
+
+  it('switches to compact cards and remembers it for this project', async () => {
+    listIssues.mockResolvedValue(fixture())
+    renderBoard('en', currentUser())
+    expect(await screen.findByText('api')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Compact' }))
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryByText('api')).not.toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem('devtrack_board:7')!)).toMatchObject({ compact: true })
+  })
+
+  it('folds a column to a narrow strip and unfolds it', async () => {
+    listIssues.mockResolvedValue(fixture())
+    renderBoard('en', currentUser())
+    expect(await screen.findByText('Alex backlog')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Fold the Backlog column' }))
+    expect(screen.queryByText('Alex backlog')).not.toBeInTheDocument()
+    const unfold = screen.getByRole('button', { name: 'Unfold the Backlog column' })
+    expect(unfold).toHaveAttribute('aria-expanded', 'false')
+    expect(JSON.parse(localStorage.getItem('devtrack_board:7')!).collapsed).toEqual(['backlog'])
+    await userEvent.click(unfold)
+    expect(screen.getByText('Alex backlog')).toBeInTheDocument()
+  })
+
+  it('groups the board into a row per assignee, you first and unassigned last', async () => {
+    listIssues.mockResolvedValue(fixture())
+    renderBoard('en', currentUser())
+    await screen.findByText('Alex backlog')
+    await userEvent.click(screen.getByRole('button', { name: 'By assignee' }))
+    const rows = screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)
+    expect(rows).toEqual([expect.stringContaining('jane.dev'), expect.stringContaining('alex.k'), expect.stringContaining('Unassigned')])
+    expect(within(screen.getByRole('group', { name: 'alex.k, Backlog' })).getByText('Alex backlog')).toBeInTheDocument()
+    expect(within(screen.getByRole('group', { name: 'Unassigned, Todo' })).getByText('Nobody todo')).toBeInTheDocument()
   })
 })

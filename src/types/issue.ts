@@ -57,6 +57,8 @@ export interface CreateIssuePayload {
   assignee_id?: number | null
   label_ids?: number[]
   due_date?: string | null
+  cycle?: number | null
+  milestone?: number | null
 }
 
 export type UpdateIssuePayload = Partial<Omit<CreateIssuePayload, 'project'>>

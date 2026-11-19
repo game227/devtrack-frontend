@@ -44,15 +44,32 @@ export function StatusTrack({ status, className = '' }: { status: IssueStatus; c
   )
 }
 
-// A single station marker (board column heads, legends). Decorative: the label next to it says the name.
-export function StationDot({ status, size = 10, className = '' }: { status: IssueStatus; size?: number; className?: string }) {
+// A station's mark, readable without colour: how full the circle is says how far the work is. Backlog
+// is a dashed ring, Todo an empty ring, In progress half full, In review three-quarters, Done a full disc
+// with a tick. Decorative: the label next to it says the name.
+export function StationGlyph({ status, size = 12, className = '' }: { status: IssueStatus; size?: number; className?: string }) {
+  const color = STATION_COLOR[status]
   return (
-    <span
-      aria-hidden="true"
-      className={`inline-block shrink-0 rounded-full ring-2 ring-surface ${className}`}
-      style={{ width: size, height: size, backgroundColor: STATION_COLOR[status] }}
-    />
+    <svg aria-hidden="true" focusable="false" width={size} height={size} viewBox="0 0 12 12" className={`shrink-0 ${className}`}>
+      {status === 'done' ? (
+        <>
+          <circle cx="6" cy="6" r="5.5" fill={color} />
+          <path d="m3.6 6.1 1.6 1.6 3.2-3.3" fill="none" stroke="var(--color-surface)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      ) : (
+        <>
+          <circle cx="6" cy="6" r="4.75" fill="var(--color-surface)" stroke={color} strokeWidth="1.5" strokeDasharray={status === 'backlog' ? '2 1.6' : undefined} />
+          {status === 'in_progress' && <path d="M6 2.75a3.25 3.25 0 0 1 0 6.5z" fill={color} />}
+          {status === 'in_review' && <path d="M6 2.75a3.25 3.25 0 1 1-3.25 3.25H6z" fill={color} />}
+        </>
+      )}
+    </svg>
   )
+}
+
+// A single station marker (relations, search results, legends).
+export function StationDot({ status, size = 10, className = '' }: { status: IssueStatus; size?: number; className?: string }) {
+  return <StationGlyph status={status} size={size + 2} className={className} />
 }
 
 // The issue page's status control: the whole line, one button per station. Toggle buttons rather than

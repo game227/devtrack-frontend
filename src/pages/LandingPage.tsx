@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Avatar } from '../components/Avatar'
 import { ContactCircles, ContactList } from '../components/ContactLinks'
@@ -13,6 +14,9 @@ import type { Lang } from '../i18n'
 import { resolveTheme } from '../lib/theme'
 import { DEMO_ENABLED } from '../api/demo'
 import { DemoButton } from '../components/DemoButton'
+import { Reveal } from '../components/Reveal'
+import { TryBoard } from '../components/landing/TryBoard'
+import { useScrolled } from '../hooks/useScrolled'
 
 // A real product screenshot (regenerated with the design; see README), in a frosted frame.
 function Screenshot({ name, alt }: { name: string; alt: string }) {
@@ -82,14 +86,15 @@ const TRUST: Array<{ key: string; icon: IconName }> = [
 // One letter each, so the overlapping circles stay legible.
 const TEAM = ['D', 'S', 'J', 'M']
 
-// Product screenshots exist in Uzbek and English; Russian visitors see the English ones.
+// Product screenshots exist in every interface language (uz, en, ru).
 function screenLang(lang: Lang) {
-  return lang === 'ru' ? 'en' : lang
+  return lang
 }
 
 export function LandingPage() {
   const { t, lang } = useI18n()
   const { isAuthenticated, isLoading } = useAuth()
+  const scrolled = useScrolled(12)
   const heroWords = t('landing.hero.l1').split(' ')
   const heroLast = heroWords.pop() ?? ''
   const heroLead = heroWords.join(' ')
@@ -102,9 +107,14 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen text-fg">
-      {/* A floating glass pill, centred over the page. */}
+      <div aria-hidden="true" className="scroll-progress" />
+      {/* A floating glass pill, centred over the page; it firms up once the page scrolls under it. */}
       <header className="sticky top-0 z-30 px-3 pt-3 sm:pt-5">
-        <div className="glass mx-auto flex h-14 max-w-3xl items-center justify-between gap-2 rounded-2xl pl-4 pr-1.5">
+        <div
+          className={`glass mx-auto flex h-14 max-w-3xl items-center justify-between gap-2 rounded-2xl pl-4 pr-1.5 transition-[box-shadow,background-color] duration-300 ${
+            scrolled ? 'shadow-float [background-color:color-mix(in_srgb,var(--color-surface)_86%,transparent)]' : ''
+          }`}
+        >
           <a href="#top" className="flex h-9 items-center rounded-lg">
             <Logo />
           </a>
@@ -123,11 +133,13 @@ export function LandingPage() {
             </a>
           </nav>
           <div className="flex items-center gap-1">
-            <Link to="/login" className={`${button('ghost', 'sm')} max-sm:hidden`}>
+            <Link to="/login" className={button('ghost', 'sm')}>
               {t('landing.signIn')}
             </Link>
             <Link to="/register" className={`${button('primary', 'md')} rounded-xl`}>
-              {t('landing.getStarted')}
+              {/* Phones get the short label so "Sign in" fits next to it. */}
+              <span className="sm:hidden">{t('landing.getStartedShort')}</span>
+              <span className="max-sm:hidden">{t('landing.getStarted')}</span>
               <Icon name="arrowRight" />
             </Link>
           </div>
@@ -187,50 +199,82 @@ export function LandingPage() {
               </span>
               <span className="text-[13px] font-medium leading-tight text-fg">{t('landing.teams')}</span>
             </div>
-            <div className="mt-10 flex flex-wrap items-end gap-6">
-              <a href="#board" aria-label={t('landing.seeBoard')} className="group block overflow-hidden rounded-xl border border-edge shadow-panel">
-                <img
-                  src={`/screens/${screenLang(lang)}/board.webp`}
-                  alt=""
-                  width={176}
-                  height={96}
-                  className="h-24 w-44 object-cover object-left-top transition-transform duration-300 group-hover:scale-105"
-                />
+            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
+              <a href="#board" className="group flex items-center gap-3 rounded-xl">
+                <span className="block overflow-hidden rounded-xl border border-edge shadow-panel">
+                  <img
+                    src={`/screens/${screenLang(lang)}/board.webp`}
+                    alt=""
+                    width={128}
+                    height={72}
+                    className="h-[72px] w-32 object-cover object-left-top transition-transform duration-300 group-hover:scale-105"
+                  />
+                </span>
+                <span className="text-sm font-medium text-fg">
+                  {t('landing.seeBoard')}
+                  <Icon name="arrowRight" className="ml-1 inline transition-transform duration-200 group-hover:translate-x-0.5" />
+                </span>
               </a>
-              <ContactCircles />
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-fg-muted">{t('landing.askUs')}</span>
+                <ContactCircles />
+              </div>
             </div>
           </div>
-          <HeroDevice />
+          <div className="parallax-up">
+            <HeroDevice />
+          </div>
         </section>
 
         {FEATURES.map((feature, index) => (
           <section key={feature.key} id={feature.id} className="scroll-mt-24">
+            {/* The picture side always gets the wider column, whichever side it is on. */}
             <div
-              className={`mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-20 ${
-                index % 2 ? 'lg:[&>:first-child]:order-2' : ''
+              className={`mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 lg:gap-16 lg:py-20 ${
+                index % 2 ? 'lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:[&>:first-child]:order-2' : 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'
               }`}
             >
-              <div>
+              <Reveal>
                 <p className={badge}>
                   <span aria-hidden="true" className="h-2 w-2 rounded-full bg-fg" />
                   {t(`landing.${feature.key}.kicker`)}
                 </p>
                 <h2 className="mt-5 text-[clamp(1.9rem,3.4vw,2.7rem)] font-medium leading-[1.08] tracking-[-0.04em]">{t(`landing.${feature.key}.title`)}</h2>
                 <p className="mt-4 max-w-md text-[15px] leading-relaxed text-fg-muted">{t(`landing.${feature.key}.text`)}</p>
-              </div>
-              <Screenshot name={feature.shot} alt={t(`landing.shot.${feature.shot}`)} />
+              </Reveal>
+              <Reveal variant={index % 2 ? 'left' : 'right'} delay={120}>
+                <Screenshot name={feature.shot} alt={t(`landing.shot.${feature.shot}`)} />
+              </Reveal>
             </div>
           </section>
         ))}
 
+        <section id="try" aria-labelledby="try-title" className="scroll-mt-24 px-4 py-14 sm:px-6 lg:py-20">
+          <div className="mx-auto max-w-6xl">
+            <Reveal className="max-w-2xl">
+              <p className={badge}>
+                <span aria-hidden="true" className="h-2 w-2 rounded-full bg-orange" />
+                {t('landing.try.kicker')}
+              </p>
+              <h2 id="try-title" className="mt-5 text-[clamp(1.9rem,3.4vw,2.7rem)] font-medium leading-[1.08] tracking-[-0.04em]">
+                {t('landing.try.title')}
+              </h2>
+              <p className="mt-4 text-[15px] leading-relaxed text-fg-muted">{t('landing.try.lead')}</p>
+            </Reveal>
+            <Reveal variant="scale" delay={120} className="mt-8">
+              <TryBoard />
+            </Reveal>
+          </div>
+        </section>
+
         <section id="start" className="scroll-mt-24 px-4 py-14 sm:px-6 lg:py-20">
-          <div className="glass mx-auto max-w-6xl rounded-[28px] px-6 py-12 sm:px-10 lg:px-14 lg:py-16">
+          <Reveal variant="scale" className="glass mx-auto max-w-6xl rounded-[28px] px-6 py-12 sm:px-10 lg:px-14 lg:py-16">
             <h2 className="max-w-xl text-[clamp(1.9rem,3.4vw,2.7rem)] font-medium leading-[1.08] tracking-[-0.04em]">{t('landing.stepsTitle')}</h2>
             {/* The three steps really are a sequence, so they sit on a line of their own. */}
             <ol className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-              <span aria-hidden="true" className="absolute bottom-3 left-[13px] top-3 w-px bg-fg/25 md:bottom-auto md:left-3 md:right-[calc(33.333%-2.1rem)] md:top-[13px] md:h-px md:w-auto" />
+              <span aria-hidden="true" className="draw-line absolute bottom-3 left-[13px] top-3 w-px bg-fg/25 md:bottom-auto md:left-3 md:right-[calc(33.333%-2.1rem)] md:top-[13px] md:h-px md:w-auto" />
               {[1, 2, 3].map((step) => (
-                <li key={step} className="relative pl-12 md:pl-0 md:pt-12">
+                <li key={step} className="reveal-item relative pl-12 md:pl-0 md:pt-12" style={{ '--i': step } as CSSProperties}>
                   <span aria-hidden="true" className="btn-ink absolute left-0 top-0 flex h-[27px] w-[27px] items-center justify-center rounded-full text-xs font-semibold">
                     {step}
                   </span>
@@ -239,15 +283,24 @@ export function LandingPage() {
                 </li>
               ))}
             </ol>
-          </div>
+          </Reveal>
         </section>
 
-        <section className="px-4 py-14 sm:px-6 lg:py-20">
-          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-            <h2 className="text-[1.75rem] font-medium leading-tight tracking-[-0.035em]">{t('landing.trustTitle')}</h2>
-            <ul className="divide-y divide-border">
-              {TRUST.map((item) => (
-                <li key={item.key} className="flex items-start gap-3 py-4 text-[15px] first:pt-0 last:pb-0">
+        <section aria-labelledby="trust-title" className="px-4 py-14 sm:px-6 lg:py-20">
+          <Reveal className="mx-auto grid max-w-6xl items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+            <div>
+              <p className={badge}>
+                <Icon name="shield" size={13} />
+                {t('landing.trust.kicker')}
+              </p>
+              <h2 id="trust-title" className="mt-5 text-[clamp(1.9rem,3.4vw,2.7rem)] font-medium leading-[1.08] tracking-[-0.04em]">
+                {t('landing.trustTitle')}
+              </h2>
+              <p className="mt-4 max-w-md text-[15px] leading-relaxed text-fg-muted">{t('landing.trust.lead')}</p>
+            </div>
+            <ul className="divide-y divide-border rounded-2xl border border-edge bg-surface/70 px-5 shadow-panel">
+              {TRUST.map((item, index) => (
+                <li key={item.key} className="reveal-item flex items-start gap-3 py-4 text-[15px]" style={{ '--i': index } as CSSProperties}>
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-fg/15 bg-surface/50">
                     <Icon name={item.icon} size={15} />
                   </span>
@@ -255,11 +308,11 @@ export function LandingPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Reveal>
         </section>
 
         <section id="contact" aria-labelledby="contact-title" className="scroll-mt-24 px-4 py-14 sm:px-6 lg:py-20">
-          <div className="mx-auto grid max-w-6xl items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+          <Reveal className="mx-auto grid max-w-6xl items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
             <div>
               <p className={badge}>
                 <span aria-hidden="true" className="h-2 w-2 rounded-full bg-orange" />
@@ -271,12 +324,15 @@ export function LandingPage() {
               <p className="mt-4 max-w-md text-[15px] leading-relaxed text-fg-muted">{t('contact.lead')}</p>
             </div>
             <ContactList />
-          </div>
+          </Reveal>
         </section>
 
         <section className="px-4 pb-20 pt-6 sm:px-6">
           {/* The closing call to action is the device's colour: ink, with light text. */}
-          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] bg-[linear-gradient(155deg,#2c2c2a_0%,#101010_45%,#050505_100%)] px-6 py-14 text-white shadow-[0_40px_80px_-40px_rgb(0_0_0/0.7)] sm:px-12 lg:py-20">
+          <Reveal
+            variant="scale"
+            className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] bg-[linear-gradient(155deg,#2c2c2a_0%,#101010_45%,#050505_100%)] px-6 py-14 text-white shadow-[0_40px_80px_-40px_rgb(0_0_0/0.7)] sm:px-12 lg:py-20"
+          >
             <span aria-hidden="true" className="corners pointer-events-none absolute inset-5 [--corner-color:rgb(255_255_255/0.5)]" />
             <div className="relative flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
               <div>
@@ -296,7 +352,7 @@ export function LandingPage() {
                 </Link>
               </div>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
 

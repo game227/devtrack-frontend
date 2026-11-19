@@ -7,12 +7,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createCycle, deleteCycle, listCycles } from '../api/cycles'
 import { BurndownChart } from '../components/BurndownChart'
 import { ConfirmButton } from '../components/ConfirmButton'
+import { PlanCount, PlanTiming } from '../components/PlanTiming'
 import { Icon } from '../components/Icon'
 import { FormField, formInputClass } from '../components/FormField'
 import { ProgressBar } from '../components/ProgressBar'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import { button } from '../components/ui'
+import { Spinner } from '../components/Spinner'
 
 export function ProjectCyclesPage() {
   // The active cycle's burndown is open by default; the others open on request.
@@ -102,12 +104,13 @@ export function ProjectCyclesPage() {
               />
             </FormField>
           </div>
-          <button
+          <button aria-busy={createMutation.isPending}
             type="submit"
             disabled={createMutation.isPending}
             className={button('primary')}
           >
-            {createMutation.isPending ? t('common.creating') : t('cycles.create')}
+            {createMutation.isPending && <Spinner />}
+{t('cycles.create')}
           </button>
         </form>
       )}
@@ -137,11 +140,12 @@ export function ProjectCyclesPage() {
                 <div className="text-xs text-fg-muted">
                   {formatDate(cycle.start_date)} – {formatDate(cycle.end_date)}
                 </div>
+                <div className="mt-1">
+                  <PlanTiming start={cycle.start_date} end={cycle.end_date} done={cycle.completed_count} total={cycle.issue_count} />
+                </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-fg-muted tabular">
-                  {t('planning.doneCount', { done: cycle.completed_count, total: cycle.issue_count })}
-                </span>
+                <PlanCount done={cycle.completed_count} total={cycle.issue_count} />
                 <ConfirmButton
                   onConfirm={() => deleteMutation.mutate(cycle.id)}
                   className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
@@ -150,21 +154,27 @@ export function ProjectCyclesPage() {
                 </ConfirmButton>
               </div>
             </div>
-            <ProgressBar percent={cycle.completion_percent} label={cycle.name} />
-            <button
-              type="button"
-              aria-expanded={isOpen(cycle)}
-              aria-controls={`burndown-${cycle.id}`}
-              onClick={() => setOpen((current) => ({ ...current, [cycle.id]: !isOpen(cycle) }))}
-              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-fg-muted hover:text-fg"
-            >
-              <Icon name="chevronDown" className={`h-3.5 w-3.5 transition-transform ${isOpen(cycle) ? 'rotate-180' : ''}`} />
-              {t('burndown.toggle')}
-            </button>
-            {isOpen(cycle) && (
-              <div id={`burndown-${cycle.id}`} className="mt-3">
-                <BurndownChart cycleId={cycle.id} name={cycle.name} />
-              </div>
+            {cycle.issue_count > 0 ? (
+              <>
+                <ProgressBar percent={cycle.completion_percent} label={cycle.name} />
+                <button
+                  type="button"
+                  aria-expanded={isOpen(cycle)}
+                  aria-controls={`burndown-${cycle.id}`}
+                  onClick={() => setOpen((current) => ({ ...current, [cycle.id]: !isOpen(cycle) }))}
+                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-fg-muted hover:text-fg"
+                >
+                  <Icon name="chevronDown" className={`h-3.5 w-3.5 transition-transform ${isOpen(cycle) ? 'rotate-180' : ''}`} />
+                  {t('burndown.toggle')}
+                </button>
+                {isOpen(cycle) && (
+                  <div id={`burndown-${cycle.id}`} className="mt-3">
+                    <BurndownChart cycleId={cycle.id} name={cycle.name} />
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-xs text-fg-muted">{t('plan.howToAddCycle')}</p>
             )}
           </div>
         ))}

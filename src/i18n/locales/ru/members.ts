@@ -1,4 +1,6 @@
 const ru: Record<string, string> = {
+  'members.roleHint.member': 'Работает с проектами и задачами; не может приглашать людей и менять роли.',
+  'members.roleHint.admin': 'Также приглашает и удаляет участников и управляет всеми проектами рабочего пространства.',
   'members.title': 'Участники',
   'members.count': 'Участников: {count}',
   'members.you': 'вы',

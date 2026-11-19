@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, within, waitFor } from '@testing-library/react'
 import { useEffect, useState } from 'react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes, useLocation } from 'react-router-dom'
@@ -141,11 +141,12 @@ describe('Layout accessibility', () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
     await userEvent.click(trigger)
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile')
-    expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/settings')
-    expect(screen.getByRole('group', { name: 'Theme' })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Language' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Log out' })).toBeInTheDocument()
+    const panel = within(document.getElementById(trigger.getAttribute('aria-controls')!)!)
+    expect(panel.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/profile')
+    expect(panel.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/settings')
+    expect(panel.getByRole('group', { name: 'Theme' })).toBeInTheDocument()
+    expect(panel.getByRole('group', { name: 'Language' })).toBeInTheDocument()
+    expect(panel.getByRole('button', { name: 'Log out' })).toBeInTheDocument()
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('link', { name: 'Profile' })).not.toBeInTheDocument()
     expect(trigger).toHaveFocus()
@@ -153,11 +154,49 @@ describe('Layout accessibility', () => {
 
 })
 
+describe('Layout sidebar and breadcrumbs', () => {
+  it('lists the main sections and the starred projects in the sidebar', async () => {
+    const { listProjects } = await import('../api/projects')
+    vi.mocked(listProjects).mockResolvedValueOnce([
+      { id: 7, name: 'Payments API', status: 'active', icon: '', is_favorite: true },
+      { id: 8, name: 'Docs Portal', status: 'planned', icon: '', is_favorite: false },
+    ] as never)
+    renderLayout('/dashboard')
+    const sidebar = within(screen.getByRole('complementary', { name: 'Sidebar' }))
+    expect(sidebar.getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '/projects')
+    const favorites = within(await sidebar.findByRole('region', { name: 'Favorites' }))
+    expect(await favorites.findByRole('link', { name: 'Payments API' })).toHaveAttribute('href', '/projects/7')
+    expect(favorites.queryByRole('link', { name: 'Docs Portal' })).not.toBeInTheDocument()
+  })
+
+  it('collapses the sidebar to icons and remembers it', async () => {
+    renderLayout('/dashboard')
+    const toggle = screen.getByRole('button', { name: 'Collapse sidebar' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    await userEvent.click(toggle)
+    expect(screen.getByRole('button', { name: 'Expand sidebar' })).toHaveAttribute('aria-expanded', 'false')
+    expect(localStorage.getItem('devtrack_sidebar')).toBe('collapsed')
+    // Narrow, the links keep their names for screen readers.
+    expect(within(screen.getByRole('complementary', { name: 'Sidebar' })).getByRole('link', { name: 'Issues' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+    expect(localStorage.getItem('devtrack_sidebar')).toBeNull()
+  })
+
+  it('says where you are: workspace, section, project and tab', async () => {
+    renderLayout('/projects/7/board')
+    const trail = within(screen.getByRole('navigation', { name: 'You are here' }))
+    expect(trail.getByRole('link', { name: 'Nova Labs' })).toHaveAttribute('href', '/dashboard')
+    expect(trail.getByRole('link', { name: 'Projects' })).toHaveAttribute('href', '/projects')
+    expect(await trail.findByRole('link', { name: 'Payments API' })).toHaveAttribute('href', '/projects/7')
+    expect(trail.getByText('Board')).toHaveAttribute('aria-current', 'page')
+  })
+})
+
 describe('Layout new issue', () => {
   it('creates an issue from the top bar and opens it when it belongs to another project', async () => {
     createIssue.mockResolvedValue({ id: 55, project: 8, number: 3 })
     renderLayout('/dashboard')
-    await userEvent.click(screen.getByRole('button', { name: 'New issue' }))
+    await userEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'New issue' }))
     const project = await screen.findByLabelText('Project')
     // Archived projects take no new work.
     await waitFor(() => expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual(expect.arrayContaining(['Payments API', 'Docs Portal'])))
@@ -173,7 +212,7 @@ describe('Layout new issue', () => {
   it("stays on the project's page when the new issue belongs to it", async () => {
     createIssue.mockResolvedValue({ id: 56, project: 7, number: 4 })
     renderLayout('/projects/7/board')
-    await userEvent.click(screen.getByRole('button', { name: 'New issue' }))
+    await userEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'New issue' }))
     await waitFor(() => expect(screen.getByLabelText('Project')).toHaveValue('7'))
     await userEvent.type(screen.getByLabelText('Title'), 'Rate limit refunds')
     await userEvent.click(screen.getByRole('button', { name: 'Create issue' }))
@@ -280,5 +319,15 @@ describe('Layout page titles', () => {
   it('falls back to the plain name on a page without a heading', async () => {
     renderLayout('/dashboard')
     await waitFor(() => expect(document.title).toBe('DevTrack'))
+  })
+})
+
+describe('BottomNav on phones', () => {
+  it('offers the main sections and a new-issue button', async () => {
+    renderLayout('/dashboard')
+    const nav = await screen.findByRole('navigation', { name: 'Main sections' })
+    expect(within(nav).getByRole('link', { name: 'Issues' })).toHaveAttribute('href', '/issues')
+    await userEvent.click(within(nav).getByRole('button', { name: 'New issue' }))
+    expect(await screen.findByRole('dialog', { name: 'New issue' })).toBeInTheDocument()
   })
 })

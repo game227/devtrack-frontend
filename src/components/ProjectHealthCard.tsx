@@ -32,16 +32,49 @@ function detailText(t: ReturnType<typeof useT>, row: ProjectHealthBreakdownRow):
     case 'bug_rate':
       return t('health.detail.bug_rate', { open: d.open_bugs ?? 0, urgent: d.urgent ?? 0 })
     case 'development_activity':
+      if (!d.days_since) return t('health.detail.activityToday', { source: d.source === 'github' ? 'GitHub' : 'DevTrack' })
       return t(`health.detail.development_activity.${d.source ?? 'devtrack'}`, { days: d.days_since ?? 0 })
     case 'flow':
       return t('health.detail.flow', { stale: d.stale ?? 0, in_flight: d.in_flight ?? 0 })
   }
 }
 
+// The score as a ring: the arc carries the same tone as the factor bars (green, orange, red at the
+// backend's thresholds), on a faint track of that tone; the number sits in the middle.
+function ScoreRing({ score }: { score: number }) {
+  const color = score >= 80 ? 'var(--color-st-done)' : score >= 50 ? 'var(--color-st-progress)' : 'var(--color-danger)'
+  return (
+    <span className="relative flex h-[76px] w-[76px] shrink-0 items-center justify-center">
+      <svg aria-hidden="true" viewBox="0 0 76 76" className="absolute inset-0 -rotate-90">
+        <circle cx="38" cy="38" r="33" fill="none" stroke={color} strokeOpacity="0.18" strokeWidth="7" />
+        <circle
+          cx="38"
+          cy="38"
+          r="33"
+          fill="none"
+          stroke={color}
+          strokeWidth="7"
+          strokeLinecap="round"
+          pathLength={100}
+          strokeDasharray={`${Math.max(score, 0.5)} 100`}
+          className="ring-fill"
+        />
+      </svg>
+      <span className="relative flex flex-col items-center leading-none">
+        <span className="text-[26px] font-semibold tracking-[-0.02em] text-fg">
+          <CountUp value={score} />
+        </span>
+        <span className="mt-0.5 text-[10px] font-medium text-fg-muted">/100</span>
+      </span>
+    </span>
+  )
+}
+
 function FactorRow({ health, factorKey }: { health: ProjectHealth; factorKey: ProjectHealthFactorKey }) {
   const t = useT()
   const score = health.factors[factorKey]
-  const weight = health.breakdown?.find((row) => row.key === factorKey)?.weight
+  const row = health.breakdown?.find((entry) => entry.key === factorKey)
+  const weight = row?.weight
   return (
     <div>
       <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
@@ -54,9 +87,13 @@ function FactorRow({ health, factorKey }: { health: ProjectHealth; factorKey: Pr
       {score === null ? (
         <p className="text-xs text-fg-muted">{t(`health.na.${factorKey}`)}</p>
       ) : (
-        <div className="h-[6px] w-full overflow-hidden rounded-full bg-well">
-          <div className={`h-full origin-left animate-grow-x rounded-full ${toneClass(score)}`} style={{ width: `${score}%` }} />
-        </div>
+        <>
+          <div className="h-[6px] w-full overflow-hidden rounded-full bg-well">
+            <div className={`h-full origin-left animate-grow-x rounded-full ${toneClass(score)}`} style={{ width: `${Math.max(score, 1)}%` }} />
+          </div>
+          {/* Why the number is what it is, in one line ("7 issues in the active cycle, 0 done..."). */}
+          {row && <p className="mt-1 text-xs text-fg-muted">{detailText(t, row)}</p>}
+        </>
       )}
     </div>
   )
@@ -88,17 +125,14 @@ export function ProjectHealthCard({ projectId }: { projectId: number }) {
     <section aria-labelledby="project-health" className="rounded-xl border border-edge bg-surface shadow-panel p-5">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 id="project-health" className="text-base font-bold text-fg">
+          <h2 id="project-health" className="text-base font-semibold tracking-[-0.01em] text-fg">
             {t('health.title')}
           </h2>
           {health.confidence === 'low' && <p className="mt-1 max-w-md text-sm text-fg-muted">{t('health.lowConfidence')}</p>}
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-4xl font-semibold leading-none tracking-[-0.02em] text-fg tabular">
-            <CountUp value={health.score} />
-            <span className="text-base font-bold text-fg-muted">/100</span>
-          </span>
+        <div className="flex items-center gap-4">
           <HealthStatusBadge status={health.status} />
+          <ScoreRing score={health.score} />
         </div>
       </div>
 
@@ -140,7 +174,7 @@ export function ProjectHealthCard({ projectId }: { projectId: number }) {
               <li key={row.key} className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="font-semibold text-fg">{t(`health.factor.${row.key}`)}</div>
-                  <div className="text-fg-muted">{row.score === null ? t(`health.na.${row.key}`) : detailText(t, row)}</div>
+                  <div className="text-fg-muted">{t(`health.hint.${row.key}`)}</div>
                 </div>
                 <span className="shrink-0 font-semibold text-fg-muted tabular">
                   {row.score === null ? t('health.noScore') : `${row.points.toFixed(1)} ${t('health.points')}`}

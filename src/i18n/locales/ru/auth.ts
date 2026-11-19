@@ -1,4 +1,7 @@
 const ru: Record<string, string> = {
+  'password.rule.length': 'Не меньше 8 символов',
+  'password.rule.digits': 'Не только цифры',
+  'password.rule.other': 'Не используйте распространённые пароли (например, 12345678) и похожие на ваше имя или почту.',
   'auth.signInTitle': 'Вход в DevTrack',
   'auth.username': 'Имя пользователя',
   'auth.password': 'Пароль',

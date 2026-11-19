@@ -12,6 +12,7 @@ import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { Note } from '../types/note'
 import { button } from '../components/ui'
+import { Spinner } from '../components/Spinner'
 
 function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
   const { t, lang, formatDateTime } = useI18n()
@@ -59,12 +60,13 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
           <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
         </div>
         <div className="flex gap-2">
-          <button
+          <button aria-busy={updateMutation.isPending}
             type="submit"
             disabled={updateMutation.isPending}
             className={button('primary')}
           >
-            {updateMutation.isPending ? t('common.saving') : t('common.save')}
+            {updateMutation.isPending && <Spinner />}
+{t('common.save')}
           </button>
           <button
             type="button"
@@ -172,12 +174,13 @@ export function ProjectNotesPage() {
             </FormField>
             <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
           </div>
-          <button
+          <button aria-busy={createMutation.isPending}
             type="submit"
             disabled={createMutation.isPending}
             className={button('primary')}
           >
-            {createMutation.isPending ? t('common.creating') : t('notes.create')}
+            {createMutation.isPending && <Spinner />}
+{t('notes.create')}
           </button>
         </form>
       )}

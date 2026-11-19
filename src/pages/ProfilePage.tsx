@@ -18,6 +18,7 @@ import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { User } from '../types/auth'
 import { button, pageTitle } from '../components/ui'
+import { PasswordRules } from '../components/PasswordRules'
 
 export function ProfilePage() {
   const { t } = useI18n()
@@ -98,7 +99,7 @@ function DeleteAccountForm() {
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-danger/40 bg-surface p-5"
     >
-      <h2 className="text-base font-bold text-danger">{t('profile.deleteAccount')}</h2>
+      <h2 className="text-base font-semibold tracking-[-0.01em] text-danger">{t('profile.deleteAccount')}</h2>
       <p className="text-sm text-fg-muted">{t('profile.deleteAccountHelp')}</p>
       {errors.non_field_errors && (
         <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
@@ -146,7 +147,7 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
 
   return (
     <div className="rounded-xl border border-edge bg-surface shadow-panel p-5">
-      <h2 className="mb-4 flex flex-wrap items-center gap-2 text-base font-bold text-fg">
+      <h2 className="mb-4 flex flex-wrap items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
         {t('profile.myActivity')}
         <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold text-fg-muted">{currentWorkspace.name}</span>
       </h2>
@@ -343,7 +344,7 @@ function PasswordForm() {
       onSubmit={handleSubmit}
       className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5"
     >
-      <h2 className="text-base font-bold text-fg">{t('profile.changePassword')}</h2>
+      <h2 className="text-base font-semibold tracking-[-0.01em] text-fg">{t('profile.changePassword')}</h2>
       {errors.non_field_errors && (
         <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
       )}
@@ -365,6 +366,7 @@ function PasswordForm() {
           autoComplete="new-password"
         />
       </FormField>
+      <PasswordRules value={newPassword} />
       <FormField label={t('profile.confirmNewPassword')} errors={errors.new_password_confirm}>
         <input
           type="password"

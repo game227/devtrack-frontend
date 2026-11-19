@@ -1,4 +1,11 @@
 const uz: Record<string, string> = {
+  'shortcuts.issue.section': 'Vazifa sahifasida',
+  'shortcuts.issue.status': "Holatni o'zgartirish",
+  'shortcuts.issue.assignee': 'Ijrochini tanlash',
+  'shortcuts.issue.priority': 'Ustuvorlikni tanlash',
+  'shortcuts.issue.edit': 'Tavsifni tahrirlash',
+  'shortcuts.issue.comment': 'Izoh yozish',
+  'shortcuts.issue.time': 'Vaqt yozish',
   'cmdk.title': 'Buyruqlar paneli',
   'cmdk.placeholder': 'Buyruq yozing yoki qidiring…',
   'cmdk.close': 'Yopish',

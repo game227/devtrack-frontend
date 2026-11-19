@@ -12,9 +12,13 @@ interface CommentThreadProps {
   queryKey: unknown[]
   listComments: () => Promise<Comment[]>
   createComment: (body: string) => Promise<Comment>
+  // Inside tabs the tab is the heading: the thread then hides its own and is labelled by the tab.
+  labelledBy?: string
+  // An id for the comment box, so a keyboard shortcut can focus it.
+  inputId?: string
 }
 
-export function CommentThread({ queryKey, listComments, createComment }: CommentThreadProps) {
+export function CommentThread({ queryKey, listComments, createComment, labelledBy, inputId }: CommentThreadProps) {
   const { t, formatDateTime } = useI18n()
   const queryClient = useQueryClient()
   const headingId = useId()
@@ -37,13 +41,15 @@ export function CommentThread({ queryKey, listComments, createComment }: Comment
   }
 
   return (
-    <section aria-labelledby={headingId}>
-      <h2 id={headingId} className="mb-3 text-base font-bold text-fg">
-        {t('comments.title')}
-        {commentsQuery.data && commentsQuery.data.length > 0 && (
-          <span className="ml-2 font-semibold text-fg-muted tabular">{commentsQuery.data.length}</span>
-        )}
-      </h2>
+    <section aria-labelledby={labelledBy ?? headingId}>
+      {!labelledBy && (
+        <h2 id={headingId} className="mb-3 text-base font-semibold tracking-[-0.01em] text-fg">
+          {t('comments.title')}
+          {commentsQuery.data && commentsQuery.data.length > 0 && (
+            <span className="ml-2 font-semibold text-fg-muted tabular">{commentsQuery.data.length}</span>
+          )}
+        </h2>
+      )}
 
       {commentsQuery.isLoading && <p className="text-sm text-fg-muted">{t('comments.loading')}</p>}
 
@@ -65,6 +71,7 @@ export function CommentThread({ queryKey, listComments, createComment }: Comment
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <textarea
+          id={inputId}
           aria-label={t('comments.placeholder')}
           className={`${formInputClass} mt-0! flex-1`}
           rows={2}

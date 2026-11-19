@@ -168,7 +168,7 @@ export function WorkspaceMembersPage() {
 
       {canInvite(me) && (
         <section aria-labelledby="invite-title" className="rounded-xl border border-edge bg-surface shadow-panel p-5">
-          <h2 id="invite-title" className="mb-1 text-base font-bold text-fg">{t('members.inviteTitle')}</h2>
+          <h2 id="invite-title" className="mb-1 text-base font-semibold tracking-[-0.01em] text-fg">{t('members.inviteTitle')}</h2>
           <p className="mb-4 text-sm text-fg-muted">{t('members.inviteHint', { days: INVITATION_DAYS })}</p>
           <form onSubmit={submitInvite} className="flex flex-wrap items-end gap-3">
             <div className="min-w-48 flex-1">
@@ -183,6 +183,7 @@ export function WorkspaceMembersPage() {
                   {canInviteAdmins(me) && <option value="admin">{t('members.role.admin')}</option>}
                 </select>
               </FormField>
+              <p className="mt-1.5 max-w-xs text-xs text-fg-muted">{t(`members.roleHint.${role}`)}</p>
             </div>
             <button type="submit" disabled={invite.isPending || !username.trim()} className={buttonClass}>
               {t('members.invite')}

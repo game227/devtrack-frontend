@@ -96,6 +96,14 @@ export function formatShortDate(lang: Lang, iso: string, now: Date = new Date())
   return date.toLocaleDateString(INTL_LOCALES[lang], sameYear ? { month: 'short', day: 'numeric' } : { dateStyle: 'medium' })
 }
 
+const UZ_WEEKDAYS = ['yakshanba', 'dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba']
+
+// A day as people say it: "chorshanba, 18-noyabr" / "Wednesday, November 18" / "среда, 18 ноября".
+export function formatLongDay(lang: Lang, date: Date): string {
+  if (lang === 'uz') return `${UZ_WEEKDAYS[date.getDay()]}, ${date.getDate()}-${UZ_MONTHS[date.getMonth()]}`
+  return date.toLocaleDateString(INTL_LOCALES[lang], { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
 export function formatDate(lang: Lang, iso: string): string {
   const dateOnly = DATE_ONLY.exec(iso)
   const date = dateOnly ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : new Date(iso)

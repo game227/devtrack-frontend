@@ -6,6 +6,7 @@ import { AuthShell, primaryButtonClass } from '../components/AuthShell'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { Spinner } from '../components/Spinner'
 
 export function ForgotPasswordPage() {
   const { t, lang } = useI18n()
@@ -62,8 +63,9 @@ export function ForgotPasswordPage() {
             </FormField>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-            {isSubmitting ? t('auth.sending') : t('auth.sendLink')}
+          <button aria-busy={isSubmitting} type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+            {isSubmitting && <Spinner />}
+{t('auth.sendLink')}
           </button>
 
           <p className="mt-6 text-center text-sm">

@@ -1,4 +1,9 @@
 const en: Record<string, string> = {
+  'wip.button': 'Column limits',
+  'wip.title': 'Work-in-progress limits',
+  'wip.explain': 'The most issues a column should hold at once. Past the limit the column turns red: finish something before starting more. Leave a field empty for no limit.',
+  'wip.limitTitle': 'Limit: {limit}',
+  'wip.over': '{count} of {limit}: finish something before starting more',
   'board.moved': "#{number} moved to {status}",
   'board.mine': "Only mine",
   'board.undo': "Undo",
@@ -16,6 +21,14 @@ const en: Record<string, string> = {
   'board.notYours': 'Only the person who created this issue, or the person it is assigned to, can move it.',
   'board.showAllDone': 'Show all ({count})',
   'board.showFewerDone': 'Show fewer',
+  'board.lanes': 'By assignee',
+  'board.view': 'Card size',
+  'board.comfortable': 'Comfortable',
+  'board.compact': 'Compact',
+  'board.collapseColumn': 'Fold the {status} column',
+  'board.expandColumn': 'Unfold the {status} column',
+  'board.dropHere': 'Lands here',
+  'board.you': 'you',
 }
 
 export default en

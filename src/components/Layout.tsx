@@ -6,9 +6,10 @@ import { useAuth } from '../features/auth/authContext'
 import { NewIssueDialog } from '../features/issues/NewIssueDialog'
 import { NewIssueContext } from '../features/issues/newIssueContext'
 import { useLiveUpdates } from '../features/live/useLiveUpdates'
+import { useFollowWorkspace } from '../features/workspace/useFollowWorkspace'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { buildCommands } from '../features/shortcuts/commands'
-import { handleShortcut } from '../features/shortcuts/shortcuts'
+import { handleShortcut, runPageShortcut } from '../features/shortcuts/shortcuts'
 import type { ShortcutState } from '../features/shortcuts/shortcuts'
 import { LANGS, useI18n } from '../i18n'
 import type { Issue, IssueStatus } from '../types/issue'
@@ -20,19 +21,17 @@ import { Icon } from './Icon'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { NotificationsMenu } from './NotificationsMenu'
 import { Popover } from './Popover'
+import { AppSidebar, SidebarSections, WorkspaceSwitcher } from './AppSidebar'
+import { Breadcrumbs } from './Breadcrumbs'
+import { FavoriteButton } from '../features/projects/FavoriteButton'
 import { ShortcutsHelp } from './ShortcutsHelp'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { Logo } from './Track'
 import { button, iconButton, kbd } from './ui'
 import { DemoBanner } from './DemoButton'
-
-const MAIN_NAV: Array<{ to: string; labelKey: string }> = [
-  { to: '/dashboard', labelKey: 'nav.dashboard' },
-  { to: '/projects', labelKey: 'nav.projects' },
-  { to: '/issues', labelKey: 'nav.issues' },
-  { to: '/teams', labelKey: 'nav.teams' },
-  { to: '/members', labelKey: 'nav.members' },
-]
+import { BottomNav } from './BottomNav'
+import { ProjectTabs } from './ProjectTabs'
+import { useScrolled } from '../hooks/useScrolled'
 
 const PROJECT_NAV: Array<{ path: string; labelKey: string; end?: boolean }> = [
   { path: '', labelKey: 'nav.overview', end: true },
@@ -45,70 +44,29 @@ const PROJECT_NAV: Array<{ path: string; labelKey: string; end?: boolean }> = [
   { path: '/analytics', labelKey: 'nav.analytics' },
 ]
 
-// The current section is marked by a stretch of the line under it (the same brand rail as the logo).
-// The current section is a light pill lifted off the glass bar.
-function topLinkClass({ isActive }: { isActive: boolean }) {
-  return `flex h-9 items-center rounded-lg px-3 text-sm font-medium transition-[background-color,color,box-shadow] duration-150 ${
-    isActive ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:bg-surface/60 hover:text-fg'
-  }`
-}
-
 function tabLinkClass({ isActive }: { isActive: boolean }) {
-  return `flex h-8 shrink-0 items-center rounded-lg px-3 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-150 ${
+  return `flex h-8 shrink-0 items-center rounded-lg px-3 text-[13px] font-medium transition-[background-color,color,box-shadow] duration-150 pointer-coarse:h-10 ${
     isActive ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:text-fg'
   }`
 }
 
-function WorkspaceSwitcher() {
-  const { t } = useI18n()
-  const { currentWorkspace, workspaces, selectWorkspace } = useWorkspace()
-  if (!currentWorkspace) return null
-  if (workspaces.length < 2) {
-    return <span className="max-w-44 truncate text-sm font-semibold text-fg-muted">{currentWorkspace.name}</span>
+const SIDEBAR_KEY = 'devtrack_sidebar'
+
+function readSidebarCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === 'collapsed'
+  } catch {
+    return false
   }
-  return (
-    <Popover
-      label={t('shell.workspaceMenu', { name: currentWorkspace.name })}
-      align="left"
-      panelClassName="w-64 p-1.5"
-      triggerClassName="flex h-9 max-w-52 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-fg-muted transition-colors duration-150 hover:bg-brand-soft/60 hover:text-fg"
-      trigger={
-        <>
-          <span className="truncate">{currentWorkspace.name}</span>
-          <Icon name="chevronDown" size={14} />
-        </>
-      }
-    >
-      <>
-          <p className="px-2.5 pb-1 pt-1.5 text-xs font-semibold text-fg-muted">{t('shell.workspaces')}</p>
-          <ul>
-            {workspaces.map((workspace) => {
-              const current = workspace.id === currentWorkspace.id
-              return (
-                <li key={workspace.id}>
-                  <button
-                    type="button"
-                    data-closes
-                    aria-current={current ? 'true' : undefined}
-                    onClick={() => selectWorkspace(workspace.id)}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-fg hover:bg-brand-soft/60"
-                  >
-                    <span className="min-w-0 flex-1 truncate">{workspace.name}</span>
-                    {current && <Icon name="check" className="text-brand" />}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-          <div className="mt-1 border-t border-border pt-1">
-            <Link to="/members" className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm text-fg-muted hover:bg-brand-soft/60 hover:text-fg">
-              <Icon name="teams" />
-              {t('shell.manageMembers')}
-            </Link>
-          </div>
-      </>
-    </Popover>
-  )
+}
+
+function writeSidebarCollapsed(collapsed: boolean) {
+  try {
+    if (collapsed) localStorage.setItem(SIDEBAR_KEY, 'collapsed')
+    else localStorage.removeItem(SIDEBAR_KEY)
+  } catch {
+    // Storage unavailable (private mode): the choice lasts until reload.
+  }
 }
 
 function UserMenu({ onShortcuts }: { onShortcuts: () => void }) {
@@ -176,7 +134,7 @@ export function Layout() {
   const { t, lang, setLang } = useI18n()
   const { logout } = useAuth()
   const { currentWorkspace, workspaces, selectWorkspace } = useWorkspace()
-  const { pathname, search } = useLocation()
+  const { pathname, search, hash } = useLocation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -187,6 +145,13 @@ export function Layout() {
   const [newIssueStatus, setNewIssueStatus] = useState<IssueStatus | undefined>(undefined)
   const toast = useToast()
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed)
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed((collapsed) => {
+      writeSidebarCollapsed(!collapsed)
+      return !collapsed
+    })
+  }, [])
 
   const projectMatch = useMatch({ path: '/projects/:id', end: false })
   const projectId = projectMatch ? Number(projectMatch.params.id) : NaN
@@ -198,7 +163,9 @@ export function Layout() {
   })
 
   const currentProjectId = inProject ? projectId : null
+  useFollowWorkspace(inProject ? projectQuery.data?.workspace : undefined)
 
+  const scrolled = useScrolled(8)
   const openNewIssue = useCallback((project?: number | null, status?: IssueStatus) => {
     setPaletteOpen(false)
     setHelpOpen(false)
@@ -261,6 +228,7 @@ export function Layout() {
           if (target === 'board') go(pid === null ? '/projects' : `/projects/${pid}/board`)
           else go(`/${target}`)
         },
+        page: runPageShortcut,
       })
       if (handled) event.preventDefault()
     }
@@ -269,6 +237,22 @@ export function Layout() {
   }, [openPalette])
 
   useLiveUpdates(currentWorkspace?.id)
+
+  // "/projects/3#project-github": the section usually appears only after the page's data has loaded, so
+  // look for it for a couple of seconds before giving up.
+  useEffect(() => {
+    if (!hash) return undefined
+    let tries = 0
+    const timer = window.setInterval(() => {
+      const target = document.getElementById(decodeURIComponent(hash.slice(1)))
+      tries += 1
+      if (target || tries > 25) {
+        window.clearInterval(timer)
+        target?.scrollIntoView({ block: 'start' })
+      }
+    }, 100)
+    return () => window.clearInterval(timer)
+  }, [pathname, hash])
 
   // The mobile menu: Escape closes it and focus goes back to the button that opened it.
   useEffect(() => {
@@ -338,9 +322,18 @@ export function Layout() {
           {t('nav.skipToContent')}
         </a>
 
+        <AppSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} onShortcuts={() => setHelpOpen(true)} />
+
+        {/* From lg the sidebar takes the left edge; everything else moves over to make room for it. */}
+        <div className={`transition-[padding] duration-200 ${sidebarCollapsed ? 'lg:pl-[5.75rem]' : 'lg:pl-[16.5rem]'}`}>
         {/* A floating glass bar: it keeps a margin from the edges and blurs what scrolls beneath it. */}
-        <header className="sticky top-0 z-30 px-2 pt-2 sm:px-3 sm:pt-3 lg:px-6">
-          <div className="glass mx-auto flex h-14 max-w-[1600px] items-center gap-1 rounded-2xl px-2 sm:gap-2 lg:px-3">
+        <header className="sticky top-0 z-30 px-2 pt-2 sm:px-3 sm:pt-3 lg:pl-0">
+          {/* Once content scrolls under it, the bar lifts off the page a little. */}
+          <div
+            className={`glass mx-auto flex h-14 max-w-[1600px] items-center gap-1 rounded-2xl px-2 transition-[box-shadow,background-color] duration-300 sm:gap-2 lg:px-3 ${
+              scrolled ? 'shadow-float [background-color:color-mix(in_srgb,var(--color-surface)_86%,transparent)]' : ''
+            }`}
+          >
             <button
               ref={menuButtonRef}
               type="button"
@@ -351,19 +344,13 @@ export function Layout() {
             >
               <Icon name="menu" size={18} />
             </button>
-            <NavLink to="/dashboard" className="mr-1 flex h-9 items-center rounded-md px-1">
+            <NavLink to="/dashboard" className="mr-1 flex h-9 items-center rounded-md px-1 lg:hidden">
               <Logo />
             </NavLink>
-            <div className="hidden md:block">
+            <div className="hidden md:block lg:hidden">
               <WorkspaceSwitcher />
             </div>
-            <nav aria-label={t('nav.mainNavigation')} className="ml-2 hidden items-center gap-0.5 lg:flex">
-              {MAIN_NAV.map((item) => (
-                <NavLink key={item.to} to={item.to} className={topLinkClass}>
-                  {t(item.labelKey)}
-                </NavLink>
-              ))}
-            </nav>
+            <Breadcrumbs className="hidden min-w-0 lg:block" />
 
             <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
               <button
@@ -378,7 +365,7 @@ export function Layout() {
                 <span className="hidden flex-1 text-left md:inline">{t('shell.search')}</span>
                 <kbd className={`${kbd} hidden md:inline`}>Ctrl K</kbd>
               </button>
-              <button type="button" onClick={() => openNewIssue(currentProjectId)} className={button('primary', 'sm')}>
+              <button type="button" onClick={() => openNewIssue(currentProjectId)} className={`${button('primary', 'sm')} max-md:hidden`}>
                 <Icon name="plus" />
                 <span className="max-sm:sr-only">{t('issues.new')}</span>
               </button>
@@ -420,27 +407,27 @@ export function Layout() {
                   </select>
                 </label>
               )}
-              <nav
-                aria-label={t('nav.mainNavigation')}
-                className="flex flex-col gap-0.5 p-2"
+              <div
+                className="scroll-quiet min-h-0 flex-1 overflow-y-auto p-2"
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest('a')) setMenuOpen(false)
                 }}
               >
-                {MAIN_NAV.map((item) => (
+                <SidebarSections />
+                <div className="mt-6 border-t border-border pt-2">
                   <NavLink
-                    key={item.to}
-                    to={item.to}
+                    to="/settings"
                     className={({ isActive }) =>
-                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium ${
+                      `flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium ${
                         isActive ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:bg-surface/60 hover:text-fg'
                       }`
                     }
                   >
-                    {t(item.labelKey)}
+                    <Icon name="settings" size={17} />
+                    {t('nav.settings')}
                   </NavLink>
-                ))}
-              </nav>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -448,7 +435,7 @@ export function Layout() {
         {inProject && (
           // The project's name and its sections form one navigation landmark (nothing outside landmarks).
           <nav aria-label={t('shell.projectSections')}>
-            <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-4 gap-y-3 px-4 pt-6 lg:px-7">
+            <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-4 gap-y-3 px-4 pt-6 lg:pl-3 lg:pr-6">
               <div className="flex min-w-0 items-center gap-3">
                 <Link to={`/projects/${projectId}`} className="flex min-w-0 items-center gap-2.5 rounded-lg">
                   <span
@@ -460,25 +447,29 @@ export function Layout() {
                   <span className="truncate text-[15px] font-semibold text-fg">{project?.name ?? t('nav.sectionProject')}</span>
                 </Link>
                 {project && <StatusBadge status={project.status} />}
+                {project && <FavoriteButton project={project} />}
               </div>
-              <div className="glass scroll-quiet flex max-w-full gap-0.5 overflow-x-auto rounded-xl p-1 lg:ml-auto">
+              <ProjectTabs>
                 {PROJECT_NAV.map((item) => (
                   <NavLink key={item.path} to={`/projects/${projectId}${item.path}`} end={item.end} className={tabLinkClass}>
                     {t(item.labelKey)}
                   </NavLink>
                 ))}
-              </div>
+              </ProjectTabs>
             </div>
           </nav>
         )}
 
-        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] px-4 py-7 outline-none lg:px-7 lg:py-9">
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[1600px] px-4 pb-28 pt-7 outline-none md:pb-7 lg:py-9 lg:pl-3 lg:pr-6">
           <DemoBanner />
           {/* Keyed by search too, so "?new=1" links remount the page and open its create form. */}
           <div key={pathname + search} className="animate-fade-in">
             <Outlet />
           </div>
         </main>
+        </div>
+
+        <BottomNav onNewIssue={() => openNewIssue(currentProjectId)} />
 
         {paletteOpen && (
           <CommandPalette commands={commands} workspaceId={currentWorkspace?.id} navigate={navigate} onClose={() => setPaletteOpen(false)} />

@@ -29,6 +29,7 @@ const WorkspaceMembersPage = lazy(() =>
 )
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
 const SettingsPage = lazy(() => import('../pages/SettingsPage').then((m) => ({ default: m.SettingsPage })))
+const SharedIssuePage = lazy(() => import('../pages/SharedIssuePage').then((m) => ({ default: m.SharedIssuePage })))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })))
 const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })))
 const TermsOfServicePage = lazy(() => import('../pages/TermsOfServicePage').then((m) => ({ default: m.TermsOfServicePage })))
@@ -46,6 +47,7 @@ export function AppRoutes() {
 
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/share/:token" element={<SharedIssuePage />} />
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />

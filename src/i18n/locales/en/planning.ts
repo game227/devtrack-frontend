@@ -1,4 +1,14 @@
 const en: Record<string, string> = {
+  'plan.passed': 'The date passed {days} days ago',
+  'plan.complete': 'All issues are done',
+  'plan.running': 'Day {day} of {total} · {left} days left',
+  'plan.left': '{days} days left',
+  'plan.dueToday': 'Due today',
+  'plan.upcoming': 'Starts in {days} days',
+  'plan.overdue': '{days} days past the date · {left} issues still open',
+  'plan.noIssues': 'No issues yet',
+  'plan.howToAddCycle': 'To add an issue, open it and choose this cycle under “Cycle” on the right.',
+  'plan.howToAddMilestone': 'To add an issue, open it and choose this milestone under “Milestone” on the right.',
   'burndown.toggle': 'Burndown',
   'burndown.title': 'Burndown of {name}',
   'burndown.left': '{count} {unit} left',
@@ -59,6 +69,7 @@ const en: Record<string, string> = {
   'analytics.noIssues': 'No issues yet — analytics appear once the project has some.',
   'analytics.noCycles': 'No cycles yet.',
   'analytics.barLabel': '{label}: {value} ({percent}%)',
+  'burndown.explore': '{name}: use the arrow keys to read each day',
 }
 
 export default en

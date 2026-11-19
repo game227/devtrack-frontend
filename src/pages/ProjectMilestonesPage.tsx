@@ -6,11 +6,13 @@ import { useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createMilestone, deleteMilestone, listMilestones } from '../api/milestones'
 import { ConfirmButton } from '../components/ConfirmButton'
+import { PlanCount, PlanTiming } from '../components/PlanTiming'
 import { FormField, formInputClass } from '../components/FormField'
 import { ProgressBar } from '../components/ProgressBar'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import { button } from '../components/ui'
+import { Spinner } from '../components/Spinner'
 
 export function ProjectMilestonesPage() {
   const { t, lang, formatDate } = useI18n()
@@ -98,12 +100,13 @@ export function ProjectMilestonesPage() {
               />
             </FormField>
           </div>
-          <button
+          <button aria-busy={createMutation.isPending}
             type="submit"
             disabled={createMutation.isPending}
             className={button('primary')}
           >
-            {createMutation.isPending ? t('common.creating') : t('milestones.create')}
+            {createMutation.isPending && <Spinner />}
+{t('milestones.create')}
           </button>
         </form>
       )}
@@ -129,11 +132,12 @@ export function ProjectMilestonesPage() {
                 <div className="text-xs text-fg-muted">
                   {t('milestones.target', { date: formatDate(milestone.target_date) })}
                 </div>
+                <div className="mt-1">
+                  <PlanTiming start={null} end={milestone.target_date} done={milestone.completed_count} total={milestone.issue_count} />
+                </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-fg-muted tabular">
-                  {t('planning.doneCount', { done: milestone.completed_count, total: milestone.issue_count })}
-                </span>
+                <PlanCount done={milestone.completed_count} total={milestone.issue_count} />
                 <ConfirmButton
                   onConfirm={() => deleteMutation.mutate(milestone.id)}
                   className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
@@ -142,7 +146,11 @@ export function ProjectMilestonesPage() {
                 </ConfirmButton>
               </div>
             </div>
-            <ProgressBar percent={milestone.completion_percent} label={milestone.name} />
+            {milestone.issue_count > 0 ? (
+              <ProgressBar percent={milestone.completion_percent} label={milestone.name} />
+            ) : (
+              <p className="text-xs text-fg-muted">{t('plan.howToAddMilestone')}</p>
+            )}
           </div>
         ))}
       </div>

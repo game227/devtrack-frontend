@@ -14,6 +14,7 @@ import { ISSUE_PRIORITIES, ISSUE_STATUSES, ISSUE_TYPES } from '../types/issue'
 import { formInputClass } from './FormField'
 import { Icon } from './Icon'
 import { button } from './ui'
+import { Spinner } from './Spinner'
 
 const select = `${formInputClass} mt-0! h-9! w-auto! py-0! text-sm`
 
@@ -151,7 +152,8 @@ export function IssueFilterBar({
             className={button('secondary', 'sm')}
           >
             <Icon name="download" className="h-4 w-4" />
-            {exportList.isPending ? t('issues.exporting') : t('issues.export')}
+            {exportList.isPending && <Spinner />}
+{t('issues.export')}
           </button>
         </div>
       </div>

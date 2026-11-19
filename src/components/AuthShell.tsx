@@ -6,7 +6,7 @@ import { ISSUE_STATUSES } from '../types/issue'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { Logo } from './Track'
-import { button } from './ui'
+import { button, pageTitle } from './ui'
 
 // Sign-in, sign-up and recovery: the form on a frosted card, and on wide screens an ink panel with the
 // line of stations, framed like the landing page's device.
@@ -27,7 +27,7 @@ export function AuthShell({ title, children }: { title: string; children: ReactN
       </header>
       <main className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="glass mx-auto w-full max-w-md rounded-[24px] p-6 sm:p-8">
-          <h1 className="mb-7 text-[32px] font-medium leading-tight tracking-[-0.04em]">{title}</h1>
+          <h1 className={`mb-7 ${pageTitle}`}>{title}</h1>
           {children}
         </div>
         <aside aria-hidden="true" className="relative hidden p-10 lg:block">

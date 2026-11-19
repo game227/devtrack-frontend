@@ -5,6 +5,20 @@ interface ShortcutActions {
   toggleHelp: () => void
   newIssue: () => void
   go: (target: 'dashboard' | 'projects' | 'issues' | 'teams' | 'board') => void
+  // Keys the open page handles itself (the issue page: E, A, P, S, M, T). Tried last, so global
+  // sequences such as "G then P" always win.
+  page?: (key: string) => boolean
+}
+
+// The page-level handler currently on screen (at most one). Pages register it while mounted.
+let pageHandler: ((key: string) => boolean) | null = null
+
+export function setPageShortcuts(handler: ((key: string) => boolean) | null) {
+  pageHandler = handler
+}
+
+export function runPageShortcut(key: string): boolean {
+  return pageHandler ? pageHandler(key) : false
 }
 
 // After pressing G, the next key within this window completes a "go to" shortcut.
@@ -69,5 +83,6 @@ export function handleShortcut(
     actions.newIssue()
     return true
   }
+  if (!event.shiftKey && actions.page?.(key)) return true
   return false
 }

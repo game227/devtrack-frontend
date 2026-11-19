@@ -32,7 +32,7 @@ export function PendingInvitations() {
 
   return (
     <section aria-labelledby="pending-invitations" className="mb-8 rounded-xl border border-brand/40 bg-brand-soft p-4">
-      <h2 id="pending-invitations" className="mb-3 text-base font-bold text-fg">
+      <h2 id="pending-invitations" className="mb-3 text-base font-semibold tracking-[-0.01em] text-fg">
         {t('invitations.title')}
       </h2>
       {respond.isError && (

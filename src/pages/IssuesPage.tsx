@@ -1,9 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { listIssues } from '../api/issues'
+import { listProjects } from '../api/projects'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
+import { BulkBar } from '../components/BulkBar'
 import { IssueFilterBar } from '../components/IssueFilterBar'
 import { IssueList, IssueRow } from '../components/IssueRow'
 import { PageSkeleton, SkeletonList } from '../components/Skeleton'
@@ -19,6 +21,14 @@ export function IssuesPage() {
   const { currentWorkspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const openNewIssue = useNewIssue()
   const { filters, setFilter, applyFilters, isFiltered } = useIssueFilters()
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const toggle = (id: number, on: boolean) =>
+    setSelected((current) => {
+      const next = new Set(current)
+      if (on) next.add(id)
+      else next.delete(id)
+      return next
+    })
 
   const [searchParams] = useSearchParams()
   const wantsNew = searchParams.get('new') === '1'
@@ -34,6 +44,12 @@ export function IssuesPage() {
     enabled: workspaceId !== undefined,
   })
 
+  const projectsQuery = useQuery({
+    queryKey: ['projects', workspaceId],
+    queryFn: () => listProjects(workspaceId!),
+    enabled: workspaceId !== undefined,
+  })
+
   if (isWorkspaceLoading) {
     return <PageSkeleton rows={4} />
   }
@@ -41,7 +57,9 @@ export function IssuesPage() {
     return <p className="text-sm text-fg-muted">{t('common.noWorkspace')}</p>
   }
 
-  const issues = issuesQuery.data ?? []
+  // Open work first, finished work after it (each in the server's order).
+  const issues = [...(issuesQuery.data ?? [])].sort((a, b) => Number(a.status === 'done') - Number(b.status === 'done'))
+  const projectNames = new Map((projectsQuery.data ?? []).map((project) => [project.id, project.name]))
 
   return (
     <div>
@@ -50,7 +68,8 @@ export function IssuesPage() {
           <h1 className={pageTitle}>{t('issues.title')}</h1>
           <p className={pageLead}>{t('issues.workspaceLead', { workspace: currentWorkspace.name })}</p>
         </div>
-        <button type="button" onClick={() => openNewIssue(null)} className={button('primary')}>
+        {/* On phones the bottom bar's "+" does this. */}
+        <button type="button" onClick={() => openNewIssue(null)} className={`${button('primary')} max-md:hidden`}>
           <Icon name="plus" />
           {t('issues.new')}
         </button>
@@ -83,9 +102,18 @@ export function IssuesPage() {
       {issues.length > 0 && (
         <IssueList label={t('issues.title')}>
           {issues.map((issue, index) => (
-            <IssueRow key={issue.id} issue={issue} index={index} />
+            <IssueRow key={issue.id} issue={issue} index={index} projectName={projectNames.get(issue.project)} selected={selected.has(issue.id)} onSelect={toggle} />
           ))}
         </IssueList>
+      )}
+
+      {selected.size > 0 && (
+        <BulkBar
+          ids={[...selected]}
+          allSelected={selected.size === issues.length}
+          onAll={() => setSelected(new Set(issues.map((issue) => issue.id)))}
+          onClear={() => setSelected(new Set())}
+        />
       )}
     </div>
   )

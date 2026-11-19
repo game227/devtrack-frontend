@@ -23,7 +23,6 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
   const { t, lang } = useI18n()
   const queryClient = useQueryClient()
   const [username, setUsername] = useState('')
-  const [role, setRole] = useState('member')
   const [specialty, setSpecialty] = useState<ProjectSpecialty | ''>('')
   const [errors, setErrors] = useState<FieldErrors>({})
 
@@ -35,7 +34,7 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['project-members', projectId] })
 
   const addMutation = useMutation({
-    mutationFn: () => addProjectMember(projectId, { username, role, specialty }),
+    mutationFn: () => addProjectMember(projectId, { username: username.trim(), role: 'member', specialty }),
     onSuccess: () => {
       refresh()
       setUsername('')
@@ -75,13 +74,13 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
 
   return (
     <section aria-labelledby="project-members" className="@container">
-      <h2 id="project-members" className="mb-3 text-base font-bold text-fg">
+      <h2 id="project-members" className="mb-3 text-base font-semibold tracking-[-0.01em] text-fg">
         {t('common.members')}
       </h2>
       {membersQuery.isLoading && <p className="text-sm text-fg-muted">{t('project.membersLoading')}</p>}
       <ul className="mb-4 divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel">
         {membersQuery.data?.map((member) => (
-          <li key={member.id} className="flex flex-col gap-2 px-4 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <li key={member.id} className="flex flex-col gap-2 px-4 py-2.5 text-sm @md:flex-row @md:items-center @md:justify-between @md:gap-3">
             <span className="flex min-w-0 items-center gap-2.5 text-fg">
               <Avatar name={member.user.username} src={member.user.avatar} size={26} />
               <span className="min-w-0">
@@ -89,7 +88,7 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
                 {member.role && <span className="block text-xs text-fg-muted">{t(`role.${member.role}`)}</span>}
               </span>
             </span>
-            <span className="flex flex-wrap items-center gap-3 sm:shrink-0">
+            <span className="flex flex-wrap items-center gap-3 @md:shrink-0">
               <select
                 aria-label={`${t('specialty.label')}: ${member.user.username}`}
                 className={compactSelect}
@@ -116,30 +115,28 @@ export function ProjectMembers({ projectId }: { projectId: number }) {
           {errors.non_field_errors.join(' ')}
         </p>
       )}
-      <form onSubmit={handleAdd} className="grid grid-cols-2 items-end gap-3 @xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+      <h3 className="mb-1 text-sm font-bold text-fg">{t('projectMembers.addTitle')}</h3>
+      <p className="mb-3 text-xs text-fg-muted">{t('projectMembers.addHint')}</p>
+      <form onSubmit={handleAdd} className="grid grid-cols-2 items-end gap-3 @xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]">
         <div className="col-span-2 @xl:col-span-1">
-        <FormField label={t('common.username')} errors={errors.username}>
-          <input className={formInputClass} value={username} onChange={(e) => setUsername(e.target.value)} required />
-        </FormField>
+          <FormField label={t('common.username')} errors={errors.username}>
+            <input className={formInputClass} value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="off" required />
+          </FormField>
         </div>
-        <FormField label={t('common.role')} errors={errors.role}>
-          <select className={formInputClass} value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="member">{t('role.member')}</option>
-            <option value="admin">{t('role.admin')}</option>
-          </select>
-        </FormField>
-        <FormField label={t('specialty.label')} errors={errors.specialty}>
-          <select
-            className={formInputClass}
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value as ProjectSpecialty | '')}
-          >
-            {specialtyOptions}
-          </select>
-        </FormField>
+        <div className="col-span-2 @xl:col-span-1">
+          <FormField label={t('specialty.label')} errors={errors.specialty}>
+            <select
+              className={formInputClass}
+              value={specialty}
+              onChange={(e) => setSpecialty(e.target.value as ProjectSpecialty | '')}
+            >
+              {specialtyOptions}
+            </select>
+          </FormField>
+        </div>
         <button
           type="submit"
-          disabled={addMutation.isPending}
+          disabled={addMutation.isPending || !username.trim()}
           className={`col-span-2 @xl:col-span-1 ${button('primary')}`}
         >
           {t('common.add')}

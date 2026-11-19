@@ -38,9 +38,10 @@ export function HeroDevice() {
               <div className="relative grid grid-cols-5 gap-1.5">
                 {ISSUE_STATUSES.map((status, column) => (
                   <div key={status} className="min-w-0">
-                    <div className="mb-2 flex items-center gap-1 px-0.5">
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLOR[status] }} />
-                      <span className="truncate font-mono text-[8px] uppercase tracking-wider text-white/45">{t(`status.${status}`)}</span>
+                    {/* Labels wrap rather than truncate: "Ko'rib chiqilmoqda" does not fit one line of a mini column. */}
+                    <div className="mb-2 flex min-h-[2.4em] items-start gap-1 px-0.5 text-[8px] leading-[1.2]">
+                      <span className="mt-[0.3em] h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLOR[status] }} />
+                      <span className="min-w-0 break-words font-mono text-white/55">{t(`status.${status}`)}</span>
                     </div>
                     <div className="flex min-h-36 flex-col gap-1.5 rounded-lg bg-white/[0.03] p-1">
                       {CARDS.filter((card) => card.status === status).map((card, i) => (

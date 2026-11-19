@@ -1,4 +1,8 @@
 const uz: Record<string, string> = {
+  'landing.getStartedShort': 'Boshlash',
+  'landing.askUs': 'Savollar bormi?',
+  'landing.trust.kicker': 'Xavfsizlik',
+  'landing.trust.lead': "Akkauntlaringiz va kod ulanishlari sukut bo'yicha himoyalangan, oldindan hech narsa sozlash shart emas.",
   'demo.try': "Demoni sinab ko'rish",
   'demo.starting': 'Demo tayyorlanmoqda…',
   'demo.busy': "Hozir demo band. Birozdan keyin urinib ko'ring.",
@@ -77,6 +81,23 @@ const uz: Record<string, string> = {
   'landing.finalTitle': 'Bitta loyihadan boshlang',
   'landing.finalText': "Ish maydoni va birinchi doska taxminan bir daqiqada tayyor bo'ladi.",
   'landing.footer': '© {year} DevTrack',
+  'landing.try.kicker': "Sinab ko'ring",
+  'landing.try.title': 'Kartani suring yoki uni commit siljitsin',
+  'landing.try.lead': 'Bu haqiqiy doskaning kichik nusxasi. Kartani boshqa bekatga suring (yoki bosing: keyingi bekatga o\'tadi) yoki commit xabarida raqamini yozing: "fixes #2" uni yakunlaydi.',
+  'landing.try.board': 'Sinov doskasi',
+  'landing.try.cardLabel': "#{number} {title}, {status}. Keyingi bekatga o'tkazish uchun bosing",
+  'landing.try.moved': '#{number} {title}: {status}',
+  'landing.try.commitLabel': 'Commit xabari',
+  'landing.try.commit': 'Commit qilish',
+  'landing.try.reset': 'Qaytadan',
+  'landing.try.log': 'Commitlar',
+  'landing.try.noMatch': "Xabarda #raqam yo'q. Masalan: fixes #2",
+  'landing.try.unknown': "Bu doskada #{number} yo'q",
+  'landing.try.allDone': 'Hammasi bajarildi. Butun chiziq shu.',
+  'landing.try.card1': 'Kirish sahifasi',
+  'landing.try.card2': 'Parolni tiklash xati',
+  'landing.try.card3': "To'lovdagi yaxlitlash xatosi",
+  'landing.try.card4': 'Tungi rejim',
 }
 
 export default uz

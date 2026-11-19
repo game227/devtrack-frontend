@@ -1,4 +1,9 @@
 const uz: Record<string, string> = {
+  'wip.button': 'Ustun limitlari',
+  'wip.title': 'Bir vaqtdagi ish limiti (WIP)',
+  'wip.explain': "Ustunda bir vaqtda ko'pi bilan nechta vazifa turishi kerak. Limitdan oshsa ustun qizil bo'ladi: yangisini boshlashdan oldin birini tugating. Limit kerak bo'lmasa maydonni bo'sh qoldiring.",
+  'wip.limitTitle': 'Limit: {limit}',
+  'wip.over': "{limit} o'rniga {count} ta: yangisini boshlashdan oldin birini tugating",
   'board.moved': "#{number} «{status}»ga o'tdi",
   'board.mine': "Faqat meniki",
   'board.undo': "Qaytarish",
@@ -16,6 +21,14 @@ const uz: Record<string, string> = {
   'board.notYours': "Bu vazifani faqat uni yaratgan yoki unga tayinlangan foydalanuvchi o'tkaza oladi.",
   'board.showAllDone': "Hammasini ko'rsatish ({count})",
   'board.showFewerDone': "Kamroq ko'rsatish",
+  'board.lanes': "Ijrochilar bo'yicha",
+  'board.view': "Karta o'lchami",
+  'board.comfortable': 'Keng',
+  'board.compact': 'Ixcham',
+  'board.collapseColumn': "«{status}» ustunini yig'ish",
+  'board.expandColumn': '«{status}» ustunini yoyish',
+  'board.dropHere': 'Shu yerga tushadi',
+  'board.you': 'siz',
 }
 
 export default uz

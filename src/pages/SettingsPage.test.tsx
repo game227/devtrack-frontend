@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { AxiosError } from 'axios'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,6 +9,8 @@ import { SettingsPage } from './SettingsPage'
 const getGithubConnectionStatus = vi.fn()
 const getGithubAuthorizeUrl = vi.fn()
 const completeGithubConnection = vi.fn()
+const updateMe = vi.fn()
+vi.mock('../api/auth', async (importOriginal) => ({ ...(await importOriginal<typeof import('../api/auth')>()), updateMe: (...a: unknown[]) => updateMe(...a) }))
 vi.mock('../api/integrations', () => ({
   getGithubConnectionStatus: () => getGithubConnectionStatus(),
   getGithubAuthorizeUrl: (nonce: string) => getGithubAuthorizeUrl(nonce),
@@ -70,5 +73,27 @@ describe('SettingsPage — connecting GitHub', () => {
     const sent = getGithubAuthorizeUrl.mock.calls[0][0] as string
     expect(sent).toMatch(/^[0-9a-f]{48}$/)
     expect(sessionStorage.getItem('devtrack_github_nonce')).toBe(sent)
+  })
+})
+
+describe('SettingsPage — weekly summary', () => {
+  it('turns the Monday email off and on for the signed-in user', async () => {
+    updateMe.mockReset().mockResolvedValue({})
+    const refreshUser = vi.fn().mockResolvedValue(undefined)
+    renderWithProviders(
+      <Routes>
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>,
+      {
+        route: '/settings',
+        lang: 'en',
+        auth: { user: { id: 1, username: 'jane', weekly_digest: true, email_verified: true } as never, isAuthenticated: true, refreshUser },
+      },
+    )
+    const box = await screen.findByRole('checkbox', { name: 'On' })
+    expect(box).toBeChecked()
+    await userEvent.click(box)
+    expect(updateMe).toHaveBeenCalledWith({ weekly_digest: false })
+    await waitFor(() => expect(refreshUser).toHaveBeenCalled())
   })
 })

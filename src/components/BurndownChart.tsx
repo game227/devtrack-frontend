@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { KeyboardEvent, PointerEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getBurndown } from '../api/cycles'
 import type { Burndown } from '../api/cycles'
@@ -61,6 +62,9 @@ function Chart({
   formatDate: (iso: string) => string
 }) {
   const { t } = useI18n()
+  // The day under the pointer (or chosen with the arrow keys): a hairline marks it and a readout gives
+  // both values, so nobody has to aim at a 2px line.
+  const [hover, setHover] = useState<number | null>(null)
 
   const n = data.days.length
   const x = (i: number) => PAD.left + (n > 1 ? (i / (n - 1)) * (W - PAD.left - PAD.right) : 0)
@@ -72,6 +76,36 @@ function Chart({
   const unit = t(data.unit === 'points' ? 'burndown.points' : 'burndown.issues')
   const ticks = [0, Math.round(data.total / 2), data.total]
   const labelEvery = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(W / 90))))
+  const lastKnown = last ? last.i : 0
+
+  function onPointerMove(event: PointerEvent<SVGRectElement>) {
+    const svg = event.currentTarget.ownerSVGElement
+    if (!svg || n === 0) return
+    const box = svg.getBoundingClientRect()
+    const px = ((event.clientX - box.left) * W) / box.width
+    const step = n > 1 ? (W - PAD.left - PAD.right) / (n - 1) : 1
+    setHover(Math.min(n - 1, Math.max(0, Math.round((px - PAD.left) / step))))
+  }
+
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const moves: Record<string, (i: number) => number> = {
+      ArrowLeft: (i) => i - 1,
+      ArrowRight: (i) => i + 1,
+      Home: () => 0,
+      End: () => n - 1,
+    }
+    const move = moves[event.key]
+    if (!move) return
+    event.preventDefault()
+    setHover((current) => Math.min(n - 1, Math.max(0, move(current ?? lastKnown))))
+  }
+
+  const hovered = hover === null ? null : data.days[hover]
+  // The readout sits beside the crosshair (never on top of the lines it reads), flipping to the left near
+  // the right edge.
+  const tipOnLeft = hover !== null && x(hover) > W - 180
+  const tipX = hover === null ? 0 : x(hover) + (tipOnLeft ? -12 : 12)
+  const round = (value: number) => Math.round(value * 10) / 10
 
   return (
     <figure className="min-w-0">
@@ -81,6 +115,15 @@ function Chart({
           {last ? t('burndown.left', { count: last.remaining, unit }) : t('burndown.notStarted')}
         </span>
       </figcaption>
+      <div
+        tabIndex={0}
+        role="group"
+        aria-label={t('burndown.explore', { name })}
+        onKeyDown={onKeyDown}
+        onFocus={() => setHover((current) => current ?? lastKnown)}
+        onBlur={() => setHover(null)}
+        className="relative rounded-lg"
+      >
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="block max-w-full" aria-hidden="true">
         {ticks.map((v) => (
           <g key={v}>
@@ -103,7 +146,48 @@ function Chart({
           <circle key={d.date} cx={x(d.i)} cy={y(d.remaining)} r="2.5" fill="var(--color-fg)" />
         ))}
         {last && <circle cx={x(last.i)} cy={y(last.remaining)} r="5.5" fill="var(--color-orange)" stroke="var(--color-surface)" strokeWidth="2" />}
+        {hovered && hover !== null && (
+          <g>
+            <line x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={H - PAD.bottom} stroke="var(--color-border-strong)" strokeWidth="1" />
+            <circle cx={x(hover)} cy={y(hovered.ideal)} r="4" fill="var(--color-surface)" stroke="var(--color-fg-muted)" strokeWidth="2" />
+            {hovered.remaining !== null && (
+              <circle cx={x(hover)} cy={y(hovered.remaining)} r="4.5" fill="var(--color-fg)" stroke="var(--color-surface)" strokeWidth="2" />
+            )}
+          </g>
+        )}
+        {/* The hit area is the whole plot: the crosshair snaps to the nearest day. */}
+        <rect
+          x={PAD.left}
+          y={PAD.top}
+          width={Math.max(0, W - PAD.left - PAD.right)}
+          height={H - PAD.top - PAD.bottom}
+          fill="transparent"
+          onPointerMove={onPointerMove}
+          onPointerLeave={() => setHover(null)}
+        />
       </svg>
+      <div
+        aria-live="polite"
+        className={`pointer-events-none absolute z-10 -translate-y-1/2 ${tipOnLeft ? '-translate-x-full' : ''}`}
+        style={{ left: tipX, top: PAD.top + (H - PAD.top - PAD.bottom) / 2 }}
+      >
+        {hovered && (
+          <div className="glass-menu rounded-lg px-2.5 py-1.5 text-xs shadow-float">
+            <div className="text-fg-muted">{formatDate(hovered.date)}</div>
+            <div className="mt-1 flex items-center gap-1.5 whitespace-nowrap">
+              <span aria-hidden="true" className="h-0.5 w-3 rounded bg-fg" />
+              <strong className="font-semibold text-fg tabular">{hovered.remaining === null ? '—' : round(hovered.remaining)}</strong>
+              <span className="text-fg-muted">{t('burndown.actual')}</span>
+            </div>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span aria-hidden="true" className="w-3 border-t-[1.5px] border-dashed border-fg-muted" />
+              <strong className="font-semibold text-fg tabular">{round(hovered.ideal)}</strong>
+              <span className="text-fg-muted">{t('burndown.ideal')}</span>
+            </div>
+          </div>
+        )}
+      </div>
+      </div>
       <div className="mt-1 flex gap-4 text-xs text-fg-muted" aria-hidden="true">
         <span className="flex items-center gap-1.5">
           <span className="h-0.5 w-4 rounded bg-fg" />

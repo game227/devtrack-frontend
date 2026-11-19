@@ -14,6 +14,8 @@ const listIssues = vi.fn()
 vi.mock('../api/dashboard', () => ({ getDashboard: (...args: unknown[]) => getDashboard(...args) }))
 vi.mock('../api/invitations', () => ({ listMyInvitations: () => Promise.resolve([]), acceptInvitation: vi.fn(), declineInvitation: vi.fn() }))
 vi.mock('../api/issues', () => ({ listIssues: (...args: unknown[]) => listIssues(...args) }))
+vi.mock('../api/projects', () => ({ listProjects: () => Promise.resolve([]) }))
+vi.mock('../api/workspaces', () => ({ listWorkspaceMembers: () => Promise.resolve([{ id: 1 }]) }))
 
 const workspace = { id: 3, name: 'Nova Labs' } as Workspace
 
@@ -154,7 +156,18 @@ describe('DashboardPage focus block', () => {
     renderDashboard()
 
     expect(await screen.findByText('You are all caught up')).toBeInTheDocument()
-    expect(screen.getByText('Create your first project')).toBeInTheDocument()
+    // The getting-started steps lead to the first project; there is no second, separate prompt.
+    expect(await screen.findByRole('link', { name: 'Create a project' })).toHaveAttribute('href', '/projects?new=1')
+    expect(screen.queryByText('Create your first project')).not.toBeInTheDocument()
+  })
+
+  it('falls back to the plain first-project prompt once the steps were hidden', async () => {
+    localStorage.setItem(`devtrack_onboarding_hidden:${workspace.id}`, '1')
+    getDashboard.mockResolvedValue(dashboard({ projects: { total: 0, active: 0, planned: 0, paused: 0, completed: 0, archived: 0 } }))
+    listIssues.mockResolvedValue([])
+    renderDashboard()
+    expect(await screen.findByText('Create your first project')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'New project' })).toHaveAttribute('href', '/projects?new=1')
+    expect(screen.queryByRole('link', { name: 'Create a project' })).not.toBeInTheDocument()
   })
 })

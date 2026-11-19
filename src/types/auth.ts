@@ -17,6 +17,8 @@ export interface User {
   avatar: string | null
   bio: string
   title: string
+  // The Monday summary email for workspaces this user owns or administers.
+  weekly_digest?: boolean
   date_joined: string
 }
 
@@ -52,6 +54,7 @@ export interface UpdateMePayload {
   bio?: string
   title?: string
   avatar?: File
+  weekly_digest?: boolean
 }
 
 export interface ChangePasswordPayload {

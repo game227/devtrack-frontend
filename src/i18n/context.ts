@@ -9,6 +9,7 @@ export interface I18nValue {
   formatDate: (iso: string) => string
   formatShortDate: (iso: string) => string
   formatTime: (iso: string) => string
+  formatLongDay: (date: Date) => string
 }
 
 export const I18nContext = createContext<I18nValue | null>(null)

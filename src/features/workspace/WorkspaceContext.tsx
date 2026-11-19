@@ -36,6 +36,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const currentWorkspace = useMemo(
     () =>
       workspaces.find((workspace) => workspace.id === selectedId) ??
+      // Nothing chosen yet: a shared workspace is where someone invited you to work, so open that
+      // rather than the empty personal one every account starts with.
+      workspaces.find((workspace) => !workspace.is_personal) ??
       workspaces.find((workspace) => workspace.is_personal) ??
       workspaces[0] ??
       null,

@@ -1,7 +1,7 @@
 import userEvent from '@testing-library/user-event'
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { Route, Routes } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeAuth, renderWithProviders } from '../test/utils'
 import { IssueDetailPage } from './IssueDetailPage'
 import type { Issue } from '../types/issue'
@@ -23,6 +23,21 @@ vi.mock('../api/labels', () => ({
 vi.mock('../api/projects', () => ({
   getProject: vi.fn().mockResolvedValue({ id: 7, workspace: 3 }),
   listProjectMembers: vi.fn().mockResolvedValue([]),
+}))
+const listChecklist = vi.fn()
+vi.mock('../api/issueParts', () => ({
+  listChecklist: (...args: unknown[]) => listChecklist(...args),
+  listRelations: vi.fn().mockResolvedValue([]),
+  listAttachments: vi.fn().mockResolvedValue([]),
+  addChecklistItem: vi.fn(),
+  updateChecklistItem: vi.fn(),
+  deleteChecklistItem: vi.fn(),
+  addRelation: vi.fn(),
+  deleteRelation: vi.fn(),
+  uploadAttachment: vi.fn(),
+  deleteAttachment: vi.fn(),
+  fetchAttachment: vi.fn(),
+  saveBlob: vi.fn(),
 }))
 vi.mock('../api/integrations', () => ({
   getIssueGithubLinks: vi.fn().mockResolvedValue({ commits: [], pull_requests: [] }),
@@ -85,6 +100,8 @@ describe('IssueDetailPage — who can edit', () => {
   beforeEach(() => {
     getIssue.mockReset()
     updateIssue.mockReset()
+    listChecklist.mockReset()
+    listChecklist.mockResolvedValue([])
   })
 
   it("lets the issue's creator edit its properties and description", async () => {
@@ -160,5 +177,63 @@ describe('IssueDetailPage — who can edit', () => {
     expect(box).toHaveValue('**Steps**\n\n1. Open the page')
     await userEvent.click(screen.getByRole('button', { name: 'Preview' }))
     expect(screen.getAllByText('Open the page').length).toBeGreaterThan(0)
+  })
+})
+
+describe('IssueDetailPage — empty parts', () => {
+  beforeEach(() => {
+    getIssue.mockReset()
+    listChecklist.mockReset()
+  })
+
+  it('gathers empty parts into one Add row and opens one ready to type into', async () => {
+    getIssue.mockResolvedValue(issue())
+    listChecklist.mockResolvedValue([])
+    renderIssue(currentUser())
+    const row = await screen.findByRole('group', { name: 'Add to this issue:' })
+    expect(screen.queryByRole('heading', { name: 'Checklist' })).not.toBeInTheDocument()
+    expect(row).toHaveTextContent(/Checklist.*Linked issue.*File/)
+    await userEvent.click(screen.getByRole('button', { name: 'Checklist' }))
+    expect(screen.getByRole('heading', { name: 'Checklist' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Add step' })).toHaveFocus()
+    expect(screen.queryByRole('button', { name: 'Checklist' })).not.toBeInTheDocument()
+  })
+
+  it('shows a part with something in it as usual, and offers only files to someone who cannot change the issue', async () => {
+    getIssue.mockResolvedValue(issue({ reporter: { id: 9, username: 'sam', avatar: null } }))
+    listChecklist.mockResolvedValue([{ id: 1, text: 'Write the migration', done: false, position: 0 }])
+    renderIssue(currentUser())
+    expect(await screen.findByRole('heading', { name: 'Checklist' })).toBeInTheDocument()
+    const row = await screen.findByRole('group', { name: 'Add to this issue:' })
+    expect(row).toHaveTextContent('File')
+    expect(row).not.toHaveTextContent('Linked issue')
+  })
+})
+
+describe('IssueDetailPage — on a phone', () => {
+  beforeEach(() => {
+    getIssue.mockReset()
+    listChecklist.mockReset()
+    listChecklist.mockResolvedValue([])
+    // A narrow screen: (min-width: 1024px) does not match.
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: (query: string) => ({ matches: false, media: query, addEventListener: () => {}, removeEventListener: () => {} }),
+    })
+  })
+  afterEach(() => {
+    Reflect.deleteProperty(window, 'matchMedia')
+  })
+
+  it('keeps the properties in a bottom sheet opened from a button in reach', async () => {
+    getIssue.mockResolvedValue(issue())
+    renderIssue(currentUser())
+    const open = await screen.findByRole('button', { name: 'Properties' })
+    expect(screen.queryByRole('complementary', { name: 'Properties' })).not.toBeInTheDocument()
+    await userEvent.click(open)
+    const sheet = screen.getByRole('dialog', { name: 'Properties' })
+    expect(within(sheet).getByRole('combobox', { name: 'Priority' })).toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog', { name: 'Properties' })).not.toBeInTheDocument()
   })
 })

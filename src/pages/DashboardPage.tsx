@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getDashboard } from '../api/dashboard'
 import { listIssues } from '../api/issues'
-import { activityLink, describeActivity } from '../features/activity/activityText'
+import { listProjects } from '../api/projects'
+import { MyDay } from '../components/MyDay'
+import { GettingStarted } from '../components/GettingStarted'
+import { readOnboardingHidden } from '../features/onboarding'
+import { ActivitySentence } from '../features/activity/ActivitySentence'
+import { activityLink } from '../features/activity/activityText'
 import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useI18n } from '../i18n'
 import { StatusBadge } from '../components/Badge'
@@ -12,17 +17,18 @@ import { EmptyState } from '../components/EmptyState'
 import { IssueList, IssueRow } from '../components/IssueRow'
 import { PendingInvitations } from '../components/PendingInvitations'
 import { Skeleton, SkeletonList } from '../components/Skeleton'
-import { TrackProgress } from '../components/Track'
+import { StationGlyph, TrackProgress } from '../components/Track'
 import { CountUp } from '../components/CountUp'
 import { pageHeader, pageLead, pageTitle, sectionTitle, textLink } from '../components/ui'
 import { useAuth } from '../features/auth/authContext'
 import { dueState } from '../lib/dueDate'
 import { sortByUrgency } from '../lib/issueOrder'
-import { STATUS_COLOR } from '../lib/statusColors'
 import { ISSUE_STATUSES } from '../types/issue'
 import type { Issue, IssueStatus } from '../types/issue'
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+// Recent activity starts short; the rest is one click away.
+const ACTIVITY_PREVIEW = 6
 
 function dayPart(at: number): 'morning' | 'day' | 'evening' | 'night' {
   const hour = new Date(at).getHours()
@@ -66,10 +72,9 @@ function MyLine({
                   <CountUp value={counts[station]} />
                 </span>
                 <span aria-hidden="true" className="flex h-6 items-center">
-                  <span
-                    className={`block rounded-full ring-4 transition-transform duration-150 ${pressed ? 'h-4 w-4 ring-brand-soft' : 'h-3 w-3 ring-bg group-hover:ring-well'}`}
-                    style={{ backgroundColor: STATUS_COLOR[station] }}
-                  />
+                  <span className={`flex rounded-full p-0.5 transition-transform duration-150 ${pressed ? 'scale-125 bg-brand-soft' : 'bg-bg group-hover:bg-well'}`}>
+                    <StationGlyph status={station} size={14} />
+                  </span>
                 </span>
                 <span className={`mt-1 text-center text-xs leading-tight ${pressed ? 'font-bold text-fg' : 'text-fg-muted'}`}>{label}</span>
               </button>
@@ -101,6 +106,17 @@ export function DashboardPage() {
     queryFn: () => listIssues({ workspace: workspaceId! }, { assignee: 'me' }),
     enabled: workspaceId !== undefined,
   })
+  // Shared with the sidebar: rows name their project ("#3" repeats across projects).
+  const projectsQuery = useQuery({
+    queryKey: ['projects', workspaceId],
+    queryFn: () => listProjects(workspaceId!),
+    enabled: workspaceId !== undefined,
+  })
+  const projectNames = new Map((projectsQuery.data ?? []).map((project) => [project.id, project.name]))
+  const projectName = (projectId: number) => projectNames.get(projectId)
+  const [allActivity, setAllActivity] = useState(false)
+  const [hiddenGuides, setHiddenGuides] = useState<number[]>([])
+  const guideHidden = workspaceId === undefined || hiddenGuides.includes(workspaceId) || readOnboardingHidden(workspaceId)
 
   const header = (
     <div className={pageHeader}>
@@ -156,7 +172,17 @@ export function DashboardPage() {
       {header}
       <PendingInvitations />
 
-      {data.projects.total === 0 && (
+      {!guideHidden && (
+        <GettingStarted
+          workspace={currentWorkspace}
+          projectsTotal={data.projects.total}
+          issuesTotal={data.issues.total}
+          onHide={() => setHiddenGuides((ids) => [...ids, currentWorkspace.id])}
+        />
+      )}
+
+      {/* The getting-started steps already lead to the first project; this is for when they are hidden. */}
+      {data.projects.total === 0 && guideHidden && (
         <EmptyState
           className="mb-8"
           icon="projects"
@@ -168,6 +194,8 @@ export function DashboardPage() {
 
       <div className="grid gap-x-10 gap-y-10 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-w-0 space-y-10">
+          {myIssuesQuery.isSuccess && <MyDay issues={mine} now={new Date(openedAt)} projectName={projectName} />}
+
           <section aria-labelledby="my-issues">
             <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <h2 id="my-issues" className={sectionTitle}>
@@ -206,7 +234,7 @@ export function DashboardPage() {
             {shown.length > 0 && (
               <IssueList label={t('dashboard.myOpenIssues')}>
                 {shown.map((issue, index) => (
-                  <IssueRow key={issue.id} issue={issue} index={index} />
+                  <IssueRow key={issue.id} issue={issue} index={index} projectName={projectName(issue.project)} />
                 ))}
               </IssueList>
             )}
@@ -219,12 +247,12 @@ export function DashboardPage() {
             {data.recent_activity.length === 0 && <p className="text-sm text-fg-muted">{t('dashboard.noActivity')}</p>}
             {data.recent_activity.length > 0 && (
               <ol className="relative ml-1 border-l-2 border-border">
-                {data.recent_activity.map((activity) => {
+                {(allActivity ? data.recent_activity : data.recent_activity.slice(0, ACTIVITY_PREVIEW)).map((activity) => {
                   const href = activityLink(activity)
                   const content = (
                     <>
                       <span className="font-bold text-fg">{activity.actor.username}</span>{' '}
-                      <span className="text-fg-muted">{describeActivity(activity, t)}</span>
+                      <ActivitySentence activity={activity} />
                     </>
                   )
                   return (
@@ -244,6 +272,11 @@ export function DashboardPage() {
                   )
                 })}
               </ol>
+            )}
+            {data.recent_activity.length > ACTIVITY_PREVIEW && (
+              <button type="button" aria-expanded={allActivity} onClick={() => setAllActivity((value) => !value)} className={`mt-4 text-sm ${textLink}`}>
+                {allActivity ? t('dashboard.showLessActivity') : t('dashboard.showMoreActivity', { count: data.recent_activity.length - ACTIVITY_PREVIEW })}
+              </button>
             )}
           </section>
         </div>

@@ -43,6 +43,12 @@ describe('LandingPage', () => {
     expect(sources.every((src) => src?.startsWith('/screens/en/'))).toBe(true)
   })
 
+  it('shows Russian visitors Russian screenshots', () => {
+    renderLanding({ lang: 'ru' })
+    const sources = screen.getAllByRole('img').map((img) => img.getAttribute('src'))
+    expect(sources.every((src) => src?.startsWith('/screens/ru/'))).toBe(true)
+  })
+
   it('sends signed-in users straight to the dashboard', () => {
     renderLanding({ auth: makeAuth({ isAuthenticated: true }) })
     expect(screen.getByText('dashboard page')).toBeInTheDocument()

@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { listIssues } from '../api/issues'
 import { EmptyState } from '../components/EmptyState'
 import { Icon } from '../components/Icon'
+import { BulkBar } from '../components/BulkBar'
 import { IssueFilterBar } from '../components/IssueFilterBar'
 import { IssueList, IssueRow } from '../components/IssueRow'
 import { SkeletonList } from '../components/Skeleton'
@@ -21,6 +22,14 @@ export function ProjectIssuesPage() {
   const openNewIssue = useNewIssue()
   const { currentWorkspace } = useWorkspace()
   const { filters, setFilter, applyFilters, isFiltered } = useIssueFilters()
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const toggle = (id: number, on: boolean) =>
+    setSelected((current) => {
+      const next = new Set(current)
+      if (on) next.add(id)
+      else next.delete(id)
+      return next
+    })
 
   // `?new=1` (the "New issue" links) lands here with the new-issue dialog open for this project.
   const [searchParams] = useSearchParams()
@@ -41,11 +50,12 @@ export function ProjectIssuesPage() {
     <div>
       <div className={pageHeader}>
         <h1 className={pageTitle}>{t('issues.title')}</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link to={`/projects/${projectId}/board`} className={button('secondary')}>
             {t('nav.board')}
           </Link>
-          <button type="button" onClick={() => openNewIssue(projectId)} className={button('primary')}>
+          {/* On phones the bottom bar's "+" does this. */}
+          <button type="button" onClick={() => openNewIssue(projectId)} className={`${button('primary')} max-md:hidden`}>
             <Icon name="plus" />
             {t('issues.new')}
           </button>
@@ -81,9 +91,19 @@ export function ProjectIssuesPage() {
       {issues.length > 0 && (
         <IssueList label={t('issues.title')}>
           {issues.map((issue, index) => (
-            <IssueRow key={issue.id} issue={issue} index={index} />
+            <IssueRow key={issue.id} issue={issue} index={index} selected={selected.has(issue.id)} onSelect={toggle} />
           ))}
         </IssueList>
+      )}
+
+      {selected.size > 0 && (
+        <BulkBar
+          ids={[...selected]}
+          projectId={projectId}
+          allSelected={selected.size === issues.length}
+          onAll={() => setSelected(new Set(issues.map((issue) => issue.id)))}
+          onClear={() => setSelected(new Set())}
+        />
       )}
     </div>
   )

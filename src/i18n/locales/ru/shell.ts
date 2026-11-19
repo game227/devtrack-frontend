@@ -1,4 +1,11 @@
 const ru: Record<string, string> = {
+  'template.label': "Шаблон:",
+  'template.bug.name': "Сообщение об ошибке",
+  'template.feature.name': "Новая функция",
+  'template.task.name': "Задача",
+  'template.bug.body': "## Как воспроизвести\n1. \n2. \n\n## Ожидалось\n\n## Получилось\n\n## Где\nБраузер / устройство / версия:",
+  'template.feature.body': "## Проблема\nКому и зачем это нужно?\n\n## Предложение\n\n## Готово, когда\n- [ ] ",
+  'template.task.body': "## Что сделать\n\n## Готово, когда\n- [ ] ",
   'shell.search': 'Поиск',
   'shell.searchHint': 'Поиск, Ctrl K',
   'shell.account': 'Меню аккаунта, {name}',

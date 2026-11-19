@@ -14,6 +14,7 @@ import { useTimeAgo } from '../hooks/useTimeAgo'
 import { useI18n } from '../i18n'
 import { Icon } from './Icon'
 import { button } from './ui'
+import { Spinner } from './Spinner'
 
 export function ProjectGithubLink({ projectId }: { projectId: number }) {
   const { t, lang } = useI18n()
@@ -74,8 +75,8 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
   const link = linkQuery.data
 
   return (
-    <div>
-      <h2 className="mb-3 flex items-center gap-2 text-base font-bold text-fg">
+    <div id="project-github" className="scroll-mt-24">
+      <h2 className="mb-3 flex items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
         <Icon name="github" size={18} />
         {t('github.title')}
       </h2>
@@ -97,13 +98,14 @@ export function ProjectGithubLink({ projectId }: { projectId: number }) {
               {link.full_name}
             </a>
             <div className="flex items-center gap-3">
-              <button
+              <button aria-busy={syncMutation.isPending}
                 type="button"
                 onClick={() => syncMutation.mutate()}
                 disabled={syncMutation.isPending}
                 className={button('secondary', 'sm')}
               >
-                {syncMutation.isPending ? t('github.syncing') : t('github.sync')}
+                {syncMutation.isPending && <Spinner />}
+{t('github.sync')}
               </button>
               <ConfirmButton
                 onConfirm={() => unlinkMutation.mutate()}

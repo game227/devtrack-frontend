@@ -1,4 +1,7 @@
 const en: Record<string, string> = {
+  'password.rule.length': 'At least 8 characters',
+  'password.rule.digits': 'Not only digits',
+  'password.rule.other': 'Avoid common passwords (like 12345678) and ones close to your name or email.',
   'auth.signInTitle': 'Sign in to DevTrack',
   'auth.username': 'Username',
   'auth.password': 'Password',

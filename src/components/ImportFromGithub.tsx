@@ -8,6 +8,7 @@ import { useI18n } from '../i18n'
 import { Icon } from './Icon'
 import { formInputClass } from './FormField'
 import { button } from './ui'
+import { Spinner } from './Spinner'
 
 // Turn a GitHub repository into a DevTrack project (linking it and optionally importing its issues).
 export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
@@ -51,7 +52,7 @@ export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
 
   return (
     <div className="mb-8 max-w-xl rounded-xl border border-edge bg-surface shadow-panel p-5">
-      <h2 className="mb-1 flex items-center gap-2 text-base font-bold text-fg">
+      <h2 className="mb-1 flex items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
         <Icon name="github" />
         {t('github.import.title')}
       </h2>
@@ -101,12 +102,13 @@ export function ImportFromGithub({ workspaceId }: { workspaceId: number }) {
                   {describeError(importMutation.error, lang)}
                 </p>
               )}
-              <button
+              <button aria-busy={importMutation.isPending}
                 type="submit"
                 disabled={!selected || importMutation.isPending}
                 className={`mt-3 ${button('primary')}`}
               >
-                {importMutation.isPending ? t('github.import.submitting') : t('github.import.submit')}
+                {importMutation.isPending && <Spinner />}
+{t('github.import.submit')}
               </button>
             </>
           )}

@@ -12,6 +12,7 @@ import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import { Icon } from '../components/Icon'
 import { button } from '../components/ui'
+import { Spinner } from '../components/Spinner'
 
 function TeamMembers({ teamId }: { teamId: number }) {
   const { t, lang } = useI18n()
@@ -169,12 +170,13 @@ export function TeamsPage() {
               />
             </FormField>
           </div>
-          <button
+          <button aria-busy={createMutation.isPending}
             type="submit"
             disabled={createMutation.isPending}
             className={button('primary')}
           >
-            {createMutation.isPending ? t('common.creating') : t('teams.create')}
+            {createMutation.isPending && <Spinner />}
+{t('teams.create')}
           </button>
         </form>
       )}

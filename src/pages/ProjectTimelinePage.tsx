@@ -4,7 +4,8 @@ import { EmptyState } from '../components/EmptyState'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { listProjectTimelinePage } from '../api/activities'
 import { Avatar } from '../components/Avatar'
-import { activityLink, describeActivity } from '../features/activity/activityText'
+import { ActivitySentence } from '../features/activity/ActivitySentence'
+import { activityLink } from '../features/activity/activityText'
 import { useI18n } from '../i18n'
 import type { Activity } from '../types/activity'
 import { button, pageTitle } from '../components/ui'
@@ -77,7 +78,7 @@ export function ProjectTimelinePage() {
                   const content = (
                     <>
                       <span className="font-bold text-fg">{activity.actor.username}</span>{' '}
-                      <span className="text-fg-muted">{describeActivity(activity, t)}</span>
+                      <ActivitySentence activity={activity} />
                     </>
                   )
                   return (

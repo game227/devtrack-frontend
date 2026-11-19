@@ -41,9 +41,11 @@ function Thumbnail({ attachment }: { attachment: IssueAttachment }) {
 export function IssueAttachments({
   issueId,
   canDelete,
+  autoFocus = false,
 }: {
   issueId: number
   canDelete: (attachment: IssueAttachment) => boolean
+  autoFocus?: boolean
 }) {
   const { t, lang, formatDateTime } = useI18n()
   const queryClient = useQueryClient()
@@ -95,7 +97,7 @@ export function IssueAttachments({
   return (
     <section aria-labelledby="issue-attachments">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 id="issue-attachments" className="text-base font-bold text-fg">
+        <h2 id="issue-attachments" className="text-base font-semibold tracking-[-0.01em] text-fg">
           {t('attachments.title')}
           {attachments.length > 0 && <span className="ml-2 font-mono text-xs font-normal text-fg-muted">{attachments.length}</span>}
         </h2>
@@ -156,7 +158,7 @@ export function IssueAttachments({
           send(e.target.files)
           e.target.value = ''
         }} />
-        <button type="button" onClick={() => input.current?.click()} disabled={upload.isPending} className={button('secondary', 'sm')}>
+        <button type="button" autoFocus={autoFocus} onClick={() => input.current?.click()} disabled={upload.isPending} className={button('secondary', 'sm')}>
           <Icon name="plus" className="h-3.5 w-3.5" />
           {t('attachments.add')}
         </button>

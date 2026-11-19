@@ -4,6 +4,8 @@ export type ActivityVerb =
   | 'created_project'
   | 'created_issue'
   | 'moved_issue'
+  // Other fields changed: metadata.changes = [{ field, from, to }]
+  | 'changed_issue'
   | 'commented'
   | 'pr_merged'
   // Membership changes (the target is the workspace; metadata.user names who it is about)

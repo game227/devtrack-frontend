@@ -9,11 +9,15 @@ import { StatusBadge, PriorityBadge } from '../components/Badge'
 import { FormField, formInputClass } from '../components/FormField'
 import { ImportFromGithub } from '../components/ImportFromGithub'
 import { Icon } from '../components/Icon'
+import { StatusHint } from '../components/ProjectEditForm'
+import { ProjectRowFacts } from '../components/ProjectRowFacts'
+import { WeeklyDone } from '../components/WeeklyDone'
 import { PageSkeleton, SkeletonList } from '../components/Skeleton'
 import { button, formPanel, listPanel, notice, pageHeader, pageLead, pageTitle } from '../components/ui'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { ProjectStatus, Priority } from '../types/project'
+import { Spinner } from '../components/Spinner'
 
 export function ProjectsPage() {
   const { t, lang } = useI18n()
@@ -26,6 +30,8 @@ export function ProjectsPage() {
   const [description, setDescription] = useState('')
   const [status, setStatus] = useState<ProjectStatus>('planned')
   const [priority, setPriority] = useState<Priority>('none')
+  const [startDate, setStartDate] = useState('')
+  const [targetDate, setTargetDate] = useState('')
   const [errors, setErrors] = useState<FieldErrors>({})
 
   const workspaceId = currentWorkspace?.id
@@ -45,6 +51,8 @@ export function ProjectsPage() {
       setDescription('')
       setStatus('planned')
       setPriority('none')
+      setStartDate('')
+      setTargetDate('')
       setErrors({})
     },
     onError: (error) => setErrors(extractFieldErrors(error, lang)),
@@ -53,7 +61,19 @@ export function ProjectsPage() {
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (!workspaceId) return
-    createMutation.mutate({ workspace: workspaceId, name, description, status, priority })
+    if (startDate && targetDate && targetDate < startDate) {
+      setErrors({ target_date: [t('schedule.tooEarly')] })
+      return
+    }
+    createMutation.mutate({
+      workspace: workspaceId,
+      name,
+      description,
+      status,
+      priority,
+      start_date: startDate || null,
+      target_date: targetDate || null,
+    })
   }
 
   if (isWorkspaceLoading) {
@@ -91,7 +111,7 @@ export function ProjectsPage() {
 
       {isFormOpen && (
         <form onSubmit={handleSubmit} className={formPanel}>
-          <h2 className="mb-4 text-base font-bold text-fg">{t('projects.new')}</h2>
+          <h2 className="mb-4 text-base font-semibold tracking-[-0.01em] text-fg">{t('projects.new')}</h2>
           {errors.non_field_errors && (
             <p role="alert" className={`mb-4 ${notice.error}`}>
               {errors.non_field_errors.join(' ')}
@@ -118,6 +138,7 @@ export function ProjectsPage() {
             </FormField>
           </div>
           <div className="mb-5 grid grid-cols-2 gap-3">
+            <div>
             <FormField label={t('common.status')} errors={errors.status}>
               <select
                 className={formInputClass}
@@ -133,6 +154,8 @@ export function ProjectsPage() {
                 )}
               </select>
             </FormField>
+            <StatusHint status={status} />
+            </div>
             <FormField label={t('common.priority')} errors={errors.priority}>
               <select
                 className={formInputClass}
@@ -147,8 +170,18 @@ export function ProjectsPage() {
               </select>
             </FormField>
           </div>
-          <button type="submit" disabled={createMutation.isPending} className={button('primary')}>
-            {createMutation.isPending ? t('common.creating') : t('projects.create')}
+          <div className="mb-2 grid grid-cols-2 gap-3">
+            <FormField label={`${t('common.startDate')} (${t('common.optional')})`} errors={errors.start_date}>
+              <input type="date" className={formInputClass} value={startDate} max={targetDate || undefined} onChange={(e) => setStartDate(e.target.value)} />
+            </FormField>
+            <FormField label={`${t('common.targetDate')} (${t('common.optional')})`} errors={errors.target_date}>
+              <input type="date" className={formInputClass} value={targetDate} min={startDate || undefined} onChange={(e) => setTargetDate(e.target.value)} />
+            </FormField>
+          </div>
+          <p className="mb-5 text-xs text-fg-muted">{t('schedule.hint')}</p>
+          <button aria-busy={createMutation.isPending} type="submit" disabled={createMutation.isPending} className={button('primary')}>
+            {createMutation.isPending && <Spinner />}
+{t('projects.create')}
           </button>
         </form>
       )}
@@ -181,7 +214,9 @@ export function ProjectsPage() {
                   <span className="block truncate text-[15px] font-bold text-fg">{project.name}</span>
                   {project.description && <span className="block truncate text-sm text-fg-muted">{project.description}</span>}
                 </span>
-                <span className="hidden shrink-0 items-center gap-3 sm:flex">
+                {project.weekly_done && <WeeklyDone weeks={project.weekly_done} className="hidden shrink-0 lg:flex" />}
+                <ProjectRowFacts project={project} />
+                <span className="hidden w-60 shrink-0 items-center justify-end gap-3 sm:flex">
                   <PriorityBadge priority={project.priority} />
                   <StatusBadge status={project.status} />
                 </span>

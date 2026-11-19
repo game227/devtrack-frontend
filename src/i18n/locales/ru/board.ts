@@ -1,4 +1,9 @@
 const ru: Record<string, string> = {
+  'wip.button': 'Лимиты колонок',
+  'wip.title': 'Лимиты незавершённой работы (WIP)',
+  'wip.explain': 'Сколько задач колонка должна держать одновременно. Сверх лимита колонка краснеет: закончите что-то, прежде чем начинать новое. Пустое поле — без лимита.',
+  'wip.limitTitle': 'Лимит: {limit}',
+  'wip.over': '{count} при лимите {limit}: закончите что-то, прежде чем начинать новое',
   'board.moved': '#{number} перемещена в «{status}»',
   'board.mine': 'Только мои',
   'board.undo': 'Отменить',
@@ -16,6 +21,14 @@ const ru: Record<string, string> = {
   'board.notYours': 'Перемещать задачу может только её автор или исполнитель.',
   'board.showAllDone': 'Показать все ({count})',
   'board.showFewerDone': 'Показать меньше',
+  'board.lanes': 'По исполнителям',
+  'board.view': 'Размер карточек',
+  'board.comfortable': 'Обычные',
+  'board.compact': 'Компактные',
+  'board.collapseColumn': 'Свернуть колонку «{status}»',
+  'board.expandColumn': 'Развернуть колонку «{status}»',
+  'board.dropHere': 'Окажется здесь',
+  'board.you': 'вы',
 }
 
 export default ru
