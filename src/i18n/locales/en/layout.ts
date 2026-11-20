@@ -1,25 +1,20 @@
 const en: Record<string, string> = {
+  'nav.mobile': 'Main sections',
+  'notifications.rich.commented': '{actor} commented on #{number} {title}',
+  'notifications.rich.mentioned': '{actor} mentioned you on #{number} {title}',
+  'notifications.rich.issue_assigned': 'You were assigned #{number} {title}',
   'nav.overview': 'Overview',
   'nav.board': 'Board',
   'nav.milestones': 'Milestones',
   'nav.notes': 'Notes',
   'nav.timeline': 'Timeline',
-  'nav.sectionWorkspace': 'Workspace',
   'nav.sectionProject': 'Project',
   'nav.openMenu': 'Open menu',
   'nav.closeMenu': 'Close menu',
   'nav.switchWorkspace': 'Switch workspace',
   'nav.mainNavigation': 'Main navigation',
+  'nav.skipToContent': 'Skip to content',
 
-  'search.placeholder': 'Search…',
-  'search.aria': 'Search projects, issues and people',
-  'search.searching': 'Searching…',
-  'search.noResults': 'No results for "{query}".',
-  'search.projects': 'Projects',
-  'search.issues': 'Issues',
-  'search.cycles': 'Cycles',
-  'search.labels': 'Labels',
-  'search.people': 'People',
 
   'notifications.title': 'Notifications',
   'notifications.markAllRead': 'Mark all read',
@@ -29,6 +24,12 @@ const en: Record<string, string> = {
   'notifications.mentioned': 'You were mentioned: "{target}"',
   'notifications.workspace_invited': 'You were invited to "{target}"',
   'notifications.project_member_added': 'You were added to "{target}"',
+  'nav.sidebar': 'Sidebar',
+  'nav.collapseSidebar': 'Collapse sidebar',
+  'nav.expandSidebar': 'Expand sidebar',
+  'nav.breadcrumb': 'You are here',
+  'nav.favorites': 'Favorites',
+  'nav.favoritesEmpty': 'Star a project (☆ next to its name) and it stays here, one click away.',
 }
 
 export default en

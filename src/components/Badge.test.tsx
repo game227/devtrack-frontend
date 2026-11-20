@@ -45,3 +45,12 @@ describe('Badge labels', () => {
     expect(screen.queryByText('Closed')).not.toBeInTheDocument()
   })
 })
+
+describe('PriorityBadge', () => {
+  it('shows nothing for "no priority" and a label for the rest', () => {
+    renderInLang('en', <PriorityBadge priority="none" />)
+    expect(screen.queryByText('None')).not.toBeInTheDocument()
+    renderInLang('en', <PriorityBadge priority="high" />)
+    expect(screen.getByText('High')).toBeInTheDocument()
+  })
+})

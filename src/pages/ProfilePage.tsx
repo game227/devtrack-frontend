@@ -9,13 +9,16 @@ import {
 } from '../api/auth'
 import { getUserAnalytics } from '../api/analytics'
 import { FormField, formInputClass } from '../components/FormField'
-import { StatCard } from '../components/StatCard'
+import { StatCard, StatRow } from '../components/StatCard'
 import { DailyActivityChart } from '../components/DailyActivityChart'
 import { useAuth } from '../features/auth/authContext'
 import { useWorkspace } from '../features/workspace/workspaceContext'
+import { TwoFactorCard } from '../components/TwoFactorCard'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { User } from '../types/auth'
+import { button, pageTitle } from '../components/ui'
+import { PasswordRules } from '../components/PasswordRules'
 
 export function ProfilePage() {
   const { t } = useI18n()
@@ -26,11 +29,12 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="max-w-xl space-y-6">
-      <h1 className="text-xl font-semibold text-fg">{t('profile.title')}</h1>
+    <div className="max-w-3xl space-y-8">
+      <h1 className={pageTitle}>{t('profile.title')}</h1>
       {!user.email_verified && <EmailVerificationBanner />}
       <ProfileForm user={user} onSaved={refreshUser} />
       <PasswordForm />
+      <TwoFactorCard enabled={user.totp_enabled} onChanged={refreshUser} />
       <DeveloperAnalyticsCard userId={user.id} />
       <DeleteAccountForm />
     </div>
@@ -52,7 +56,7 @@ function EmailVerificationBanner() {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-bg-elevated p-4 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-edge bg-surface shadow-panel p-4 text-sm">
       <span className="text-fg-muted">{t('profile.emailUnverified')}</span>
       {status === 'sent' ? (
         <span role="status" className="text-fg-muted">{t('profile.verificationSent')}</span>
@@ -61,7 +65,7 @@ function EmailVerificationBanner() {
           type="button"
           onClick={handleResend}
           disabled={status === 'sending'}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg disabled:opacity-50"
+          className={button('primary')}
         >
           {t('profile.resendVerification')}
         </button>
@@ -93,9 +97,9 @@ function DeleteAccountForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-2xl border border-danger/40 bg-bg-elevated p-5"
+      className="space-y-4 rounded-xl border border-danger/40 bg-surface p-5"
     >
-      <h2 className="text-sm font-semibold text-danger">{t('profile.deleteAccount')}</h2>
+      <h2 className="text-base font-semibold tracking-[-0.01em] text-danger">{t('profile.deleteAccount')}</h2>
       <p className="text-sm text-fg-muted">{t('profile.deleteAccountHelp')}</p>
       {errors.non_field_errors && (
         <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
@@ -113,7 +117,7 @@ function DeleteAccountForm() {
       <button
         type="submit"
         disabled={status === 'deleting'}
-        className="rounded-md border border-danger px-3 py-2 text-sm font-medium text-danger transition-colors duration-150 hover:bg-danger/10 active:scale-[0.98] disabled:opacity-50"
+        className={button('danger')}
       >
         {status === 'deleting' ? t('profile.deleting') : t('profile.deleteAccountButton')}
       </button>
@@ -142,21 +146,25 @@ function DeveloperAnalyticsCard({ userId }: { userId: number }) {
   const analytics = analyticsQuery.data
 
   return (
-    <div className="rounded-2xl border border-border bg-bg-elevated p-5">
-      <h2 className="mb-3 text-sm font-semibold text-fg">
-        {t('profile.myActivity')} <span className="text-fg-muted">· {currentWorkspace.name}</span>
+    <div className="rounded-xl border border-edge bg-surface shadow-panel p-5">
+      <h2 className="mb-4 flex flex-wrap items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
+        {t('profile.myActivity')}
+        <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold text-fg-muted">{currentWorkspace.name}</span>
       </h2>
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <StatRow className="mb-5">
         <StatCard label={t('profile.projects')} value={analytics.projects_count} />
         <StatCard label={t('profile.tasksCompleted')} value={analytics.tasks_completed} />
         <StatCard label={t('profile.issuesResolved')} value={analytics.issues_resolved} />
         <StatCard label={t('profile.openAssigned')} value={analytics.open_assigned} />
-      </div>
-      <div className="mb-1 text-xs text-fg-muted">{t('profile.dailyActivity')}</div>
+      </StatRow>
+      <h3 className="mb-2 text-sm font-bold text-fg">{t('profile.dailyActivity')}</h3>
       <DailyActivityChart data={analytics.daily_activity} />
     </div>
   )
 }
+
+const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024
 
 function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<void> }) {
   const { t, lang } = useI18n()
@@ -169,12 +177,39 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
   const [errors, setErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
 
+  // The preview always shows exactly what Save would upload (or the saved avatar when nothing will be).
+  function showPreview(next: string | null) {
+    setAvatarPreview((previous) => {
+      if (previous?.startsWith('blob:')) URL.revokeObjectURL(previous)
+      return next
+    })
+  }
+
   function handleAvatarChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null
-    setAvatarFile(file)
-    if (file) {
-      setAvatarPreview(URL.createObjectURL(file))
+    if (!file) {
+      // The picker was cancelled: nothing new will be uploaded.
+      setAvatarFile(null)
+      showPreview(user.avatar)
+      return
     }
+    // The same limits the server enforces (JPEG/PNG/WebP, at most 2 MB), checked up front so the user is
+    // told immediately instead of after an upload. A rejected file also drops any earlier pick.
+    const problem = !AVATAR_TYPES.includes(file.type)
+      ? t('profile.avatarType')
+      : file.size > AVATAR_MAX_BYTES
+        ? t('profile.avatarTooLarge')
+        : null
+    if (problem) {
+      event.target.value = ''
+      setAvatarFile(null)
+      showPreview(user.avatar)
+      setErrors((previous) => ({ ...previous, avatar: [problem] }))
+      return
+    }
+    setErrors((previous) => Object.fromEntries(Object.entries(previous).filter(([field]) => field !== 'avatar')))
+    showPreview(URL.createObjectURL(file))
+    setAvatarFile(file)
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -200,23 +235,28 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5"
+      className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5"
     >
       <div className="flex items-center gap-4">
         {avatarPreview ? (
-          <img src={avatarPreview} alt="" className="h-16 w-16 rounded-full border border-border object-cover" />
+          <img src={avatarPreview} alt="" className="h-16 w-16 rounded-full object-cover ring-1 ring-border" />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-border bg-bg text-xl text-fg-muted">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-well text-xl font-bold text-fg-muted">
             {user.username.slice(0, 1).toUpperCase()}
           </div>
         )}
-        <label className="cursor-pointer text-sm">
-          <span className="block rounded-md border border-border px-3 py-1.5 text-fg-muted transition-colors duration-150 hover:border-fg hover:text-fg">
+        <label className="cursor-pointer rounded-md text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand">
+          <span className="block rounded-md border border-border-strong bg-surface px-3 py-1.5 font-semibold text-fg transition-colors duration-150 hover:bg-brand-soft/60">
             {t('profile.changeAvatar')}
           </span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+          <input type="file" accept={AVATAR_TYPES.join(',')} className="sr-only" onChange={handleAvatarChange} />
         </label>
       </div>
+      {errors.avatar && (
+        <p role="alert" className="text-sm text-danger">
+          {errors.avatar.join(' ')}
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <FormField label={t('profile.firstName')} errors={errors.first_name}>
@@ -257,7 +297,7 @@ function ProfileForm({ user, onSaved }: { user: User; onSaved: () => Promise<voi
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className={button('primary')}
         >
           {status === 'saving' ? t('common.saving') : t('profile.saveChanges')}
         </button>
@@ -302,9 +342,9 @@ function PasswordForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-2xl border border-border bg-bg-elevated p-5"
+      className="space-y-4 rounded-xl border border-edge bg-surface shadow-panel p-5"
     >
-      <h2 className="text-sm font-semibold text-fg">{t('profile.changePassword')}</h2>
+      <h2 className="text-base font-semibold tracking-[-0.01em] text-fg">{t('profile.changePassword')}</h2>
       {errors.non_field_errors && (
         <p role="alert" className="text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
       )}
@@ -326,6 +366,7 @@ function PasswordForm() {
           autoComplete="new-password"
         />
       </FormField>
+      <PasswordRules value={newPassword} />
       <FormField label={t('profile.confirmNewPassword')} errors={errors.new_password_confirm}>
         <input
           type="password"
@@ -339,7 +380,7 @@ function PasswordForm() {
         <button
           type="submit"
           disabled={status === 'saving'}
-          className="rounded-md border border-border px-3 py-2 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className={button('primary')}
         >
           {status === 'saving' ? t('common.saving') : t('profile.updatePassword')}
         </button>

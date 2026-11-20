@@ -33,7 +33,8 @@ export function ConfirmButton({ onConfirm, children, className = '', disabled }:
           setArmed(true)
         }
       }}
-      className={`${className} ${armed ? 'text-danger' : ''}`}
+      // Armed, it turns solid red so the second click is unmistakably the destructive one.
+      className={`${className} ${armed ? 'text-danger border-danger! bg-danger! text-bg!' : ''}`}
     >
       {armed ? t('confirm.ask') : children}
     </button>

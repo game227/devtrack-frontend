@@ -16,5 +16,3 @@ export interface CreateMilestonePayload {
   description?: string
   target_date: string
 }
-
-export type UpdateMilestonePayload = Partial<Omit<CreateMilestonePayload, 'project'>>

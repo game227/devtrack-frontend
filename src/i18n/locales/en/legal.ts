@@ -30,10 +30,7 @@ We use a small number of service providers to run DevTrack: a hosting provider (
 Your data is kept for as long as your account is active. You can delete your account at any time from Settings; this deactivates it, removes your personal information (name, email, bio, avatar), and revokes your active sessions. We keep a minimal, anonymized record where necessary to preserve other people's shared workspace data (for example, an issue you reported stays visible to your former teammates, attributed to a deactivated account).
 
 ## Your choices
-You can update or correct your profile at any time from Settings, disconnect GitHub or Telegram at any time, and delete your account at any time. If you have a question we haven't answered here, or want a copy of your data, write to us.
-
-## Contact
-abdulazizshukurov12@gmail.com`,
+You can update or correct your profile at any time from Settings, disconnect GitHub or Telegram at any time, and delete your account at any time. If you have a question we haven't answered here, or want a copy of your data, write to us.`,
 
   'legal.terms.title': 'Terms of Service',
   'legal.terms.body': `## Agreement
@@ -64,8 +61,5 @@ You can stop using DevTrack and delete your account at any time from Settings. W
 DevTrack is provided without warranties of any kind. To the extent permitted by law, we aren't liable for indirect or incidental damages arising from your use of the service.
 
 ## Changes to these terms
-If these terms change meaningfully, we'll update the date below and, where practical, let you know in the app.
-
-## Contact
-abdulazizshukurov12@gmail.com`,
+If these terms change meaningfully, we'll update the date below and, where practical, let you know in the app.`,
 } as const

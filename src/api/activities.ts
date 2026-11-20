@@ -2,7 +2,7 @@ import { apiClient } from './client'
 import type { PaginatedResponse } from '../types/api'
 import type { Activity } from '../types/activity'
 
-export interface ActivityPage {
+interface ActivityPage {
   results: Activity[]
   hasNext: boolean
 }

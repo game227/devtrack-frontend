@@ -54,6 +54,32 @@ describe('LoginPage', () => {
     expect(login).toHaveBeenCalledWith({ username: 'jane', password: 'wrong' })
   })
 
+  it('asks for the authenticator code when the account has two-factor authentication on', async () => {
+    const login = vi
+      .fn()
+      .mockRejectedValueOnce(badRequest({ otp: ['Enter the code from your authenticator app.'] }))
+      .mockRejectedValueOnce(badRequest({ otp: ['That code is not valid.'] }))
+      .mockResolvedValueOnce(undefined)
+    renderWithProviders(<LoginPage />, { auth: { login }, lang: 'en' })
+    const user = userEvent.setup()
+
+    await user.type(screen.getByLabelText('Username'), 'jane')
+    await user.type(screen.getByLabelText('Password'), 'pw')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+    // The first answer only reveals the code field; it is not an error yet.
+    const codeField = await screen.findByLabelText('Authentication code')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+
+    await user.type(codeField, '000000')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('That code is not valid.')
+
+    await user.clear(codeField)
+    await user.type(codeField, '123456')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+    await waitFor(() => expect(login).toHaveBeenLastCalledWith({ username: 'jane', password: 'pw', otp: '123456' }))
+  })
+
   it('renders in English when English is selected', () => {
     renderWithProviders(<LoginPage />, { lang: 'en' })
     expect(screen.getByRole('heading', { name: 'Sign in to DevTrack' })).toBeInTheDocument()

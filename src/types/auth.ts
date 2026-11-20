@@ -1,3 +1,4 @@
+import type { Lang } from '../i18n/core'
 export interface UserBrief {
   id: number
   username: string
@@ -9,15 +10,19 @@ export interface User {
   username: string
   email: string
   email_verified: boolean
+  // Two-factor authentication (an authenticator app code at sign-in) is on.
+  totp_enabled: boolean
   first_name: string
   last_name: string
   avatar: string | null
   bio: string
   title: string
+  // The Monday summary email for workspaces this user owns or administers.
+  weekly_digest?: boolean
   date_joined: string
 }
 
-export interface AuthTokens {
+interface AuthTokens {
   access: string
   refresh: string
 }
@@ -33,12 +38,14 @@ export interface RegisterPayload {
   password_confirm: string
   first_name?: string
   last_name?: string
-  lang?: 'uz' | 'en'
+  lang?: Lang
 }
 
 export interface LoginPayload {
   username: string
   password: string
+  // The authenticator (or recovery) code, for accounts with two-factor authentication on.
+  otp?: string
 }
 
 export interface UpdateMePayload {
@@ -47,6 +54,7 @@ export interface UpdateMePayload {
   bio?: string
   title?: string
   avatar?: File
+  weekly_digest?: boolean
 }
 
 export interface ChangePasswordPayload {
@@ -58,7 +66,7 @@ export interface ChangePasswordPayload {
 export interface RequestPasswordResetPayload {
   email: string
   // Language of the message that carries the reset link.
-  lang?: 'uz' | 'en'
+  lang?: Lang
 }
 
 export interface ConfirmPasswordResetPayload {

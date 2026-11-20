@@ -1,6 +1,6 @@
-export type RelativeUnit = 'now' | 'minutes' | 'hours' | 'days'
+type RelativeUnit = 'now' | 'minutes' | 'hours' | 'days'
 
-export interface RelativeParts {
+interface RelativeParts {
   unit: RelativeUnit
   count: number
 }
@@ -9,7 +9,7 @@ const MINUTE = 60_000
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 // Older than this reads better as a date than as "41 days ago".
-export const RELATIVE_LIMIT_DAYS = 30
+const RELATIVE_LIMIT_DAYS = 30
 
 // How long ago `iso` was, in the coarsest unit that is still exact enough. Returns null once it is
 // too old for "ago" phrasing (the caller then shows a date). Future timestamps count as "now".

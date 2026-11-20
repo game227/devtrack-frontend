@@ -6,6 +6,7 @@ import { AuthShell, primaryButtonClass } from '../components/AuthShell'
 import { FormField, formInputClass } from '../components/FormField'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { Spinner } from '../components/Spinner'
 
 export function ForgotPasswordPage() {
   const { t, lang } = useI18n()
@@ -32,10 +33,10 @@ export function ForgotPasswordPage() {
     <AuthShell title={t('auth.forgotTitle')}>
       {isSent ? (
         <div>
-          <p role="status" className="mb-4 text-sm text-success">
+          <p role="status" className="mb-5 rounded-lg border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
             {t('auth.linkSent')}
           </p>
-          <Link to="/login" className="text-sm text-accent hover:underline">
+          <Link to="/login" className="text-sm font-semibold text-accent hover:underline">
             {t('auth.backToSignIn')}
           </Link>
         </div>
@@ -44,12 +45,12 @@ export function ForgotPasswordPage() {
           <p className="mb-4 text-sm text-fg-muted">{t('auth.forgotHelp')}</p>
 
           {errors.non_field_errors && (
-            <p role="alert" className="mb-4 text-sm text-danger">
+            <p role="alert" className="mb-5 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
               {errors.non_field_errors.join(' ')}
             </p>
           )}
 
-          <div className="mb-4">
+          <div className="mb-6">
             <FormField label={t('auth.email')} errors={errors.email}>
               <input
                 type="email"
@@ -62,12 +63,13 @@ export function ForgotPasswordPage() {
             </FormField>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-            {isSubmitting ? t('auth.sending') : t('auth.sendLink')}
+          <button aria-busy={isSubmitting} type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+            {isSubmitting && <Spinner />}
+{t('auth.sendLink')}
           </button>
 
-          <p className="mt-4 text-center text-sm">
-            <Link to="/login" className="text-accent hover:underline">
+          <p className="mt-6 text-center text-sm">
+            <Link to="/login" className="font-semibold text-accent hover:underline">
               {t('auth.backToSignIn')}
             </Link>
           </p>

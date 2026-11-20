@@ -1,4 +1,7 @@
 const en: Record<string, string> = {
+  'password.rule.length': 'At least 8 characters',
+  'password.rule.digits': 'Not only digits',
+  'password.rule.other': 'Avoid common passwords (like 12345678) and ones close to your name or email.',
   'auth.signInTitle': 'Sign in to DevTrack',
   'auth.username': 'Username',
   'auth.password': 'Password',
@@ -36,6 +39,8 @@ const en: Record<string, string> = {
   'auth.verifyEmailSuccess': 'Your email is verified.',
   'auth.verifyEmailError': 'This verification link is invalid or has already been used.',
   'auth.goToDashboard': 'Go to dashboard',
+  'auth.otp': 'Authentication code',
+  'auth.otpHint': 'The 6-digit code from your authenticator app, or one of your recovery codes.',
 }
 
 export default en

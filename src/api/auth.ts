@@ -1,3 +1,5 @@
+import type { Lang } from '../i18n/core'
+import { setAccessToken, setStoredRefreshToken } from '../features/auth/tokenStore'
 import { apiClient } from './client'
 import type {
   AuthResponse,
@@ -48,11 +50,22 @@ export async function updateMe(payload: UpdateMePayload): Promise<User> {
   return data
 }
 
+// Changing the password ends every other session on the server (a stolen refresh token must not outlive
+// the old password); this one carries on with the fresh pair the server returns, so it is stored here —
+// otherwise the user would be signed out the next time the short-lived access token expires.
 export async function changePassword(
   payload: ChangePasswordPayload,
 ): Promise<{ detail: string }> {
-  const { data } = await apiClient.post<{ detail: string }>('/auth/password/change/', payload)
-  return data
+  const { data } = await apiClient.post<{ detail: string; access: string; refresh: string }>(
+    '/auth/password/change/',
+    payload,
+  )
+  // An older backend answers with only `detail`: keep the current session rather than storing nothing.
+  if (data.access && data.refresh) {
+    setAccessToken(data.access)
+    setStoredRefreshToken(data.refresh)
+  }
+  return { detail: data.detail }
 }
 
 export async function requestPasswordReset(
@@ -79,7 +92,7 @@ export async function confirmEmailVerification(
   return data
 }
 
-export async function resendEmailVerification(lang?: 'uz' | 'en'): Promise<{ detail: string }> {
+export async function resendEmailVerification(lang?: Lang): Promise<{ detail: string }> {
   const { data } = await apiClient.post<{ detail: string }>('/auth/email/verify/resend/', { lang })
   return data
 }
@@ -88,4 +101,27 @@ export async function deleteAccount(payload: DeleteAccountPayload): Promise<void
   await apiClient.post('/auth/me/delete/', payload)
 }
 
-export { refreshAccessToken as refreshToken } from './client'
+// Two-factor authentication. Setup returns a secret for the authenticator app that only takes effect
+// once enable() has confirmed a code from it.
+export async function setupTwoFactor(password: string): Promise<{ secret: string; otpauth_uri: string }> {
+  const { data } = await apiClient.post<{ secret: string; otpauth_uri: string }>('/auth/2fa/setup/', { password })
+  return data
+}
+
+// Turning it on ends every other session; this one continues on the fresh pair returned with the
+// one-time recovery codes.
+export async function enableTwoFactor(code: string): Promise<string[]> {
+  const { data } = await apiClient.post<{ recovery_codes: string[]; access: string; refresh: string }>(
+    '/auth/2fa/enable/',
+    { code },
+  )
+  if (data.access && data.refresh) {
+    setAccessToken(data.access)
+    setStoredRefreshToken(data.refresh)
+  }
+  return data.recovery_codes
+}
+
+export async function disableTwoFactor(password: string, code: string): Promise<void> {
+  await apiClient.post('/auth/2fa/disable/', { password, code })
+}

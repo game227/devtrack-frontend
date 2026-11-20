@@ -9,7 +9,7 @@ import type {
   UpdateProjectPayload,
 } from '../types/project'
 
-export interface ProjectFilters {
+interface ProjectFilters {
   status?: string
   priority?: string
 }
@@ -36,8 +36,12 @@ export async function updateProject(id: number, payload: UpdateProjectPayload): 
   return data
 }
 
-export async function deleteProject(id: number): Promise<void> {
-  await apiClient.delete(`/projects/${id}/`)
+// Keeps a project in (or takes it out of) the signed-in user's sidebar.
+export async function setProjectFavorite(id: number, favorite: boolean): Promise<boolean> {
+  const { data } = favorite
+    ? await apiClient.put<{ is_favorite: boolean }>(`/projects/${id}/favorite/`)
+    : await apiClient.delete<{ is_favorite: boolean }>(`/projects/${id}/favorite/`)
+  return data.is_favorite
 }
 
 export async function listProjectMembers(projectId: number): Promise<ProjectMember[]> {

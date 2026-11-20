@@ -30,10 +30,7 @@ DevTrack'ni ishga tushirish uchun bir nechta xizmat ko'rsatuvchi provayderlardan
 Ma'lumotlaringiz akkauntingiz faol bo'lgan davomida saqlanadi. Sozlamalar bo'limidan istalgan vaqtda akkauntingizni o'chirishingiz mumkin — bu uni faolsizlantiradi, shaxsiy ma'lumotlaringizni (ism, email, bio, avatar) tozalaydi va faol seanslaringizni bekor qiladi. Boshqalarning umumiy ish maydoni ma'lumotlarini saqlab qolish zarur bo'lgan joylarda minimal, anonimlashtirilgan yozuv qoldiriladi (masalan, siz ochgan vazifa sobiq jamoadoshlaringizga ko'rinishda qoladi, lekin faolsizlantirilgan akkauntga tegishli sifatida).
 
 ## Sizning tanlovlaringiz
-Istalgan vaqtda Sozlamalar bo'limidan profilingizni yangilashingiz yoki to'g'rilashingiz, GitHub yoki Telegram ulanishini uzishingiz va akkauntingizni o'chirishingiz mumkin. Agar bu yerda javob topa olmagan savolingiz bo'lsa yoki ma'lumotlaringiz nusxasini so'ramoqchi bo'lsangiz, bizga yozing.
-
-## Bog'lanish
-abdulazizshukurov12@gmail.com`,
+Istalgan vaqtda Sozlamalar bo'limidan profilingizni yangilashingiz yoki to'g'rilashingiz, GitHub yoki Telegram ulanishini uzishingiz va akkauntingizni o'chirishingiz mumkin. Agar bu yerda javob topa olmagan savolingiz bo'lsa yoki ma'lumotlaringiz nusxasini so'ramoqchi bo'lsangiz, bizga yozing.`,
 
   'legal.terms.title': 'Foydalanish shartlari',
   'legal.terms.body': `## Kelishuv
@@ -64,8 +61,5 @@ Istalgan vaqtda Sozlamalar bo'limidan DevTrack'dan foydalanishni to'xtatishingiz
 DevTrack hech qanday kafolatsiz taqdim etiladi. Qonun ruxsat bergan darajada, xizmatdan foydalanishingiz natijasida yuzaga kelgan bilvosita yoki tasodifiy zararlar uchun javobgar emasmiz.
 
 ## Ushbu shartlardagi o'zgarishlar
-Agar ushbu shartlar sezilarli darajada o'zgarsa, pastdagi sanani yangilaymiz va imkon qadar ilova ichida sizga xabar beramiz.
-
-## Bog'lanish
-abdulazizshukurov12@gmail.com`,
+Agar ushbu shartlar sezilarli darajada o'zgarsa, pastdagi sanani yangilaymiz va imkon qadar ilova ichida sizga xabar beramiz.`,
 } as const

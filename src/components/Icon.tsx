@@ -99,6 +99,15 @@ const PATHS = {
   plus: <path d="M12 5v14M5 12h14" />,
   check: <path d="m5 12.5 4.5 4.5L19 7" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
+  download: (
+    <>
+      <path d="M12 4v11" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M5 20h14" />
+    </>
+  ),
+  bookmark: <path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z" />,
+  filter: <path d="M4 5h16l-6 7.5V19l-4-2v-4.5z" />,
   arrowRight: <path d="M5 12h14m-5-5 5 5-5 5" />,
   github: (
     <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
@@ -125,6 +134,49 @@ const PATHS = {
     <>
       <rect x="3" y="4" width="18" height="12" rx="2" />
       <path d="M8 20h8M12 16v4" />
+    </>
+  ),
+  chevronDown: <path d="m6 9 6 6 6-6" />,
+  chevronRight: <path d="m9 6 6 6-6 6" />,
+  collapse: <path d="M4 12h6m0 0-3-3m3 3-3 3m13-3h-6m0 0 3-3m-3 3 3 3" />,
+  star: <path d="m12 3.6 2.55 5.17 5.7.83-4.12 4.02.97 5.68L12 16.62 6.9 19.3l.97-5.68L3.75 9.6l5.7-.83z" />,
+  sidebar: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <path d="M9.5 4v16" />
+    </>
+  ),
+  members: (
+    <>
+      <circle cx="9.5" cy="8" r="3.5" />
+      <path d="M3.5 19.5a6 6 0 0 1 12 0M18.5 8v6m-3-3h6" />
+    </>
+  ),
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="m4 7 8 6 8-6" />
+    </>
+  ),
+  phone: <path d="M6.6 3.5h2.6l1.4 4-2 1.3a12.6 12.6 0 0 0 6.6 6.6l1.3-2 4 1.4v2.6a2 2 0 0 1-2.2 2A17.2 17.2 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z" />,
+  instagram: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" />
+    </>
+  ),
+  keyboard: (
+    <>
+      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+      <path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M7.5 14h9" />
+    </>
+  ),
+  external: (
+    <>
+      <path d="M14 4h6v6" />
+      <path d="M20 4 11 13" />
+      <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
     </>
   ),
 } as const

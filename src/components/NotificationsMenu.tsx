@@ -4,9 +4,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { listNotifications, markAllNotificationsRead, markNotificationRead } from '../api/notifications'
 import { useI18n } from '../i18n'
 import { Icon } from './Icon'
+import { iconButton } from './ui'
 import type { AppNotification } from '../types/notification'
 
 function notificationLink(notification: AppNotification): string | null {
+  // A comment or mention opens the issue it was written on.
+  if (notification.issue) return `/issues/${notification.issue.id}`
   if (notification.target_type === 'issue') return `/issues/${notification.target_id}`
   if (notification.target_type === 'project') return `/projects/${notification.target_id}`
   return null
@@ -22,7 +25,7 @@ export function NotificationsMenu() {
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
     queryFn: listNotifications,
-    refetchInterval: 30000,
+    // No polling of its own: the layout's live updates mark it stale when something new arrives.
   })
 
   const markReadMutation = useMutation({
@@ -47,8 +50,23 @@ export function NotificationsMenu() {
 
   const notifications = notificationsQuery.data ?? []
   const unreadCount = notifications.filter((n) => !n.is_read).length
+  // The bell rings once whenever the unread count goes up (not on the first load).
+  const seenUnread = useRef<number | null>(null)
+  const [ringKey, setRingKey] = useState(0)
+  useEffect(() => {
+    if (!notificationsQuery.isSuccess) return
+    if (seenUnread.current !== null && unreadCount > seenUnread.current) setRingKey((k) => k + 1)
+    seenUnread.current = unreadCount
+  }, [unreadCount, notificationsQuery.isSuccess])
 
   function notificationText(notification: AppNotification): string {
+    const issue = notification.issue
+    if (issue && notification.actor && (notification.verb === 'commented' || notification.verb === 'mentioned')) {
+      return t(`notifications.rich.${notification.verb}`, { actor: notification.actor, number: issue.number, title: issue.title })
+    }
+    if (issue && notification.verb === 'issue_assigned') {
+      return t('notifications.rich.issue_assigned', { number: issue.number, title: issue.title })
+    }
     const key = `notifications.${notification.verb}`
     const text = t(key, { target: notification.target_display })
     // Unknown verbs from a newer backend fall back to the raw verb instead of a translation key.
@@ -70,48 +88,61 @@ export function NotificationsMenu() {
     <div ref={containerRef} className="relative">
       <button
         type="button"
-        aria-label={t('notifications.title')}
+        // The visible text is the unread count, so the accessible name has to contain it (WCAG 2.5.3).
+        aria-label={
+          unreadCount > 0 ? `${t('notifications.title')}, ${unreadCount > 9 ? '9+' : unreadCount}` : t('notifications.title')
+        }
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
-        className="relative flex rounded-md border border-border p-1.5 transition-colors duration-150 hover:text-fg"
+        className={`relative ${iconButton()}`}
       >
-        <Icon name="bell" size={16} />
+        <Icon key={ringKey} name="bell" size={18} className={ringKey ? 'origin-top animate-ring' : undefined} />
         {unreadCount > 0 && (
-          <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-bg">
+          <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold leading-none text-bg ring-2 ring-bg">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 top-full z-10 mt-1 max-h-96 w-80 max-w-[calc(100vw-2rem)] origin-top-right animate-scale-in overflow-y-auto rounded-md border border-border bg-bg-elevated">
-          <div className="flex items-center justify-between border-b border-border px-3 py-2">
-            <span className="text-xs font-semibold uppercase text-fg-muted">{t('notifications.title')}</span>
+        <div className="absolute right-0 top-full z-40 mt-2 max-h-[28rem] w-96 max-w-[calc(100vw-1.5rem)] origin-top-right animate-scale-in overflow-y-auto glass-menu rounded-xl shadow-float max-sm:-right-12">
+          <div className="sticky top-0 flex items-center justify-between border-b border-border bg-surface/90 px-4 py-3">
+            <h2 className="text-sm font-bold text-fg">{t('notifications.title')}</h2>
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={() => markAllReadMutation.mutate()}
                 disabled={markAllReadMutation.isPending}
-                className="text-xs text-accent hover:underline disabled:opacity-50"
+                className="text-xs font-semibold text-accent hover:underline disabled:opacity-50"
               >
                 {t('notifications.markAllRead')}
               </button>
             )}
           </div>
-          {notificationsQuery.isLoading && <p className="px-3 py-3 text-sm text-fg-muted">{t('common.loading')}</p>}
+          {notificationsQuery.isLoading && <p className="px-4 py-4 text-sm text-fg-muted">{t('common.loading')}</p>}
           {notificationsQuery.isSuccess && notifications.length === 0 && (
-            <p className="px-3 py-3 text-sm text-fg-muted">{t('notifications.empty')}</p>
+            <p className="px-4 py-6 text-sm text-fg-muted">{t('notifications.empty')}</p>
           )}
           {notifications.map((notification) => (
             <button
               key={notification.id}
               type="button"
               onClick={() => handleClick(notification)}
-              className={`block w-full border-b border-border px-3 py-2 text-left text-sm transition-colors duration-150 last:border-b-0 hover:bg-bg ${
+              className={`flex w-full gap-3 border-b border-border px-4 py-3 text-left text-sm transition-colors duration-150 last:border-b-0 hover:bg-brand-soft/60 ${
                 notification.is_read ? 'text-fg-muted' : 'text-fg'
               }`}
             >
-              <div>{notificationText(notification)}</div>
-              <div className="mt-0.5 text-xs text-fg-muted">{formatDateTime(notification.created_at)}</div>
+              <span
+                aria-hidden="true"
+                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.is_read ? 'bg-transparent' : 'bg-orange'}`}
+              />
+              <span className="min-w-0">
+                <span className={`block ${notification.is_read ? '' : 'font-semibold'}`}>{notificationText(notification)}</span>
+                {/* The comment itself, quoted under the line that says who wrote it where. */}
+                {notification.issue && notification.actor && notification.target_display && (
+                  <span className="mt-0.5 line-clamp-2 block text-xs text-fg-muted">“{notification.target_display}”</span>
+                )}
+                <span className="mt-0.5 block text-xs text-fg-muted">{formatDateTime(notification.created_at)}</span>
+              </span>
             </button>
           ))}
         </div>

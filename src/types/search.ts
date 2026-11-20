@@ -10,6 +10,7 @@ export interface SearchProjectResult {
 
 export interface SearchIssueResult {
   id: number
+  number: number
   title: string
   type: IssueType
   status: IssueStatus

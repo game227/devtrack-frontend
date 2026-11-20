@@ -15,8 +15,6 @@ export interface CreateTeamPayload {
   description?: string
 }
 
-export type UpdateTeamPayload = Partial<Omit<CreateTeamPayload, 'workspace'>>
-
 export interface TeamMember {
   id: number
   user: UserBrief

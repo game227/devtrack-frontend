@@ -1,4 +1,7 @@
 const uz: Record<string, string> = {
+  'password.rule.length': 'Kamida 8 ta belgi',
+  'password.rule.digits': 'Faqat raqamlardan emas',
+  'password.rule.other': "Oddiy parollardan (masalan, 12345678) va ismingiz yoki emailingizga o'xshash paroldan saqlaning.",
   'auth.signInTitle': "DevTrack'ga kirish",
   'auth.username': 'Foydalanuvchi nomi',
   'auth.password': 'Parol',
@@ -35,7 +38,9 @@ const uz: Record<string, string> = {
   'auth.verifyingEmail': 'Tasdiqlanmoqda…',
   'auth.verifyEmailSuccess': 'Emailingiz tasdiqlandi.',
   'auth.verifyEmailError': "Bu tasdiqlash havolasi noto'g'ri yoki allaqachon ishlatilgan.",
-  'auth.goToDashboard': "Boshqaruv paneliga o'tish",
+  'auth.goToDashboard': "Bosh sahifaga o'tish",
+  'auth.otp': 'Tasdiqlash kodi',
+  'auth.otpHint': "Autentifikator ilovangizdagi 6 xonali kod yoki tiklash kodlaringizdan biri.",
 }
 
 export default uz

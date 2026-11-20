@@ -6,6 +6,7 @@ import { FormField, formInputClass } from '../components/FormField'
 import { useAuth } from '../features/auth/authContext'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { Spinner } from '../components/Spinner'
 
 export function LoginPage() {
   const { t, lang } = useI18n()
@@ -13,6 +14,9 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  // Shown once the server says this account needs an authenticator code.
+  const [needsCode, setNeedsCode] = useState(false)
+  const [otp, setOtp] = useState('')
   const [errors, setErrors] = useState<FieldErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -21,10 +25,17 @@ export function LoginPage() {
     setErrors({})
     setIsSubmitting(true)
     try {
-      await login({ username, password })
+      await login(needsCode ? { username, password, otp } : { username, password })
       navigate('/dashboard', { replace: true })
     } catch (error) {
-      setErrors(extractFieldErrors(error, lang))
+      const fieldErrors = extractFieldErrors(error, lang)
+      if (fieldErrors.otp) {
+        // First time: just ask for the code; after that, say it was wrong.
+        if (needsCode) setErrors(fieldErrors)
+        setNeedsCode(true)
+      } else {
+        setErrors(fieldErrors)
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -34,12 +45,12 @@ export function LoginPage() {
     <AuthShell title={t('auth.signInTitle')}>
       <form onSubmit={handleSubmit}>
         {errors.non_field_errors && (
-          <p role="alert" className="mb-4 text-sm text-danger">
+          <p role="alert" className="mb-5 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
             {errors.non_field_errors.join(' ')}
           </p>
         )}
 
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('auth.username')} errors={errors.username}>
             <input
               className={formInputClass}
@@ -64,19 +75,37 @@ export function LoginPage() {
           </FormField>
         </div>
 
-        <div className="mb-4 text-right text-xs">
-          <Link to="/forgot-password" className="text-accent hover:underline">
+        {needsCode && (
+          <div className="mb-4">
+            <FormField label={t('auth.otp')} errors={errors.otp}>
+              <input
+                className={formInputClass}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                autoComplete="one-time-code"
+                inputMode="text"
+                autoFocus
+                required
+              />
+            </FormField>
+            <p className="mt-1 text-xs text-fg-muted">{t('auth.otpHint')}</p>
+          </div>
+        )}
+
+        <div className="mb-5 text-right text-sm">
+          <Link to="/forgot-password" className="font-semibold text-accent hover:underline">
             {t('auth.forgotPassword')}
           </Link>
         </div>
 
-        <button type="submit" disabled={isSubmitting} className={primaryButtonClass}>
-          {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
+        <button aria-busy={isSubmitting} type="submit" disabled={isSubmitting} className={primaryButtonClass}>
+          {isSubmitting && <Spinner />}
+{t('auth.signIn')}
         </button>
 
-        <p className="mt-4 text-center text-sm text-fg-muted">
+        <p className="mt-6 text-center text-sm text-fg-muted">
           {t('auth.noAccount')}{' '}
-          <Link to="/register" className="text-accent hover:underline">
+          <Link to="/register" className="font-semibold text-accent hover:underline">
             {t('auth.register')}
           </Link>
         </p>

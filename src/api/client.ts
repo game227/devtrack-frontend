@@ -36,16 +36,30 @@ let refreshPromise: Promise<string | null> | null = null
 
 async function performRefresh(): Promise<string | null> {
   const refresh = getStoredRefreshToken()
-  if (!refresh) return null
+  if (!refresh) {
+    // Signed out elsewhere (another tab cleared the stored token): this tab's session is over too, so
+    // send it to sign-in instead of leaving the page failing request after request.
+    if (getAccessToken()) {
+      setAccessToken(null)
+      notifyAuthExpired()
+    }
+    return null
+  }
   try {
     const { data } = await refreshClient.post<{ access: string; refresh: string }>(
       '/auth/token/refresh/',
       { refresh },
     )
+    // A newer pair may have been stored while this request was in flight (a password change revokes
+    // every older session and hands this one a fresh pair): never overwrite it with the old session's.
+    if (getStoredRefreshToken() !== refresh) return getAccessToken()
     setAccessToken(data.access)
     setStoredRefreshToken(data.refresh)
     return data.access
   } catch {
+    // Likewise, a refresh that failed with a token that has since been replaced says nothing about the
+    // current session.
+    if (getStoredRefreshToken() !== refresh) return getAccessToken()
     setAccessToken(null)
     setStoredRefreshToken(null)
     notifyAuthExpired()

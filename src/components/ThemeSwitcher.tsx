@@ -15,7 +15,7 @@ export function ThemeSwitcher({ className = '' }: { className?: string }) {
     <div
       role="group"
       aria-label={t('theme.label')}
-      className={`inline-flex items-center rounded-md border border-border p-0.5 ${className}`}
+      className={`inline-flex items-center gap-0.5 rounded-xl bg-fg/[0.07] p-1 ${className}`}
     >
       {THEME_PREFERENCES.map((option) => {
         const active = preference === option
@@ -27,7 +27,7 @@ export function ThemeSwitcher({ className = '' }: { className?: string }) {
             aria-label={t(`theme.${option}`)}
             aria-pressed={active}
             onClick={() => setPreference(option)}
-            className={`rounded p-1 transition-colors ${active ? 'bg-fg text-bg' : 'text-fg-muted hover:text-fg'}`}
+            className={`flex h-7 w-8 items-center justify-center rounded-lg transition-colors ${active ? 'bg-brand-soft text-fg shadow-panel' : 'text-fg-muted hover:text-fg'}`}
           >
             <Icon name={ICONS[option]} size={14} />
           </button>

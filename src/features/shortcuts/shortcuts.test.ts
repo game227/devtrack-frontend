@@ -77,6 +77,7 @@ describe('commands', () => {
     toggleLanguage: vi.fn(),
     logout: vi.fn(),
     showShortcuts: vi.fn(),
+    newIssue: vi.fn(),
   })
 
   it('only offers project pages while a project is open', () => {
@@ -84,9 +85,13 @@ describe('commands', () => {
     expect(buildCommands(ctx(7)).some((c) => c.id === 'p-board')).toBe(true)
   })
 
-  it('routes "new issue" to the current project, or to the projects list', () => {
+  it('opens the new-issue dialog instead of navigating, and links to it per project', () => {
+    const c = ctx(7)
+    buildCommands(c).find((cmd) => cmd.id === 'new-issue')!.run()
+    expect(c.newIssue).toHaveBeenCalledOnce()
+    expect(c.navigate).not.toHaveBeenCalled()
     expect(newIssuePath(7)).toBe('/projects/7/issues?new=1')
-    expect(newIssuePath(null)).toBe('/projects')
+    expect(newIssuePath(null)).toBe('/issues?new=1')
   })
 
   it('runs navigation through the supplied navigate function', () => {

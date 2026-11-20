@@ -23,6 +23,7 @@ export function makeAuth(overrides: Partial<AuthContextValue> = {}): AuthContext
     register: async () => {},
     logout: async () => {},
     refreshUser: async () => {},
+    startDemo: async () => {},
     ...overrides,
   }
 }

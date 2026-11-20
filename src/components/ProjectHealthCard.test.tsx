@@ -44,7 +44,7 @@ describe('ProjectHealthCard', () => {
       // Each label is on its factor row and again inside the (collapsed) breakdown.
       expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1)
     }
-    expect(screen.getByText('· 31%')).toBeInTheDocument()
+    expect(screen.getByText('(31%)')).toBeInTheDocument()
   })
 
   it('says why a factor is not applicable instead of showing a fake number', async () => {
@@ -52,7 +52,7 @@ describe('ProjectHealthCard', () => {
     renderCard()
     // Shown on the factor's row and again in the (collapsed) breakdown.
     expect((await screen.findAllByText('No issues have a due date.')).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('No score').length).toBeGreaterThanOrEqual(1)
   })
 
   it('colours a bar by its score, matching the status thresholds', async () => {
@@ -61,8 +61,8 @@ describe('ProjectHealthCard', () => {
     await screen.findByText('72')
     const bars = [...container.querySelectorAll<HTMLElement>('[style*="width"]')]
     const byWidth = Object.fromEntries(bars.map((bar) => [bar.style.width, bar.className]))
-    expect(byWidth['100%']).toContain('bg-success')
-    expect(byWidth['55%']).toContain('bg-warning')
+    expect(byWidth['100%']).toContain('bg-st-done')
+    expect(byWidth['55%']).toContain('bg-st-progress')
     expect(byWidth['40%']).toContain('bg-danger')
   })
 
@@ -94,14 +94,15 @@ describe('ProjectHealthCard', () => {
     expect(screen.getByText('No activity for 16 days.')).toBeInTheDocument()
   })
 
-  it('opens a breakdown with the numbers behind each factor', async () => {
+  it('says under each factor why it scored what it did, and breaks down the points on request', async () => {
     getProjectHealth.mockResolvedValue(health())
     renderCard()
-    await userEvent.click(await screen.findByText('How is this calculated?'))
-    const list = screen.getByText(/2 of 10 issues done · 50% of the schedule has passed/).closest('ul') as HTMLElement
-    expect(within(list).getByText('12.4 pts')).toBeInTheDocument()
-    expect(within(list).getByText('Last activity 1 day(s) ago (GitHub)')).toBeInTheDocument()
-    expect(within(list).getByText('1 of 3 items in flight have stalled')).toBeInTheDocument()
+    expect(await screen.findByText(/2 of 10 issues done · 50% of the schedule has passed/)).toBeInTheDocument()
+    expect(screen.getByText('Last activity 1 day(s) ago (GitHub)')).toBeInTheDocument()
+    expect(screen.getByText('1 of 3 items in flight have stalled')).toBeInTheDocument()
+    await userEvent.click(screen.getByText('How is this calculated?'))
+    const list = screen.getByText('12.4 pts').closest('ul') as HTMLElement
+    expect(within(list).getByText('Are we as far along as the plan says we should be?')).toBeInTheDocument()
   })
 
   it('still renders against an older backend that has no breakdown or new factors', async () => {

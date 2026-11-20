@@ -1,4 +1,25 @@
 const uz: Record<string, string> = {
+  'plan.passed': "Sana {days} kun oldin o'tgan",
+  'plan.complete': 'Barcha vazifalar bajarildi',
+  'plan.running': '{total} kundan {day}-kun · {left} kun qoldi',
+  'plan.left': '{days} kun qoldi',
+  'plan.dueToday': 'Muddat — bugun',
+  'plan.upcoming': '{days} kundan keyin boshlanadi',
+  'plan.overdue': "Sanadan {days} kun o'tdi · {left} ta vazifa hali ochiq",
+  'plan.noIssues': "Hali vazifa yo'q",
+  'plan.howToAddCycle': "Vazifa qo'shish uchun uni oching va o'ngdagi «Sikl» maydonida shu siklni tanlang.",
+  'plan.howToAddMilestone': "Vazifa qo'shish uchun uni oching va o'ngdagi «Bosqich» maydonida shu bosqichni tanlang.",
+  'burndown.toggle': 'Burndown grafigi',
+  'burndown.title': '{name}: burndown',
+  'burndown.left': '{count} {unit} qoldi',
+  'burndown.points': 'ball',
+  'burndown.issues': 'vazifa',
+  'burndown.notStarted': 'Hali boshlanmagan',
+  'burndown.actual': 'Qolgan',
+  'burndown.ideal': 'Ideal',
+  'burndown.day': 'Kun',
+  'burndown.empty': "Burndown ko'rinishi uchun bu siklga vazifa qo'shing.",
+  'burndown.failed': "Burndown grafigini yuklab bo'lmadi.",
   'confirm.ask': 'Ishonchingiz komilmi?',
   'planning.doneCount': '{done}/{total} bajarildi',
 
@@ -48,6 +69,7 @@ const uz: Record<string, string> = {
   'analytics.noIssues': "Hozircha vazifa yo'q — loyihada vazifalar paydo bo'lgach tahlil ko'rinadi.",
   'analytics.noCycles': "Hozircha sikl yo'q.",
   'analytics.barLabel': '{label}: {value} ({percent}%)',
+  'burndown.explore': "{name}: kunma-kun ko'rish uchun ← → tugmalaridan foydalaning",
 }
 
 export default uz

@@ -9,6 +9,8 @@ export interface AuthContextValue {
   register: (payload: RegisterPayload) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
+  // Signs in to a fresh demo account (only offered when the demo is enabled).
+  startDemo: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

@@ -1,4 +1,8 @@
 const uz: Record<string, string> = {
+  'crash.title': "Bu sahifada nimadir noto'g'ri ketdi",
+  'crash.text': "Xato qayd etildi. Davom etish uchun sahifani qayta yuklang; ishingiz serverda saqlangan.",
+  'crash.reload': "Sahifani qayta yuklash",
+  'crash.retry': "Qayta urinish",
   'common.loading': 'Yuklanmoqda…',
   'common.save': 'Saqlash',
   'common.saving': 'Saqlanmoqda…',
@@ -62,11 +66,12 @@ const uz: Record<string, string> = {
   'role.admin': 'Admin',
   'role.member': "A'zo",
 
-  'nav.dashboard': 'Boshqaruv paneli',
+  'nav.dashboard': 'Bosh sahifa',
   'nav.projects': 'Loyihalar',
   'nav.issues': 'Vazifalar',
   'nav.cycles': 'Sikllar',
   'nav.teams': 'Jamoalar',
+  'nav.members': "A'zolar",
   'nav.analytics': 'Tahlil',
   'nav.settings': 'Sozlamalar',
   'nav.profile': 'Profil',
@@ -76,6 +81,7 @@ const uz: Record<string, string> = {
 
   'lang.uz': "O'zbekcha",
   'lang.en': 'English',
+  'lang.ru': 'Русский',
   'lang.switch': 'Til',
 
   'common.loadingWorkspace': 'Ish maydoni yuklanmoqda…',
@@ -85,6 +91,7 @@ const uz: Record<string, string> = {
   'common.status': 'Holat',
   'common.priority': 'Ustuvorlik',
   'common.type': 'Turi',
+  'common.notSet': 'Belgilanmagan',
   'common.title': 'Sarlavha',
   'common.assignee': 'Ijrochi',
   'common.reporter': 'Muallif',

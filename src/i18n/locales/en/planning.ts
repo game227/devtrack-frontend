@@ -1,4 +1,25 @@
 const en: Record<string, string> = {
+  'plan.passed': 'The date passed {days} days ago',
+  'plan.complete': 'All issues are done',
+  'plan.running': 'Day {day} of {total} · {left} days left',
+  'plan.left': '{days} days left',
+  'plan.dueToday': 'Due today',
+  'plan.upcoming': 'Starts in {days} days',
+  'plan.overdue': '{days} days past the date · {left} issues still open',
+  'plan.noIssues': 'No issues yet',
+  'plan.howToAddCycle': 'To add an issue, open it and choose this cycle under “Cycle” on the right.',
+  'plan.howToAddMilestone': 'To add an issue, open it and choose this milestone under “Milestone” on the right.',
+  'burndown.toggle': 'Burndown',
+  'burndown.title': 'Burndown of {name}',
+  'burndown.left': '{count} {unit} left',
+  'burndown.points': 'points',
+  'burndown.issues': 'issues',
+  'burndown.notStarted': 'Starts soon',
+  'burndown.actual': 'Left',
+  'burndown.ideal': 'Ideal',
+  'burndown.day': 'Day',
+  'burndown.empty': 'Add issues to this cycle to see its burndown.',
+  'burndown.failed': "Couldn't load the burndown.",
   'confirm.ask': 'Are you sure?',
   'planning.doneCount': '{done}/{total} done',
 
@@ -48,6 +69,7 @@ const en: Record<string, string> = {
   'analytics.noIssues': 'No issues yet — analytics appear once the project has some.',
   'analytics.noCycles': 'No cycles yet.',
   'analytics.barLabel': '{label}: {value} ({percent}%)',
+  'burndown.explore': '{name}: use the arrow keys to read each day',
 }
 
 export default en

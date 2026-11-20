@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { WorkspaceContext } from '../features/workspace/workspaceContext'
 import { makeAuth, renderWithProviders } from '../test/utils'
@@ -11,7 +12,10 @@ import type { Workspace } from '../types/workspace'
 const getDashboard = vi.fn()
 const listIssues = vi.fn()
 vi.mock('../api/dashboard', () => ({ getDashboard: (...args: unknown[]) => getDashboard(...args) }))
+vi.mock('../api/invitations', () => ({ listMyInvitations: () => Promise.resolve([]), acceptInvitation: vi.fn(), declineInvitation: vi.fn() }))
 vi.mock('../api/issues', () => ({ listIssues: (...args: unknown[]) => listIssues(...args) }))
+vi.mock('../api/projects', () => ({ listProjects: () => Promise.resolve([]) }))
+vi.mock('../api/workspaces', () => ({ listWorkspaceMembers: () => Promise.resolve([{ id: 1 }]) }))
 
 const workspace = { id: 3, name: 'Nova Labs' } as Workspace
 
@@ -20,6 +24,7 @@ const user: User = {
   username: 'jane.dev',
   email: 'jane@example.com',
   email_verified: true,
+  totp_enabled: false,
   first_name: '',
   last_name: '',
   avatar: null,
@@ -44,6 +49,7 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
   return {
     id,
     project: 1,
+    number: id + 100,  // deliberately not equal to the id: the UI must show the number
     title: `Issue ${id}`,
     description: '',
     type: 'task',
@@ -57,6 +63,9 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
     due_date: null,
     github_number: null,
     github_url: '',
+    estimate: null,
+    checklist: null,
+    completed_at: null,
     created_at: '2026-09-01T10:00:00Z',
     updated_at: '2026-09-01T10:00:00Z',
     ...overrides,
@@ -87,28 +96,58 @@ describe('DashboardPage focus block', () => {
     listIssues.mockReset()
   })
 
-  it('counts my overdue, due-soon, in-progress and in-review issues and lists the most urgent first', async () => {
+  it('puts my open issues on the line, flags overdue and due-soon ones, and lists the most urgent first', async () => {
     getDashboard.mockResolvedValue(dashboard())
     listIssues.mockResolvedValue([
       issue(1, { title: 'Later work', due_date: daysFromToday(20) }),
       issue(2, { title: 'Late work', due_date: daysFromToday(-2), status: 'in_progress' }),
       issue(3, { title: 'Soon work', due_date: daysFromToday(1), status: 'in_review' }),
-      issue(4, { title: 'Finished', status: 'done', due_date: daysFromToday(-9) }),
+      issue(4, { title: 'Finished long ago', status: 'done', due_date: daysFromToday(-9), completed_at: '2026-01-01T10:00:00Z' }),
+      issue(5, { title: 'Finished today', status: 'done', completed_at: new Date().toISOString() }),
     ])
     renderDashboard()
 
-    expect(await screen.findByText('Hi jane.dev — here is what needs you today.')).toBeInTheDocument()
-    const tile = (label: string) => screen.getByText(label).parentElement as HTMLElement
-    expect(within(tile('Your overdue issues')).getByText('1')).toHaveClass('text-danger')
-    expect(within(tile('Due in the next 3 days')).getByText('1')).toHaveClass('text-warning')
-    expect(within(tile('In progress')).getByText('1')).toBeInTheDocument()
-    expect(within(tile('In review')).getByText('1')).toBeInTheDocument()
+    expect(await screen.findByText(/jane\.dev\. Here is your part of the work\.|jane\.dev\? Here is your part of the work\./)).toBeInTheDocument()
+    // One station per status, each with how many of my issues sit there; Done counts the last 7 days.
+    expect(await screen.findByRole('button', { name: 'Todo, 1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'In progress, 1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'In review, 1' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done in 7 days, 1' })).toBeInTheDocument()
+    expect(screen.getByText('1 overdue')).toHaveClass('text-danger')
+    expect(screen.getByText('1 due within 3 days')).toHaveClass('text-warning')
 
-    const titles = screen.getAllByRole('link').map((link) => link.textContent ?? '')
+    const list = screen.getByRole('list', { name: 'Your issues' })
+    const titles = within(list).getAllByRole('link').map((link) => link.textContent ?? '')
     const order = ['Late work', 'Soon work', 'Later work'].map((name) => titles.findIndex((t) => t.includes(name)))
     expect(order).toEqual([...order].sort((a, b) => a - b))
     expect(order.every((i) => i >= 0)).toBe(true)
-    expect(screen.queryByText('Finished')).not.toBeInTheDocument()
+    expect(within(list).queryByText(/Finished/)).not.toBeInTheDocument()
+  })
+
+  it('filters the list by a station, and back', async () => {
+    getDashboard.mockResolvedValue(dashboard())
+    listIssues.mockResolvedValue([
+      issue(1, { title: 'Later work' }),
+      issue(2, { title: 'Late work', status: 'in_progress' }),
+      issue(5, { title: 'Finished today', status: 'done', completed_at: new Date().toISOString() }),
+    ])
+    renderDashboard()
+
+    const progress = await screen.findByRole('button', { name: 'In progress, 1' })
+    await userEvent.click(progress)
+    expect(progress).toHaveAttribute('aria-pressed', 'true')
+    let list = screen.getByRole('list', { name: 'Your issues' })
+    expect(within(list).getByText('Late work')).toBeInTheDocument()
+    expect(within(list).queryByText('Later work')).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Done in 7 days, 1' }))
+    list = screen.getByRole('list', { name: 'Your issues' })
+    expect(within(list).getByText('Finished today')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Show all open' }))
+    list = screen.getByRole('list', { name: 'Your issues' })
+    expect(within(list).getByText('Later work')).toBeInTheDocument()
+    expect(within(list).getByText('Late work')).toBeInTheDocument()
   })
 
   it('celebrates an empty queue and prompts a brand-new workspace to create a project', async () => {
@@ -117,7 +156,18 @@ describe('DashboardPage focus block', () => {
     renderDashboard()
 
     expect(await screen.findByText('You are all caught up')).toBeInTheDocument()
-    expect(screen.getByText('Create your first project')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'New project' })).toHaveAttribute('href', '/projects')
+    // The getting-started steps lead to the first project; there is no second, separate prompt.
+    expect(await screen.findByRole('link', { name: 'Create a project' })).toHaveAttribute('href', '/projects?new=1')
+    expect(screen.queryByText('Create your first project')).not.toBeInTheDocument()
+  })
+
+  it('falls back to the plain first-project prompt once the steps were hidden', async () => {
+    localStorage.setItem(`devtrack_onboarding_hidden:${workspace.id}`, '1')
+    getDashboard.mockResolvedValue(dashboard({ projects: { total: 0, active: 0, planned: 0, paused: 0, completed: 0, archived: 0 } }))
+    listIssues.mockResolvedValue([])
+    renderDashboard()
+    expect(await screen.findByText('Create your first project')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'New project' })).toHaveAttribute('href', '/projects?new=1')
+    expect(screen.queryByRole('link', { name: 'Create a project' })).not.toBeInTheDocument()
   })
 })

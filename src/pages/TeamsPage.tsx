@@ -10,6 +10,9 @@ import { Avatar } from '../components/Avatar'
 import { ConfirmButton } from '../components/ConfirmButton'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
+import { Icon } from '../components/Icon'
+import { button } from '../components/ui'
+import { Spinner } from '../components/Spinner'
 
 function TeamMembers({ teamId }: { teamId: number }) {
   const { t, lang } = useI18n()
@@ -48,13 +51,13 @@ function TeamMembers({ teamId }: { teamId: number }) {
   }
 
   return (
-    <div className="mt-3 border-t border-border pt-3">
+    <div className="border-t border-border pt-4">
       {membersQuery.isLoading && <p className="text-sm text-fg-muted">{t('teams.membersLoading')}</p>}
       <ul className="mb-3 flex flex-col gap-1">
         {membersQuery.data?.map((member) => (
           <li
             key={member.id}
-            className="flex items-center justify-between rounded-2xl border border-border bg-bg px-3 py-2 text-sm"
+            className="flex items-center justify-between rounded-lg bg-well px-3 py-2 text-sm"
           >
             <span className="flex items-center gap-2 text-fg">
               <Avatar name={member.user.username} src={member.user.avatar} size={20} />
@@ -62,7 +65,7 @@ function TeamMembers({ teamId }: { teamId: number }) {
             </span>
             <ConfirmButton
               onConfirm={() => removeMutation.mutate(member.user.id)}
-              className="text-xs text-fg-muted transition-colors duration-150 hover:text-danger"
+              className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
             >
               {t('common.remove')}
             </ConfirmButton>
@@ -72,7 +75,7 @@ function TeamMembers({ teamId }: { teamId: number }) {
       </ul>
 
       {errors.non_field_errors && (
-        <p role="alert" className="mb-2 text-sm text-danger">
+        <p role="alert" className="mb-2 text-sm font-semibold text-danger">
           {errors.non_field_errors.join(' ')}
         </p>
       )}
@@ -83,7 +86,7 @@ function TeamMembers({ teamId }: { teamId: number }) {
         <button
           type="submit"
           disabled={addMutation.isPending}
-          className="mb-0.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+          className={button('primary')}
         >
           {t('common.add')}
         </button>
@@ -136,28 +139,28 @@ export function TeamsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">{t('teams.title')}</h1>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+        <h1 className="text-2xl font-semibold tracking-[-0.015em] text-fg">{t('teams.title')}</h1>
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+          className={button(isFormOpen ? 'secondary' : 'primary')}
         >
           {isFormOpen ? t('common.cancel') : t('teams.new')}
         </button>
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-8 max-w-xl rounded-xl border border-edge bg-surface shadow-panel p-5">
           {errors.non_field_errors && (
-            <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
+            <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
           )}
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('common.name')} errors={errors.name}>
               <input className={formInputClass} value={name} onChange={(e) => setName(e.target.value)} required />
             </FormField>
           </div>
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('common.description')} errors={errors.description}>
               <textarea
                 className={formInputClass}
@@ -167,12 +170,13 @@ export function TeamsPage() {
               />
             </FormField>
           </div>
-          <button
+          <button aria-busy={createMutation.isPending}
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className={button('primary')}
           >
-            {createMutation.isPending ? t('common.creating') : t('teams.create')}
+            {createMutation.isPending && <Spinner />}
+{t('teams.create')}
           </button>
         </form>
       )}
@@ -190,25 +194,37 @@ export function TeamsPage() {
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel empty:hidden">
         {teamsQuery.data?.map((team) => {
           const isExpanded = expandedTeamId === team.id
           return (
-            <div key={team.id} className="rounded-2xl border border-border bg-bg-elevated px-4 py-3">
+            <div key={team.id}>
               <button
                 type="button"
+                aria-expanded={isExpanded}
                 onClick={() => setExpandedTeamId(isExpanded ? null : team.id)}
-                className="flex w-full items-center justify-between text-left"
+                className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors duration-150 hover:bg-brand-soft/60"
               >
-                <div>
-                  <div className="text-sm font-medium text-fg">{team.name}</div>
-                  {team.description && <div className="text-xs text-fg-muted">{team.description}</div>}
-                </div>
-                <span className="text-xs text-fg-muted">
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-well text-sm font-semibold text-fg-muted"
+                >
+                  {team.name.slice(0, 1).toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[15px] font-bold text-fg">{team.name}</span>
+                  {team.description && <span className="block truncate text-sm text-fg-muted">{team.description}</span>}
+                </span>
+                <span className="shrink-0 text-sm font-semibold text-fg-muted">
                   {t(team.member_count === 1 ? 'teams.memberOne' : 'teams.memberMany', { count: team.member_count })}
                 </span>
+                <Icon name="chevronDown" className={`shrink-0 text-fg-muted transition-transform duration-150 ${isExpanded ? 'rotate-180' : ''}`} />
               </button>
-              {isExpanded && <TeamMembers teamId={team.id} />}
+              {isExpanded && (
+                <div className="px-5 pb-4">
+                  <TeamMembers teamId={team.id} />
+                </div>
+              )}
             </div>
           )
         })}

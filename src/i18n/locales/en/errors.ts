@@ -40,6 +40,12 @@ const en: Record<string, string> = {
   'error.ownerCannotBeRemoved': 'The workspace owner cannot be removed.',
   'error.network': 'Cannot reach the server. Check your connection and try again.',
   'error.loadFailed': "Couldn't load this data.",
+  'error.viewNameTaken': 'You already have a view with this name.',
+  'error.tooManyViews': 'You can keep up to {n} saved views per list.',
+  'error.attachmentType': 'Only images (PNG, JPEG, GIF, WebP), PDF and plain text files can be attached.',
+  'error.attachmentSize': 'Files can be at most {n} MB.',
+  'error.attachmentCount': 'An issue can hold up to {n} files.',
+  'error.demoBlocked': 'This is not available in the demo.',
 }
 
 export default en

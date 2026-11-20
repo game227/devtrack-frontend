@@ -1,27 +1,40 @@
-import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { renderWithProviders } from '../test/utils'
+import { act, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Reveal } from './Reveal'
 
+afterEach(() => vi.unstubAllGlobals())
+
 describe('Reveal', () => {
-  // jsdom has no IntersectionObserver, so this exercises the "unsupported environment" path —
-  // it must fail open (show the content) rather than leave it permanently hidden.
-  it('renders its children visibly when IntersectionObserver is unavailable', () => {
-    renderWithProviders(
-      <Reveal>
-        <p>hero copy</p>
-      </Reveal>,
-    )
-    expect(screen.getByText('hero copy')).toBeInTheDocument()
-    expect(screen.getByText('hero copy').parentElement).toHaveClass('opacity-100')
+  it('shows content at once where IntersectionObserver is missing', () => {
+    vi.stubGlobal('IntersectionObserver', undefined)
+    render(<Reveal>hello</Reveal>)
+    expect(screen.getByText('hello')).toHaveAttribute('data-reveal', 'shown')
   })
 
-  it('applies the requested stagger delay', () => {
-    renderWithProviders(
-      <Reveal delay={240}>
-        <span>staggered</span>
+  it('stays hidden until it scrolls into view, then stays shown', () => {
+    let callback: IntersectionObserverCallback = () => {}
+    const disconnect = vi.fn()
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(cb: IntersectionObserverCallback) {
+          callback = cb
+        }
+        observe() {}
+        disconnect = disconnect
+      },
+    )
+    render(
+      <Reveal variant="left" delay={120}>
+        picture
       </Reveal>,
     )
-    expect(screen.getByText('staggered').parentElement).toHaveStyle({ transitionDelay: '240ms' })
+    const element = screen.getByText('picture')
+    expect(element).toHaveAttribute('data-reveal', 'hidden')
+    expect(element).toHaveAttribute('data-variant', 'left')
+    expect(element.style.getPropertyValue('--reveal-delay')).toBe('120ms')
+    act(() => callback([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver))
+    expect(element).toHaveAttribute('data-reveal', 'shown')
+    expect(disconnect).toHaveBeenCalled()
   })
 })

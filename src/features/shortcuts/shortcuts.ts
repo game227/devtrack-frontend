@@ -1,10 +1,24 @@
 // Global keyboard shortcuts. Kept free of React so the key handling is easy to reason about and test.
 
-export interface ShortcutActions {
+interface ShortcutActions {
   openPalette: () => void
   toggleHelp: () => void
   newIssue: () => void
   go: (target: 'dashboard' | 'projects' | 'issues' | 'teams' | 'board') => void
+  // Keys the open page handles itself (the issue page: E, A, P, S, M, T). Tried last, so global
+  // sequences such as "G then P" always win.
+  page?: (key: string) => boolean
+}
+
+// The page-level handler currently on screen (at most one). Pages register it while mounted.
+let pageHandler: ((key: string) => boolean) | null = null
+
+export function setPageShortcuts(handler: ((key: string) => boolean) | null) {
+  pageHandler = handler
+}
+
+export function runPageShortcut(key: string): boolean {
+  return pageHandler ? pageHandler(key) : false
 }
 
 // After pressing G, the next key within this window completes a "go to" shortcut.
@@ -18,7 +32,7 @@ const GO_TARGETS: Record<string, Parameters<ShortcutActions['go']>[0]> = {
   b: 'board',
 }
 
-export function isTypingTarget(target: EventTarget | null): boolean {
+function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
   const tag = target.tagName
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
@@ -69,5 +83,6 @@ export function handleShortcut(
     actions.newIssue()
     return true
   }
+  if (!event.shiftKey && actions.page?.(key)) return true
   return false
 }

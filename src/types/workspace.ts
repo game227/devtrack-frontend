@@ -13,11 +13,6 @@ export interface Workspace {
   created_at: string
 }
 
-export interface CreateWorkspacePayload {
-  name: string
-  description?: string
-}
-
 export interface WorkspaceMember {
   id: number
   user: UserBrief

@@ -1,25 +1,20 @@
 const uz: Record<string, string> = {
+  'nav.mobile': "Asosiy bo'limlar",
+  'notifications.rich.commented': '{actor} #{number} «{title}» vazifasiga izoh yozdi',
+  'notifications.rich.mentioned': '{actor} sizni #{number} «{title}» vazifasida eslatdi',
+  'notifications.rich.issue_assigned': 'Sizga #{number} «{title}» vazifasi tayinlandi',
   'nav.overview': 'Umumiy',
   'nav.board': 'Doska',
   'nav.milestones': 'Bosqichlar',
   'nav.notes': 'Qaydlar',
   'nav.timeline': 'Xronologiya',
-  'nav.sectionWorkspace': 'Ish maydoni',
   'nav.sectionProject': 'Loyiha',
   'nav.openMenu': 'Menyuni ochish',
   'nav.closeMenu': 'Menyuni yopish',
   'nav.switchWorkspace': 'Ish maydonini almashtirish',
   'nav.mainNavigation': 'Asosiy navigatsiya',
+  'nav.skipToContent': "Asosiy kontentga o'tish",
 
-  'search.placeholder': 'Qidirish…',
-  'search.aria': 'Loyiha, vazifa va odamlarni qidirish',
-  'search.searching': 'Qidirilmoqda…',
-  'search.noResults': '"{query}" bo\'yicha hech narsa topilmadi.',
-  'search.projects': 'Loyihalar',
-  'search.issues': 'Vazifalar',
-  'search.cycles': 'Sikllar',
-  'search.labels': 'Yorliqlar',
-  'search.people': 'Odamlar',
 
   'notifications.title': 'Bildirishnomalar',
   'notifications.markAllRead': "Hammasini o'qilgan qilish",
@@ -29,6 +24,12 @@ const uz: Record<string, string> = {
   'notifications.mentioned': 'Sizni eslatishdi: "{target}"',
   'notifications.workspace_invited': 'Siz "{target}" ish maydoniga taklif qilindingiz',
   'notifications.project_member_added': 'Siz "{target}" loyihasiga qo\'shildingiz',
+  'nav.sidebar': 'Yon panel',
+  'nav.collapseSidebar': "Panelni yig'ish",
+  'nav.expandSidebar': 'Panelni yoyish',
+  'nav.breadcrumb': 'Siz turgan joy',
+  'nav.favorites': 'Sevimlilar',
+  'nav.favoritesEmpty': "Loyihani yulduzcha bilan belgilang (nomi yonidagi ☆) — u shu yerda, bir bosishda ochiladigan bo'lib turadi.",
 }
 
 export default uz

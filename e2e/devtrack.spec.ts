@@ -25,7 +25,9 @@ test('register, create a project, create an issue, and move it on the board', as
   await expect(page).toHaveURL(/\/dashboard/)
 
   await page.goto('/projects')
-  await page.getByRole('button', { name: 'Yangi loyiha' }).click()
+  // A brand-new account has no projects, so the empty state offers a second "Yangi loyiha" button;
+  // use the page header's (the first one).
+  await page.getByRole('button', { name: 'Yangi loyiha' }).first().click()
   const projectName = `E2E Project ${stamp}`
   await page.getByLabel('Nomi').fill(projectName)
   await page.getByRole('button', { name: 'Loyiha yaratish' }).click()
@@ -49,10 +51,10 @@ test('register, create a project, create an issue, and move it on the board', as
   await expect(page.getByText(issueTitle)).toBeVisible()
 
   // Desktop kanban cards move via native HTML5 drag-and-drop, which is
-  // brittle to simulate reliably. The board also ships an explicit
-  // <select> for touch screens (see ProjectBoardPage.tsx, `md:hidden`)
-  // that makes the same server call — switch to a narrow viewport to
-  // reveal it and drive that instead.
+  // brittle to simulate reliably. Every movable card also has an explicit
+  // status <select> (always shown on touch-sized screens, on hover/focus on
+  // desktop) that makes the same server call — switch to a narrow viewport
+  // and drive that instead.
   await page.setViewportSize({ width: 390, height: 844 })
   await page.getByLabel("O'tkazish").selectOption('in_progress')
   await expect(page.getByLabel("O'tkazish")).toHaveValue('in_progress')

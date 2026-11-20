@@ -7,9 +7,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createProjectNote, deleteNote, listProjectNotes, updateNote } from '../api/notes'
 import { FormField, formInputClass } from '../components/FormField'
 import { ConfirmButton } from '../components/ConfirmButton'
+import { Markdown } from '../components/Markdown'
 import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
 import { useI18n } from '../i18n'
 import type { Note } from '../types/note'
+import { button } from '../components/ui'
+import { Spinner } from '../components/Spinner'
 
 function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
   const { t, lang, formatDateTime } = useI18n()
@@ -41,32 +44,34 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
 
   if (isEditing) {
     return (
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-bg-elevated p-4">
+      <form onSubmit={handleSubmit} className="px-5 py-5">
         {errors.non_field_errors && (
-          <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
+          <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
         )}
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('common.title')} errors={errors.title}>
             <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
           </FormField>
         </div>
-        <div className="mb-3">
+        <div className="mb-4">
           <FormField label={t('notes.body')} errors={errors.body}>
             <textarea className={formInputClass} value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
           </FormField>
+          <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
         </div>
         <div className="flex gap-2">
-          <button
+          <button aria-busy={updateMutation.isPending}
             type="submit"
             disabled={updateMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className={button('primary')}
           >
-            {updateMutation.isPending ? t('common.saving') : t('common.save')}
+            {updateMutation.isPending && <Spinner />}
+{t('common.save')}
           </button>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
+            className={button('secondary')}
           >
             {t('common.cancel')}
           </button>
@@ -76,26 +81,33 @@ function NoteCard({ note, projectId }: { note: Note; projectId: number }) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-bg-elevated p-4">
-      <div className="mb-1 flex items-center justify-between">
-        <span className="text-sm font-medium text-fg">{note.title}</span>
-        <div className="flex items-center gap-3 text-xs text-fg-muted">
-          <span>
-            {note.author.username} · {formatDateTime(note.updated_at)}
-          </span>
-          <button type="button" onClick={() => setIsEditing(true)} className="transition-colors duration-150 hover:text-fg">
+    <article className="px-5 py-5">
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+        <div className="min-w-0">
+          <h2 className="text-[17px] font-bold text-fg">{note.title}</h2>
+          <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-fg-muted">
+            <span className="font-semibold">{note.author.username}</span>
+            <span>{formatDateTime(note.updated_at)}</span>
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-brand-soft/60 hover:text-fg"
+          >
             {t('common.edit')}
           </button>
           <ConfirmButton
             onConfirm={() => deleteMutation.mutate()}
-            className="transition-colors duration-150 hover:text-danger"
+            className="rounded-md px-2 py-1 text-xs font-semibold text-fg-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger"
           >
             {t('common.delete')}
           </ConfirmButton>
         </div>
       </div>
-      <p className="whitespace-pre-wrap text-sm text-fg">{note.body}</p>
-    </div>
+      <Markdown className="max-w-3xl text-[15px] leading-relaxed text-fg">{note.body}</Markdown>
+    </article>
   )
 }
 
@@ -135,38 +147,40 @@ export function ProjectNotesPage() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">{t('notes.title')}</h1>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+        <h1 className="text-2xl font-semibold tracking-[-0.015em] text-fg">{t('notes.title')}</h1>
         <button
           type="button"
           onClick={() => setIsFormOpen((open) => !open)}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
+          className={button(isFormOpen ? 'secondary' : 'primary')}
         >
           {isFormOpen ? t('common.cancel') : t('notes.new')}
         </button>
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-lg rounded-2xl border border-border bg-bg-elevated p-4">
+        <form onSubmit={handleSubmit} className="mb-8 max-w-xl rounded-xl border border-edge bg-surface shadow-panel p-5">
           {errors.non_field_errors && (
-            <p role="alert" className="mb-3 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
+            <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">{errors.non_field_errors.join(' ')}</p>
           )}
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('common.title')} errors={errors.title}>
               <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
             </FormField>
           </div>
-          <div className="mb-3">
+          <div className="mb-4">
             <FormField label={t('notes.body')} errors={errors.body}>
               <textarea className={formInputClass} value={body} onChange={(e) => setBody(e.target.value)} rows={4} />
             </FormField>
+            <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
           </div>
-          <button
+          <button aria-busy={createMutation.isPending}
             type="submit"
             disabled={createMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+            className={button('primary')}
           >
-            {createMutation.isPending ? t('common.creating') : t('notes.create')}
+            {createMutation.isPending && <Spinner />}
+{t('notes.create')}
           </button>
         </form>
       )}
@@ -184,7 +198,7 @@ export function ProjectNotesPage() {
         />
       )}
 
-      <div className="flex flex-col gap-3">
+      <div className="divide-y divide-border overflow-hidden rounded-xl border border-edge bg-surface shadow-panel empty:hidden">
         {notesQuery.data?.map((note) => (
           <NoteCard key={note.id} note={note} projectId={projectId} />
         ))}

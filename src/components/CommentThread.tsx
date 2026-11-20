@@ -1,20 +1,27 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useI18n } from '../i18n'
 import type { Comment } from '../types/comment'
 import { Avatar } from './Avatar'
+import { Markdown } from './Markdown'
 import { formInputClass } from './FormField'
+import { button } from './ui'
 
 interface CommentThreadProps {
   queryKey: unknown[]
   listComments: () => Promise<Comment[]>
   createComment: (body: string) => Promise<Comment>
+  // Inside tabs the tab is the heading: the thread then hides its own and is labelled by the tab.
+  labelledBy?: string
+  // An id for the comment box, so a keyboard shortcut can focus it.
+  inputId?: string
 }
 
-export function CommentThread({ queryKey, listComments, createComment }: CommentThreadProps) {
+export function CommentThread({ queryKey, listComments, createComment, labelledBy, inputId }: CommentThreadProps) {
   const { t, formatDateTime } = useI18n()
   const queryClient = useQueryClient()
+  const headingId = useId()
   const [body, setBody] = useState('')
 
   const commentsQuery = useQuery({ queryKey, queryFn: listComments })
@@ -34,44 +41,49 @@ export function CommentThread({ queryKey, listComments, createComment }: Comment
   }
 
   return (
-    <div>
-      <h2 className="mb-2 text-sm font-semibold text-fg">{t('comments.title')}</h2>
+    <section aria-labelledby={labelledBy ?? headingId}>
+      {!labelledBy && (
+        <h2 id={headingId} className="mb-3 text-base font-semibold tracking-[-0.01em] text-fg">
+          {t('comments.title')}
+          {commentsQuery.data && commentsQuery.data.length > 0 && (
+            <span className="ml-2 font-semibold text-fg-muted tabular">{commentsQuery.data.length}</span>
+          )}
+        </h2>
+      )}
 
       {commentsQuery.isLoading && <p className="text-sm text-fg-muted">{t('comments.loading')}</p>}
 
-      <ul className="mb-3 flex flex-col gap-2">
+      <ul className="mb-4 flex flex-col gap-5">
         {commentsQuery.data?.map((comment) => (
-          <li key={comment.id} className="rounded-2xl border border-border bg-bg-elevated p-3 text-sm">
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <span className="flex items-center gap-2 font-medium text-fg">
-                <Avatar name={comment.author.username} src={comment.author.avatar} size={20} />
-                {comment.author.username}
-              </span>
-              <span className="text-xs text-fg-muted">{formatDateTime(comment.created_at)}</span>
+          <li key={comment.id} className="flex gap-3 text-sm">
+            <Avatar name={comment.author.username} src={comment.author.avatar} size={30} />
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex flex-wrap items-baseline gap-x-2">
+                <span className="font-bold text-fg">{comment.author.username}</span>
+                <span className="text-xs text-fg-muted">{formatDateTime(comment.created_at)}</span>
+              </div>
+              <Markdown className="text-[15px] leading-relaxed text-fg">{comment.body}</Markdown>
             </div>
-            <p className="whitespace-pre-wrap text-fg">{comment.body}</p>
           </li>
         ))}
         {commentsQuery.data?.length === 0 && <li className="text-sm text-fg-muted">{t('comments.empty')}</li>}
       </ul>
 
-      <form onSubmit={handleSubmit} className="flex items-start gap-2">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <textarea
+          id={inputId}
           aria-label={t('comments.placeholder')}
-          className={`${formInputClass} flex-1`}
+          className={`${formInputClass} mt-0! flex-1`}
           rows={2}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder={t('comments.placeholder')}
         />
-        <button
-          type="submit"
-          disabled={createMutation.isPending || !body.trim()}
-          className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-        >
+        <button type="submit" disabled={createMutation.isPending || !body.trim()} className={`self-end sm:self-start ${button('primary')}`}>
           {t('comments.post')}
         </button>
       </form>
-    </div>
+      <p className="mt-1.5 text-xs text-fg-muted">{t('markdown.hint')}</p>
+    </section>
   )
 }

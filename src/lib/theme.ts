@@ -1,19 +1,20 @@
-// Colour theme: dark (the default, DevTrack's own look), light, or follow the operating system.
+// Colour theme: light (the default), dark, or follow the operating system.
 // The choice is remembered per browser; the theme itself is just a data-theme attribute on <html>
 // that flips the colour tokens in styles/index.css. index.html applies it before first paint —
 // keep the storage key and default there in step with this file.
 
 export type ThemePreference = 'system' | 'light' | 'dark'
-export type ResolvedTheme = 'light' | 'dark'
+type ResolvedTheme = 'light' | 'dark'
 
 export const THEME_STORAGE_KEY = 'devtrack_theme'
-export const DEFAULT_PREFERENCE: ThemePreference = 'dark'
+export const DEFAULT_PREFERENCE: ThemePreference = 'light'
 export const THEME_PREFERENCES: ThemePreference[] = ['light', 'dark', 'system']
 
 const DARK_QUERY = '(prefers-color-scheme: dark)'
-const THEME_COLOR: Record<ResolvedTheme, string> = { dark: '#000000', light: '#ffffff' }
+// Browser chrome colour: the page background of each theme (styles/index.css --color-bg).
+const THEME_COLOR: Record<ResolvedTheme, string> = { dark: '#151515', light: '#cececc' }
 
-export function isPreference(value: unknown): value is ThemePreference {
+function isPreference(value: unknown): value is ThemePreference {
   return value === 'light' || value === 'dark' || value === 'system'
 }
 
@@ -27,7 +28,7 @@ export function readPreference(): ThemePreference {
   return DEFAULT_PREFERENCE
 }
 
-export function systemPrefersDark(): boolean {
+function systemPrefersDark(): boolean {
   return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(DARK_QUERY).matches
 }
 
@@ -43,39 +44,21 @@ export function applyTheme(theme: ResolvedTheme) {
 
 // --- the switch animation ------------------------------------------------------------------------
 //
-// The new theme flows down over the old one like water: a wavy front travels from the top edge of the
-// viewport to the bottom, ripples drifting along it. It is a View Transition — the browser holds a
-// picture of the old page and of the new one, and we animate a clip-path on the new one — so nothing in
-// the app re-renders differently. Browsers without View Transitions (and people who prefer reduced
-// motion) simply get the instant switch.
+// The new theme slides in from the left behind a straight edge, like a train passing the platform. It
+// is a View Transition — the browser holds a picture of the old page and of the new one, and we animate
+// a clip-path on the new one — so nothing in the app re-renders differently. Browsers without View
+// Transitions (and people who prefer reduced motion) simply get the instant switch.
 
-export const WAVE_DURATION_MS = 1300
-const WAVE_FRAMES = 56
-const WAVE_COLUMNS = 26 // points along the front
-const WAVE_AMPLITUDE = 7 // how tall the ripples are, in % of the viewport height
-const WAVE_RIPPLES = 1.6 // how many crests fit across the width
+export const SWEEP_DURATION_MS = 520
 
-const clampPercent = (value: number) => Math.min(100 + WAVE_AMPLITUDE * 2, Math.max(0, value))
-
-// The visible (new-theme) region at `progress` 0..1: everything above a rippling front. At 0 nothing is
-// revealed, at 1 everything is; the ripples drift sideways as the front descends.
-export function waveClipPath(progress: number): string {
-  const front = -WAVE_AMPLITUDE + progress * (100 + 2 * WAVE_AMPLITUDE)
-  const points = ['0% 0%', '100% 0%']
-  for (let column = WAVE_COLUMNS; column >= 0; column--) {
-    const x = (column / WAVE_COLUMNS) * 100
-    const phase = (x / 100) * Math.PI * 2 * WAVE_RIPPLES + progress * Math.PI * 2 * 2.5
-    const y = clampPercent(front + WAVE_AMPLITUDE * Math.sin(phase))
-    points.push(`${x.toFixed(1)}% ${y.toFixed(2)}%`)
-  }
-  return `polygon(${points.join(', ')})`
+// The visible (new-theme) region at `progress` 0..1: everything left of the edge.
+export function sweepClipPath(progress: number): string {
+  const hidden = Math.min(100, Math.max(0, (1 - progress) * 100))
+  return `inset(0 ${hidden.toFixed(2)}% 0 0)`
 }
 
-// Ease in and out so the wave gathers, sweeps and settles rather than moving at a constant speed.
-const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)
-
-export function waveKeyframes(): { clipPath: string }[] {
-  return Array.from({ length: WAVE_FRAMES + 1 }, (_, i) => ({ clipPath: waveClipPath(easeInOut(i / WAVE_FRAMES)) }))
+export function sweepKeyframes(): { clipPath: string }[] {
+  return [{ clipPath: sweepClipPath(0) }, { clipPath: sweepClipPath(1) }]
 }
 
 function prefersReducedMotion(): boolean {
@@ -86,7 +69,7 @@ type ViewTransitionDocument = Document & {
   startViewTransition?: (update: () => void) => { ready: Promise<void> }
 }
 
-export function applyThemeAnimated(theme: ResolvedTheme) {
+function applyThemeAnimated(theme: ResolvedTheme) {
   const doc = document as ViewTransitionDocument
   if (typeof doc.startViewTransition !== 'function' || prefersReducedMotion()) {
     applyTheme(theme)
@@ -95,9 +78,9 @@ export function applyThemeAnimated(theme: ResolvedTheme) {
   const transition = doc.startViewTransition(() => applyTheme(theme))
   transition.ready
     .then(() => {
-      document.documentElement.animate(waveKeyframes(), {
-        duration: WAVE_DURATION_MS,
-        easing: 'linear', // the easing is baked into the keyframes above
+      document.documentElement.animate(sweepKeyframes(), {
+        duration: SWEEP_DURATION_MS,
+        easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
         pseudoElement: '::view-transition-new(root)',
       })
     })
@@ -133,7 +116,7 @@ export function setPreference(next: ThemePreference) {
     // Not persisted, but the choice still applies for this visit.
   }
   const after = resolveTheme(next)
-  // Only a real change of look gets the flowing animation (choosing "system" while it already
+  // Only a real change of look gets the sweep (choosing "system" while it already
   // matches, or re-clicking the current theme, is silent).
   if (before === after) applyTheme(after)
   else applyThemeAnimated(after)

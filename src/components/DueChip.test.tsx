@@ -20,9 +20,14 @@ describe('DueChip', () => {
     expect(screen.getByText('Due today')).toHaveClass('text-warning')
   })
 
-  it('stays muted for a distant date', () => {
+  it('stays muted for a distant date, shown short within the year', () => {
     renderWithProviders(<DueChip dueDate="2026-12-01" status="todo" />, { lang: 'en' })
-    expect(screen.getByText(/2026/)).toHaveClass('text-fg-muted')
+    expect(screen.getByText('Dec 1')).toHaveClass('text-fg-muted')
+  })
+
+  it('adds the year for a date in another year', () => {
+    renderWithProviders(<DueChip dueDate="2027-01-15" status="todo" />, { lang: 'uz' })
+    expect(screen.getByText('15 yan 2027')).toHaveClass('text-fg-muted')
   })
 
   it('renders nothing for finished issues or missing dates', () => {

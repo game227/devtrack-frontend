@@ -1,4 +1,8 @@
 const en: Record<string, string> = {
+  'crash.title': "Something went wrong on this page",
+  'crash.text': "The error has been noted. Reload the page to carry on; your work is saved on the server.",
+  'crash.reload': "Reload the page",
+  'crash.retry': "Try again",
   'common.loading': 'Loading…',
   'common.save': 'Save',
   'common.saving': 'Saving…',
@@ -67,6 +71,7 @@ const en: Record<string, string> = {
   'nav.issues': 'Issues',
   'nav.cycles': 'Cycles',
   'nav.teams': 'Teams',
+  'nav.members': 'Members',
   'nav.analytics': 'Analytics',
   'nav.settings': 'Settings',
   'nav.profile': 'Profile',
@@ -76,6 +81,7 @@ const en: Record<string, string> = {
 
   'lang.uz': "O'zbekcha",
   'lang.en': 'English',
+  'lang.ru': 'Русский',
   'lang.switch': 'Language',
 
   'common.loadingWorkspace': 'Loading workspace…',
@@ -85,6 +91,7 @@ const en: Record<string, string> = {
   'common.status': 'Status',
   'common.priority': 'Priority',
   'common.type': 'Type',
+  'common.notSet': 'Not set',
   'common.title': 'Title',
   'common.assignee': 'Assignee',
   'common.reporter': 'Reporter',

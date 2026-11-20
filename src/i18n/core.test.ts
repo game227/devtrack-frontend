@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LANG, LANGS, STORAGE_KEY, dictionaries, formatDate, formatDateTime, formatTime, readStoredLang, storeLang, translate } from './core'
+import { DEFAULT_LANG, LANGS, STORAGE_KEY, dictionaries, formatDate, formatDateTime, formatShortDate, formatTime, readStoredLang, storeLang, translate } from './core'
 
 describe('translate', () => {
   it('returns the translation for the requested language', () => {
@@ -78,8 +78,13 @@ describe('language storage', () => {
   })
 
   it('ignores unsupported stored values', () => {
-    localStorage.setItem(STORAGE_KEY, 'ru')
+    localStorage.setItem(STORAGE_KEY, 'de')
     expect(readStoredLang()).toBe('uz')
+  })
+
+  it('remembers Russian', () => {
+    localStorage.setItem(STORAGE_KEY, 'ru')
+    expect(readStoredLang()).toBe('ru')
   })
 })
 
@@ -97,5 +102,17 @@ describe('date formatting', () => {
     const mm = String(local.getMinutes()).padStart(2, '0')
     expect(formatTime('uz', iso)).toBe(`${hh}:${mm}`)
     expect(formatDateTime('uz', iso)).toBe(`${local.getDate()} sentabr 2026, ${hh}:${mm}`)
+  })
+})
+
+describe('formatShortDate', () => {
+  const now = new Date(2026, 10, 15)
+  it('drops the year within the current year', () => {
+    expect(formatShortDate('uz', '2026-11-16', now)).toBe('16 noy')
+    expect(formatShortDate('en', '2026-11-16', now)).toBe(new Date(2026, 10, 16).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))
+  })
+  it('keeps the year for other years', () => {
+    expect(formatShortDate('uz', '2027-01-02', now)).toBe('2 yan 2027')
+    expect(formatShortDate('en', '2027-01-02', now)).toBe(new Date(2027, 0, 2).toLocaleDateString('en-US', { dateStyle: 'medium' }))
   })
 })

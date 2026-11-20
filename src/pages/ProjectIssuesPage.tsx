@@ -1,190 +1,110 @@
-import { useState } from 'react'
-import { SkeletonList } from '../components/Skeleton'
-import { EmptyState } from '../components/EmptyState'
-import type { FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createIssue, listIssues } from '../api/issues'
-import { FormField, formInputClass } from '../components/FormField'
-import { IssueRow } from '../components/IssueRow'
-import { extractFieldErrors, type FieldErrors } from '../features/auth/errors'
+import { useQuery } from '@tanstack/react-query'
+import { listIssues } from '../api/issues'
+import { EmptyState } from '../components/EmptyState'
+import { Icon } from '../components/Icon'
+import { BulkBar } from '../components/BulkBar'
+import { IssueFilterBar } from '../components/IssueFilterBar'
+import { IssueList, IssueRow } from '../components/IssueRow'
+import { SkeletonList } from '../components/Skeleton'
+import { button, pageHeader, pageTitle } from '../components/ui'
+import { useNewIssue } from '../features/issues/newIssueContext'
+import { useIssueFilters } from '../features/issues/useIssueFilters'
+import { useWorkspace } from '../features/workspace/workspaceContext'
 import { useI18n } from '../i18n'
-import { ISSUE_STATUSES } from '../types/issue'
-import type { IssueStatus, IssueType } from '../types/issue'
-import type { Priority } from '../types/project'
-
-const TYPES: IssueType[] = ['task', 'bug', 'feature', 'improvement', 'chore']
-const PRIORITIES: Priority[] = ['none', 'low', 'medium', 'high', 'urgent']
+import type { IssueFilters } from '../types/issue'
 
 export function ProjectIssuesPage() {
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const { id } = useParams<{ id: string }>()
   const projectId = Number(id)
-  const queryClient = useQueryClient()
+  const openNewIssue = useNewIssue()
+  const { currentWorkspace } = useWorkspace()
+  const { filters, setFilter, applyFilters, isFiltered } = useIssueFilters()
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const toggle = (id: number, on: boolean) =>
+    setSelected((current) => {
+      const next = new Set(current)
+      if (on) next.add(id)
+      else next.delete(id)
+      return next
+    })
 
-  const [statusFilter, setStatusFilter] = useState<IssueStatus | ''>('')
-  const [typeFilter, setTypeFilter] = useState<IssueType | ''>('')
-  const [mineOnly, setMineOnly] = useState(false)
-
-  // `?new=1` (board empty state, the "C" shortcut) lands here with the create form already open.
+  // `?new=1` (the "New issue" links) lands here with the new-issue dialog open for this project.
   const [searchParams] = useSearchParams()
-  const [isFormOpen, setIsFormOpen] = useState(() => searchParams.get('new') === '1')
-  const [title, setTitle] = useState('')
-  const [type, setType] = useState<IssueType>('task')
-  const [priority, setPriority] = useState<Priority>('none')
-  const [errors, setErrors] = useState<FieldErrors>({})
+  const wantsNew = searchParams.get('new') === '1'
+  useEffect(() => {
+    if (wantsNew && Number.isFinite(projectId)) openNewIssue(projectId)
+  }, [wantsNew, projectId, openNewIssue])
 
   const issuesQuery = useQuery({
-    queryKey: ['issues', projectId, statusFilter, typeFilter, mineOnly],
-    queryFn: () =>
-      listIssues(
-        { project: projectId },
-        {
-          status: statusFilter || undefined,
-          type: typeFilter || undefined,
-          assignee: mineOnly ? 'me' : undefined,
-        },
-      ),
+    queryKey: ['issues', projectId, filters],
+    queryFn: () => listIssues({ project: projectId }, filters as IssueFilters),
     enabled: Number.isFinite(projectId),
   })
 
-  const createMutation = useMutation({
-    mutationFn: createIssue,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['issues', projectId] })
-      setIsFormOpen(false)
-      setTitle('')
-      setType('task')
-      setPriority('none')
-      setErrors({})
-    },
-    onError: (error) => setErrors(extractFieldErrors(error, lang)),
-  })
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault()
-    createMutation.mutate({ project: projectId, title, type, priority })
-  }
+  const issues = issuesQuery.data ?? []
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-fg">{t('issues.title')}</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            to={`/projects/${projectId}/board`}
-            className="rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-fg"
-          >
+      <div className={pageHeader}>
+        <h1 className={pageTitle}>{t('issues.title')}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to={`/projects/${projectId}/board`} className={button('secondary')}>
             {t('nav.board')}
           </Link>
-          <button
-            type="button"
-            onClick={() => setIsFormOpen((open) => !open)}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98]"
-          >
-            {isFormOpen ? t('common.cancel') : t('issues.new')}
+          {/* On phones the bottom bar's "+" does this. */}
+          <button type="button" onClick={() => openNewIssue(projectId)} className={`${button('primary')} max-md:hidden`}>
+            <Icon name="plus" />
+            {t('issues.new')}
           </button>
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
-        <select
-          aria-label={t('issues.filterStatus')}
-          className={`${formInputClass} mt-0! w-auto!`}
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as IssueStatus | '')}
-        >
-          <option value="">{t('issues.allStatuses')}</option>
-          {ISSUE_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {t(`status.${s}`)}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label={t('issues.filterType')}
-          className={`${formInputClass} mt-0! w-auto!`}
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as IssueType | '')}
-        >
-          <option value="">{t('issues.allTypes')}</option>
-          {TYPES.map((value) => (
-            <option key={value} value={value}>
-              {t(`issueType.${value}`)}
-            </option>
-          ))}
-        </select>
-        <label className="flex items-center gap-1.5 text-fg-muted">
-          <input type="checkbox" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} />
-          {t('issues.assignedToMe')}
-        </label>
-      </div>
-
-      {isFormOpen && (
-        <form onSubmit={handleSubmit} className="mb-6 max-w-md rounded-2xl border border-border bg-bg-elevated p-4">
-          {errors.non_field_errors && (
-            <p role="alert" className="mb-3 text-sm text-danger">
-              {errors.non_field_errors.join(' ')}
-            </p>
-          )}
-          <div className="mb-3">
-            <FormField label={t('common.title')} errors={errors.title}>
-              <input className={formInputClass} value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </FormField>
-          </div>
-          <div className="mb-3 grid grid-cols-2 gap-2">
-            <FormField label={t('common.type')} errors={errors.type}>
-              <select className={formInputClass} value={type} onChange={(e) => setType(e.target.value as IssueType)}>
-                {TYPES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`issueType.${value}`)}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <FormField label={t('common.priority')} errors={errors.priority}>
-              <select
-                className={formInputClass}
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as Priority)}
-              >
-                {PRIORITIES.map((value) => (
-                  <option key={value} value={value}>
-                    {t(`priority.${value}`)}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-          </div>
-          <button
-            type="submit"
-            disabled={createMutation.isPending}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
-          >
-            {createMutation.isPending ? t('common.creating') : t('issues.create')}
-          </button>
-        </form>
+      {currentWorkspace && Number.isFinite(projectId) && (
+        <IssueFilterBar
+          scope={{ project: projectId }}
+          workspaceId={currentWorkspace.id}
+          filters={filters}
+          onFilter={setFilter}
+          onApply={applyFilters}
+          count={issuesQuery.isSuccess ? issues.length : undefined}
+        />
       )}
 
       {issuesQuery.isLoading && <SkeletonList count={4} />}
       {issuesQuery.isError && <p className="text-sm text-danger">{t('issues.loadFailed')}</p>}
-      {issuesQuery.data?.length === 0 &&
-        (statusFilter || typeFilter || mineOnly ? (
-          <p className="text-sm text-fg-muted">{t('issues.empty')}</p>
+      {issuesQuery.isSuccess &&
+        issues.length === 0 &&
+        (isFiltered ? (
+          <p className="rounded-xl border border-dashed border-border-strong px-4 py-6 text-sm text-fg-muted">{t('issues.empty')}</p>
         ) : (
-          !isFormOpen && (
-            <EmptyState
-              icon="issues"
-              title={t('empty.issues.title')}
-              description={t('empty.issues.desc')}
-              action={{ label: t('empty.issues.action'), onClick: () => setIsFormOpen(true) }}
-            />
-          )
+          <EmptyState
+            icon="issues"
+            title={t('empty.issues.title')}
+            description={t('empty.issues.desc')}
+            action={{ label: t('empty.issues.action'), onClick: () => openNewIssue(projectId) }}
+          />
         ))}
 
-      <div className="flex flex-col gap-2">
-        {issuesQuery.data?.map((issue) => <IssueRow key={issue.id} issue={issue} />)}
-      </div>
+      {issues.length > 0 && (
+        <IssueList label={t('issues.title')}>
+          {issues.map((issue, index) => (
+            <IssueRow key={issue.id} issue={issue} index={index} selected={selected.has(issue.id)} onSelect={toggle} />
+          ))}
+        </IssueList>
+      )}
+
+      {selected.size > 0 && (
+        <BulkBar
+          ids={[...selected]}
+          projectId={projectId}
+          allSelected={selected.size === issues.length}
+          onAll={() => setSelected(new Set(issues.map((issue) => issue.id)))}
+          onClear={() => setSelected(new Set())}
+        />
+      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 export type DueState = 'overdue' | 'soon' | 'later'
 
 // Issues due within this many days (inclusive of today) count as "due soon".
-export const DUE_SOON_DAYS = 3
+const DUE_SOON_DAYS = 3
 
 function localIsoDate(now: Date): string {
   const month = String(now.getMonth() + 1).padStart(2, '0')

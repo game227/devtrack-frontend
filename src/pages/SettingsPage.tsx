@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { isAxiosError } from 'axios'
 import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  completeGithubConnection,
   disconnectGithub,
   getGithubAuthorizeUrl,
   getGithubConnectionStatus,
@@ -10,34 +12,90 @@ import {
 import { disconnectTelegram, getTelegramConnectionStatus, getTelegramDeepLink } from '../api/telegram'
 import { ConfirmButton } from '../components/ConfirmButton'
 import { Icon } from '../components/Icon'
+import { ContactList } from '../components/ContactLinks'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { useI18n } from '../i18n'
+import { button, notice, pageTitle } from '../components/ui'
+import { PushCard } from '../components/PushCard'
+import { updateMe } from '../api/auth'
+import { useAuth } from '../features/auth/authContext'
 
-const primaryButton =
-  'shrink-0 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-fg transition-colors duration-150 hover:border-fg active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100'
-const dangerButton =
-  'shrink-0 rounded-md border border-border px-3 py-1.5 text-sm text-fg transition-colors duration-150 hover:border-danger hover:text-danger disabled:opacity-50'
+const primaryButton = button('primary')
+const dangerButton = button('danger')
 
-function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings'; children: ReactNode }) {
+function Card({ title, icon, children }: { title: string; icon?: 'github' | 'send' | 'settings' | 'mail'; children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-bg-elevated p-5">
-      <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-fg">
-        {icon && <Icon name={icon} />}
+    <section className="rounded-xl border border-edge bg-surface shadow-panel p-5">
+      <h2 className="mb-3 flex items-center gap-2 text-base font-semibold tracking-[-0.01em] text-fg">
+        {icon && <Icon name={icon} size={18} />}
         {title}
       </h2>
       {children}
-    </div>
+    </section>
+  )
+}
+
+// The Monday email: projects' health, late issues and what got done, for owners and admins.
+function DigestCard() {
+  const { t } = useI18n()
+  const { user, refreshUser } = useAuth()
+  const [error, setError] = useState(false)
+  const save = useMutation({
+    mutationFn: (on: boolean) => updateMe({ weekly_digest: on }),
+    onSuccess: () => {
+      setError(false)
+      void refreshUser()
+    },
+    onError: () => setError(true),
+  })
+  if (!user || user.weekly_digest === undefined) return null
+  const on = save.isPending ? Boolean(save.variables) : user.weekly_digest
+  return (
+    <Card title={t('digest.title')} icon="mail">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="max-w-md text-sm text-fg-muted">{t('digest.help')}</p>
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-fg">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-[var(--color-fg)]"
+            checked={on}
+            disabled={save.isPending}
+            onChange={(e) => save.mutate(e.target.checked)}
+          />
+          {t(on ? 'digest.on' : 'digest.off')}
+        </label>
+      </div>
+      {!user.email_verified && <p className="mt-2 text-xs text-fg-muted">{t('digest.verify')}</p>}
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-danger">
+          {t('digest.failed')}
+        </p>
+      )}
+    </Card>
+  )
+}
+
+function ContactCard() {
+  const { t } = useI18n()
+  return (
+    <Card title={t('contact.title')}>
+      <p className="mb-4 text-sm text-fg-muted">{t('contact.settingsHelp')}</p>
+      <ContactList />
+    </Card>
   )
 }
 
 export function SettingsPage() {
   const { t } = useI18n()
   return (
-    <div className="max-w-xl space-y-6">
-      <h1 className="text-xl font-semibold text-fg">{t('settings.title')}</h1>
+    <div className="max-w-2xl space-y-6">
+      <h1 className={pageTitle}>{t('settings.title')}</h1>
       <LanguageCard />
       <GithubConnectionCard />
       <TelegramConnectionCard />
+      <PushCard />
+      <DigestCard />
+      <ContactCard />
     </div>
   )
 }
@@ -46,12 +104,40 @@ function LanguageCard() {
   const { t } = useI18n()
   return (
     <Card title={t('settings.language')} icon="settings">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-fg-muted">{t('settings.languageHelp')}</p>
         <LanguageSwitcher />
       </div>
     </Card>
   )
+}
+
+const GITHUB_NONCE_KEY = 'devtrack_github_nonce'
+// Error codes the backend may send back; anything else in the URL is not echoed (a crafted link could
+// otherwise put any sentence in this banner).
+const GITHUB_ERRORS = new Set([
+  'access_denied',
+  'authorization_failed',
+  'missing_params',
+  'invalid_state',
+  'connection_failed',
+  'account_already_linked',
+  'invalid_or_expired',
+])
+
+function newNonce(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(24))
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+function takeNonce(): string {
+  try {
+    const nonce = sessionStorage.getItem(GITHUB_NONCE_KEY) ?? ''
+    sessionStorage.removeItem(GITHUB_NONCE_KEY)
+    return nonce
+  } catch {
+    return ''
+  }
 }
 
 function GithubConnectionCard() {
@@ -65,26 +151,39 @@ function GithubConnectionCard() {
     queryFn: getGithubConnectionStatus,
   })
 
-  // The OAuth callback is handled entirely by the backend, which 302s back
-  // here with ?github=connected or ?github_error=... — this just surfaces
-  // that one-time result, then strips the params so a refresh doesn't re-show it.
+  const showError = (code: string) =>
+    setBanner({
+      kind: 'error',
+      text: t('settings.githubConnectFailed', {
+        reason: t(`github.error.${GITHUB_ERRORS.has(code) ? code : 'authorization_failed'}`),
+      }),
+    })
+
+  // GitHub sends the browser back through the backend, which parks the authorization and redirects here
+  // with ?github_pending=<id> (or ?github_error=<code>). This browser then claims it with the nonce it
+  // kept, signed in as the user who started; the params are stripped so a refresh does not repeat it.
+  const handled = useRef(false)
   useEffect(() => {
-    const connected = searchParams.get('github')
+    if (handled.current) return
+    handled.current = true
+    const pending = searchParams.get('github_pending')
     const error = searchParams.get('github_error')
-    if (connected === 'connected') {
-      setBanner({ kind: 'success', text: t('settings.githubConnected') })
-      void queryClient.invalidateQueries({ queryKey: ['github-connection'] })
+    if (pending) {
+      completeGithubConnection(pending, takeNonce())
+        .then(() => {
+          setBanner({ kind: 'success', text: t('settings.githubConnected') })
+          void queryClient.invalidateQueries({ queryKey: ['github-connection'] })
+        })
+        .catch((failure: unknown) => {
+          const detail = isAxiosError(failure) ? String(failure.response?.data?.detail ?? '') : ''
+          showError(detail)
+        })
     } else if (error) {
-      const key = `github.error.${error}`
-      const known = t(key)
-      setBanner({
-        kind: 'error',
-        text: t('settings.githubConnectFailed', { reason: known === key ? error.replace(/_/g, ' ') : known }),
-      })
+      showError(error)
     }
-    if (connected || error) {
+    if (pending || error) {
       setSearchParams((params) => {
-        params.delete('github')
+        params.delete('github_pending')
         params.delete('github_error')
         return params
       }, { replace: true })
@@ -94,7 +193,15 @@ function GithubConnectionCard() {
   }, [])
 
   const connectMutation = useMutation({
-    mutationFn: getGithubAuthorizeUrl,
+    mutationFn: () => {
+      const nonce = newNonce()
+      try {
+        sessionStorage.setItem(GITHUB_NONCE_KEY, nonce)
+      } catch {
+        // Without storage the connection cannot be finished; the server will say so.
+      }
+      return getGithubAuthorizeUrl(nonce)
+    },
     onSuccess: ({ authorize_url }) => {
       // Full browser navigation, not apiClient — GitHub's consent page can't be fetched via XHR.
       window.location.href = authorize_url
@@ -109,12 +216,12 @@ function GithubConnectionCard() {
   return (
     <Card title={t('github.title')} icon="github">
       {banner && (
-        <p role={banner.kind === 'error' ? 'alert' : 'status'} className={`mb-3 text-sm ${banner.kind === 'success' ? 'text-success' : 'text-danger'}`}>
+        <p role={banner.kind === 'error' ? 'alert' : 'status'} className={`mb-4 ${banner.kind === 'success' ? notice.success : notice.error}`}>
           {banner.text}
         </p>
       )}
       {connectMutation.isError && (
-        <p role="alert" className="mb-3 text-sm text-danger">
+        <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
           {t('settings.connectFailed')}
         </p>
       )}
@@ -122,7 +229,7 @@ function GithubConnectionCard() {
       {connectionQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
 
       {connectionQuery.data && !connectionQuery.data.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg-muted">{t('settings.githubHelp')}</p>
           <button type="button" onClick={() => connectMutation.mutate()} disabled={connectMutation.isPending} className={primaryButton}>
             {t('settings.githubConnect')}
@@ -131,9 +238,9 @@ function GithubConnectionCard() {
       )}
 
       {connectionQuery.data?.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg">
-            {t('settings.connectedAs')} <span className="font-medium">{connectionQuery.data.github_username}</span>
+            {t('settings.connectedAs')} <span className="font-semibold">{connectionQuery.data.github_username}</span>
           </p>
           <ConfirmButton
             onConfirm={() => disconnectMutation.mutate()}
@@ -176,7 +283,7 @@ function TelegramConnectionCard() {
   return (
     <Card title="Telegram" icon="send">
       {connectMutation.isError && (
-        <p role="alert" className="mb-3 text-sm text-danger">
+        <p role="alert" className="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
           {t('settings.connectFailed')}
         </p>
       )}
@@ -184,7 +291,7 @@ function TelegramConnectionCard() {
       {connectionQuery.isLoading && <p className="text-sm text-fg-muted">{t('common.loading')}</p>}
 
       {connectionQuery.data && !connectionQuery.data.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg-muted">{t('settings.telegramHelp')}</p>
           <button type="button" onClick={() => connectMutation.mutate()} disabled={connectMutation.isPending} className={primaryButton}>
             {t('settings.telegramConnect')}
@@ -193,10 +300,10 @@ function TelegramConnectionCard() {
       )}
 
       {connectionQuery.data?.connected && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-fg">
             {t('settings.connectedAs')}{' '}
-            <span className="font-medium">@{connectionQuery.data.telegram_username || t('settings.telegramUnknown')}</span>
+            <span className="font-semibold">@{connectionQuery.data.telegram_username || t('settings.telegramUnknown')}</span>
           </p>
           <ConfirmButton
             onConfirm={() => disconnectMutation.mutate()}

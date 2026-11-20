@@ -1,0 +1,28 @@
+const ru: Record<string, string> = {
+  'template.label': "Шаблон:",
+  'template.bug.name': "Сообщение об ошибке",
+  'template.feature.name': "Новая функция",
+  'template.task.name': "Задача",
+  'template.bug.body': "## Как воспроизвести\n1. \n2. \n\n## Ожидалось\n\n## Получилось\n\n## Где\nБраузер / устройство / версия:",
+  'template.feature.body': "## Проблема\nКому и зачем это нужно?\n\n## Предложение\n\n## Готово, когда\n- [ ] ",
+  'template.task.body': "## Что сделать\n\n## Готово, когда\n- [ ] ",
+  'shell.search': 'Поиск',
+  'shell.searchHint': 'Поиск, Ctrl K',
+  'shell.account': 'Меню аккаунта, {name}',
+  'shell.projectSections': 'Разделы проекта',
+  'shell.workspaceMenu': 'Рабочее пространство: {name}',
+  'shell.workspaces': 'Ваши рабочие пространства',
+  'shell.manageMembers': 'Управление участниками',
+  'shell.open': 'Открыть',
+  'shell.live': 'Обновляется вживую',
+  'shell.appearance': 'Оформление',
+  'newIssue.title': 'Новая задача',
+  'newIssue.startsAt': 'Начальная станция',
+  'newIssue.created': 'Задача #{number} создана',
+  'newIssue.project': 'Проект',
+  'newIssue.noProjects': 'Задачи принадлежат проектам. Сначала создайте проект, затем добавляйте задачи.',
+  'newIssue.createProject': 'Создать проект',
+  'newIssue.descriptionHint': 'Необязательно. Что нужно сделать и как понять, что готово.',
+}
+
+export default ru

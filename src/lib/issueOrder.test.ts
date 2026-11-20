@@ -8,6 +8,7 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
   return {
     id,
     project: 1,
+    number: id + 100,
     title: `Issue ${id}`,
     description: '',
     type: 'task',
@@ -21,6 +22,9 @@ function issue(id: number, overrides: Partial<Issue>): Issue {
     due_date: null,
     github_number: null,
     github_url: '',
+    estimate: null,
+    checklist: null,
+    completed_at: null,
     created_at: '2026-09-01T10:00:00Z',
     updated_at: '2026-09-01T10:00:00Z',
     ...overrides,
