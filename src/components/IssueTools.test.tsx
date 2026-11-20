@@ -39,6 +39,8 @@ beforeEach(() => {
 
 describe('ShareIssueButtons', () => {
   it('creates a link for the chosen period, copies it and can revoke it', async () => {
+    // Fixed here, not taken from a local .env (CI has none).
+    vi.stubEnv('VITE_API_BASE_URL', 'https://api.example.test/api/v1')
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
     const link = { id: 3, token: 'tok', expires_at: '2026-11-25T10:00:00Z', revoked: false, live: true, created_by: user, created_at: '' }
@@ -51,10 +53,26 @@ describe('ShareIssueButtons', () => {
     await userEvent.click(within(dialog).getByRole('button', { name: '30 days' }))
     await userEvent.click(within(dialog).getByRole('button', { name: 'Create and copy link' }))
     expect(api.createShareLink).toHaveBeenCalledWith(5, 30)
-    // Through the API's preview page, so chat apps can show the issue (VITE_API_BASE_URL from .env).
-    await waitFor(() => expect(writeText).toHaveBeenCalledWith('http://localhost:8000/s/tok?lang=en'))
+    // Through the API's preview page, so chat apps can show the issue.
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('https://api.example.test/s/tok?lang=en'))
     await userEvent.click(await within(dialog).findByRole('button', { name: 'Revoke' }))
     expect(api.revokeShareLink.mock.calls[0][0]).toBe(3)
+    vi.unstubAllEnvs()
+  })
+
+  it('links the page itself when no API address is configured', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', '')
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    const link = { id: 4, token: 'tok2', expires_at: '2026-11-25T10:00:00Z', revoked: false, live: true, created_by: user, created_at: '' }
+    api.listShareLinks.mockResolvedValue([])
+    api.createShareLink.mockResolvedValue(link)
+    renderWithProviders(<ShareIssueButtons issueId={5} canShare />, { lang: 'en' })
+    await userEvent.click(screen.getByRole('button', { name: 'Share' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Share a read-only link' })
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Create and copy link' }))
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(`${window.location.origin}/share/tok2`))
+    vi.unstubAllEnvs()
   })
 
   it('offers only printing to people who may not share', () => {

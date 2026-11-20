@@ -9,6 +9,9 @@ Stack: React 19, React Router 7, TanStack Query 5, Tailwind CSS 4 (design tokens
 
 ## Setup
 
+New here? The [quick start](https://github.com/game227/devtrack-backend/blob/security-hardening/QUICKSTART.md) in the backend repository sets up the database, the API and this app together.
+
+
 ```bash
 npm install
 cp .env.example .env   # adjust VITE_API_BASE_URL if the backend runs elsewhere
